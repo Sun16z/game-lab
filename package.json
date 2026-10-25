@@ -7,10 +7,11 @@
     "dev": "pnpm build:game && pnpm --filter @game-lab/portal dev",
     "dev:game": "pnpm --filter @game-lab/perfect-stack dev",
     "dev:monster": "pnpm --filter @game-lab/monster-math dev",
-    "build:game": "pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && pnpm --filter @game-lab/monster-math build && node scripts/copy-game.mjs",
+    "build:game": "pnpm audio:check && pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && pnpm --filter @game-lab/monster-math build && node scripts/copy-game.mjs",
     "build": "pnpm build:game && pnpm --filter @game-lab/portal build",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test"
+    "test": "pnpm -r --if-present test",
+    "audio:check": "node scripts/check-audio.mjs"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

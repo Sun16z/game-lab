@@ -2,12 +2,15 @@ import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
 import { standaloneAdapter } from "@game-lab/platform-adapters";
-import { getStreakPraise } from "@game-lab/locale-voice";
+import { getStreakPraise, getStreakPraiseCue } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
+import { mountAudioControls } from "@game-lab/game-audio/ui";
+import { createMonsterAudio } from "./audio";
 import { chooseLanguage, translations, type Language } from "./i18n";
 import { answerQuestion, createQuestionStream, initialBattleState, ROUND_SECONDS, type BattleState, type Question } from "./rules";
 import { loadReview, saveReview } from "./review";
 import "./style.css";
+import "@game-lab/game-audio/style.css";
 
 const VERSION = "0.1.0";
 const EVENT_KEY = "game-lab:session-events";
@@ -79,8 +82,8 @@ class MonsterMathGame {
   private animationFrame = 0;
   private answerLocked = false;
   private retryIndex = 0;
-  private soundEnabled = false;
-  private audioContext: AudioContext | null = null;
+  private readonly audio = createMonsterAudio(safeStorage());
+  private audioControls?: ReturnType<typeof mountAudioControls>;
   private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   private readonly incomingChallenge = (() => {
     const value = new URLSearchParams(location.search).get("challenge");
@@ -96,10 +99,7 @@ class MonsterMathGame {
       try { safeStorage()?.setItem("game-lab:language", this.language); } catch { /* Optional preference. */ }
       this.applyLanguage();
     });
-    element("sound-button").addEventListener("click", () => {
-      this.soundEnabled = !this.soundEnabled;
-      this.applyLanguage();
-    });
+    this.audioControls = mountAudioControls(element<HTMLButtonElement>("sound-button"), this.audio, this.language);
     element("start-button").addEventListener("click", () => this.start());
     element("retry-button").addEventListener("click", () => this.retry());
     element("pause-button").addEventListener("click", () => this.pause());
@@ -145,6 +145,9 @@ class MonsterMathGame {
 
   private start(): void {
     if (this.run.state !== "READY") return;
+    this.audio.unlock();
+    this.audio.resume();
+    this.audio.music("main");
     this.battle = initialBattleState();
     this.reviewKeys = new Set(loadReview(safeStorage()));
     this.nextQuestion = createQuestionStream(this.run.seed, [...this.reviewKeys]);
@@ -196,6 +199,7 @@ class MonsterMathGame {
     if (!this.reducedMotion) monster.classList.add(correct ? result.bossDefeated || !beforeBoss ? "defeated" : "hit" : "wrong");
     const praise = correct && this.battle.combo > 0 && this.battle.combo % 3 === 0
       ? getStreakPraise(this.language, this.battle.combo, this.voiceLocaleTag) : "";
+    if (praise) void this.audio.say(getStreakPraiseCue(this.battle.combo), this.voiceLocaleTag);
     const feedback = !correct ? t.wrong(question.answer)
       : result.bossDefeated ? `${t.bossDown} +${result.points}`
         : result.bossAppeared ? `${t.bossIncoming} +${result.points}`
@@ -217,6 +221,7 @@ class MonsterMathGame {
 
   private pause(): void {
     if (this.run.state !== "PLAYING") return;
+    this.audio.pause();
     this.remainingMs = Math.max(0, this.deadline - performance.now());
     cancelAnimationFrame(this.animationFrame);
     this.run = transitionRun(this.run, "PAUSED", new Date().toISOString());
@@ -227,6 +232,7 @@ class MonsterMathGame {
 
   private resume(): void {
     if (this.run.state !== "PAUSED") return;
+    this.audio.resume();
     this.run = transitionRun(this.run, "PLAYING", new Date().toISOString());
     this.deadline = performance.now() + this.remainingMs;
     standaloneAdapter.gameplayStart();
@@ -237,6 +243,8 @@ class MonsterMathGame {
 
   private finish(): void {
     if (this.run.state !== "PLAYING") return;
+    this.audio.pause();
+    this.audio.play("victory");
     cancelAnimationFrame(this.animationFrame);
     this.remainingMs = 0;
     this.run = transitionRun(this.run, "RESULT", new Date().toISOString());
@@ -315,8 +323,7 @@ class MonsterMathGame {
     element("score-label").textContent = t.score;
     element("best-label").textContent = t.best;
     element("combo-label").textContent = t.combo;
-    element("sound-button").textContent = this.soundEnabled ? t.soundOn : t.soundOff;
-    element("sound-button").setAttribute("aria-pressed", String(this.soundEnabled));
+    this.audioControls?.updateLanguage(this.language);
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").textContent = t.readyTitle;
     element("ready-description").textContent = t.readyDescription;
@@ -346,23 +353,7 @@ class MonsterMathGame {
   }
 
   private playTone(correct: boolean, boss: boolean, combo: number): void {
-    if (!this.soundEnabled) return;
-    try {
-      this.audioContext ??= new AudioContext();
-      const notes = correct ? boss ? [0, 5] : [0, 3] : [-5];
-      for (let index = 0; index < notes.length; index++) {
-        const start = this.audioContext.currentTime + index * 0.06;
-        const oscillator = this.audioContext.createOscillator();
-        const gain = this.audioContext.createGain();
-        oscillator.type = correct ? "sine" : "triangle";
-        oscillator.frequency.value = 440 * Math.pow(2, (notes[index] + Math.min(combo, 8)) / 12);
-        gain.gain.setValueAtTime(0.045, start);
-        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.13);
-        oscillator.connect(gain).connect(this.audioContext.destination);
-        oscillator.start(start);
-        oscillator.stop(start + 0.13);
-      }
-    } catch { /* Audio is optional. */ }
+    this.audio.play(correct ? boss ? "boss" : "correct" : "wrong", Math.min(combo, 8));
   }
 
   private resultLink(): string {

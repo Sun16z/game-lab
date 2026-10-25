@@ -12,7 +12,8 @@ function filesIn(directory) {
   });
 }
 const files = filesIn(dist).filter((path) => !path.endsWith("/sw.js"));
-const urls = ["./", ...files.map((path) => `./${relative(dist, path).replaceAll("\\", "/")}`)];
+// Audio enters the runtime cache after first playback, keeping install light.
+const urls = ["./", ...files.map((path) => `./${relative(dist, path).replaceAll("\\", "/")}`).filter((url) => !url.startsWith("./audio/"))];
 const hash = createHash("sha256");
 for (const file of files) hash.update(readFileSync(file));
 const cacheName = `${game}-${hash.digest("hex").slice(0, 12)}`;
@@ -28,7 +29,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   if (!event.request.url.startsWith(self.registration.scope)) return;
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-    if (response.ok) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(event.request, copy)); }
+    if (response.status === 200) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(event.request, copy)); }
     return response;
   })));
 });

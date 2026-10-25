@@ -25,3 +25,21 @@ export function createLocalScoreStorage(storage: Pick<Storage, "getItem" | "setI
     }
   };
 }
+
+export interface PreferenceStorage {
+  get(key: string): string | null;
+  set(key: string, value: string): boolean;
+}
+
+export function createLocalPreferenceStorage(storage: Pick<Storage, "getItem" | "setItem"> | undefined): PreferenceStorage {
+  return {
+    get(key) {
+      try { return storage?.getItem(`game-lab:preference:${key}`) ?? null; }
+      catch { return null; }
+    },
+    set(key, value) {
+      try { storage?.setItem(`game-lab:preference:${key}`, value); return Boolean(storage); }
+      catch { return false; }
+    }
+  };
+}

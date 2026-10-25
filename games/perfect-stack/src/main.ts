@@ -3,14 +3,17 @@ import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
 import { standaloneAdapter } from "@game-lab/platform-adapters";
-import { getStreakPraise } from "@game-lab/locale-voice";
+import { getStreakPraise, getStreakPraiseCue } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
+import { mountAudioControls } from "@game-lab/game-audio/ui";
+import { createStackAudio } from "./audio";
 import { chooseLanguage, translations, type Language } from "./i18n";
 import { shareTranslations } from "./share-i18n";
 import { progressCopy } from "./progress-i18n";
 import { advanceProgress, isThemeUnlocked, loadProgress, saveProgress, themeThresholds, type Achievement, type Theme } from "./progress";
 import { INITIAL_WIDTH, movingX, placeBlock, sceneryForLayer, speedForLayer, type Block } from "./rules";
 import "./style.css";
+import "@game-lab/game-audio/style.css";
 
 const WIDTH = 480;
 const HEIGHT = 720;
@@ -111,8 +114,8 @@ class StackScene extends Phaser.Scene {
   private retryIndex = 0;
   private language: Language = chooseLanguage(new URLSearchParams(location.search).get("lang") ?? savedLanguage() ?? navigator.language);
   private voiceLocaleTag = new URLSearchParams(location.search).get("lang") ?? navigator.language;
-  private soundEnabled = false;
-  private audioContext: AudioContext | null = null;
+  private readonly audio = createStackAudio(safeStorage());
+  private audioControls?: ReturnType<typeof mountAudioControls>;
   private toastTimer: number | undefined;
   private failedX: number | null = null;
   private lastResultWasBest = false;
@@ -154,10 +157,7 @@ class StackScene extends Phaser.Scene {
     element("copy-link-button").addEventListener("click", () => void this.copyResultLink());
     element("pause-button").addEventListener("click", () => this.pause());
     element("resume-button").addEventListener("click", () => this.resume());
-    element("sound-button").addEventListener("click", () => {
-      this.soundEnabled = !this.soundEnabled;
-      this.applyLanguage();
-    });
+    this.audioControls = mountAudioControls(element<HTMLButtonElement>("sound-button"), this.audio, this.language);
     this.input.on("pointerdown", () => { if (this.run.state === "PLAYING") this.drop(); });
     window.addEventListener("keydown", (event) => {
       if (event.code !== "Space" || event.repeat) return;
@@ -216,6 +216,9 @@ class StackScene extends Phaser.Scene {
 
   private startRun(): void {
     if (this.run.state !== "READY") return;
+    this.audio.unlock();
+    this.audio.resume();
+    this.audio.music("main");
     this.resetTower();
     this.run = transitionRun(this.run, "PLAYING", new Date().toISOString());
     this.activeStartedAt = performance.now();
@@ -280,6 +283,7 @@ class StackScene extends Phaser.Scene {
     if (justBeatRecord) this.recordCelebrated = true;
     const streakMilestone = outcome.perfect && outcome.combo % 3 === 0;
     const praise = streakMilestone ? getStreakPraise(this.language, outcome.combo, this.voiceLocaleTag) : "";
+    if (praise) void this.audio.say(getStreakPraiseCue(outcome.combo), this.voiceLocaleTag);
     const feedback = streakMilestone
       ? `${praise}\n${outcome.bullseye ? `${t.bullseye} ` : ""}+${outcome.points}${outcome.repairedPx > 0 ? ` · ${t.repair} +${outcome.repairedPx}px` : ""}`
       : outcome.bullseye ? `${t.bullseye} +${outcome.points}`
@@ -293,6 +297,8 @@ class StackScene extends Phaser.Scene {
 
   private finish(reason: string): void {
     if (this.run.state !== "PLAYING") return;
+    this.audio.pause();
+    this.audio.play("finish");
     this.run = transitionRun(this.run, "RESULT", new Date().toISOString());
     standaloneAdapter.gameplayStop();
     this.lastResultBestBefore = this.bestLayers;
@@ -387,6 +393,7 @@ class StackScene extends Phaser.Scene {
 
   private pause(): void {
     if (this.run.state !== "PLAYING") return;
+    this.audio.pause();
     this.activeElapsed = (performance.now() - this.activeStartedAt) / 1000;
     this.run = transitionRun(this.run, "PAUSED", new Date().toISOString());
     standaloneAdapter.gameplayStop();
@@ -398,6 +405,7 @@ class StackScene extends Phaser.Scene {
 
   private resume(): void {
     if (this.run.state !== "PAUSED") return;
+    this.audio.resume();
     this.run = transitionRun(this.run, "PLAYING", new Date().toISOString());
     this.activeStartedAt = performance.now() - this.activeElapsed * 1000;
     standaloneAdapter.gameplayStart();
@@ -488,8 +496,7 @@ class StackScene extends Phaser.Scene {
     element("layers-label").textContent = t.layers;
     element("score-label").textContent = t.score;
     element("best-label").textContent = t.best;
-    element("sound-button").textContent = this.soundEnabled ? t.soundOn : t.soundOff;
-    element("sound-button").setAttribute("aria-pressed", String(this.soundEnabled));
+    this.audioControls?.updateLanguage(this.language);
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").innerHTML = t.readyTitle;
     element("ready-description").textContent = t.readyDescription;
@@ -521,25 +528,8 @@ class StackScene extends Phaser.Scene {
   }
 
   private playPlacementMelody(perfect: boolean, bullseye: boolean, layers: number): void {
-    if (!this.soundEnabled) return;
-    try {
-      this.audioContext ??= new AudioContext();
-      const scale = [0, 2, 4, 7, 9];
-      const notes = bullseye ? 3 : perfect ? 2 : 1;
-      for (let index = 0; index < notes; index++) {
-        const start = this.audioContext.currentTime + index * 0.055;
-        const semitone = scale[(layers + index) % scale.length] + (bullseye ? 12 : 0);
-        const oscillator = this.audioContext.createOscillator();
-        const volume = this.audioContext.createGain();
-        oscillator.type = "sine";
-        oscillator.frequency.value = 330 * Math.pow(2, semitone / 12);
-        volume.gain.setValueAtTime(0.055, start);
-        volume.gain.exponentialRampToValueAtTime(0.001, start + 0.11);
-        oscillator.connect(volume).connect(this.audioContext.destination);
-        oscillator.start(start);
-        oscillator.stop(start + 0.11);
-      }
-    } catch { /* Sound is optional. */ }
+    const scale = [0, 2, 4, 7, 9];
+    this.audio.play(bullseye ? "bullseye" : perfect ? "perfect" : "drop", scale[layers % scale.length]);
   }
 
   private draw(): void {

@@ -41,3 +41,15 @@ export const praisePhrases = {
     "कमाल कर दिया!"
   ]
 } as const;
+export const approvedPraiseAudio = {
+  "zh-Hant": {},
+  "zh-TW": {},
+  "en": {},
+  "es": {},
+  "pt-BR": {},
+  "fr": {},
+  "ar": {},
+  "sw": {},
+  "id": {},
+  "hi": {}
+} as const;

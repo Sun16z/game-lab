@@ -1,0 +1,25 @@
+{
+  "name": "@game-lab/game-audio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@game-lab/game-storage": "workspace:*",
+    "howler": "2.2.4",
+    "zzfx": "1.4.0"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.12"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./ui": "./src/ui.ts",
+    "./style.css": "./src/style.css"
+  }
+}

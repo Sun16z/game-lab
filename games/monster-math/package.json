@@ -15,7 +15,10 @@
     "@game-lab/game-analytics": "workspace:*",
     "@game-lab/locale-voice": "workspace:*",
     "@game-lab/game-share": "workspace:*",
-    "@game-lab/platform-adapters": "workspace:*"
+    "@game-lab/platform-adapters": "workspace:*",
+    "@game-lab/game-audio": "workspace:*"
   },
-  "devDependencies": { "vite": "^7.1.0" }
+  "devDependencies": {
+    "vite": "^7.1.0"
+  }
 }
