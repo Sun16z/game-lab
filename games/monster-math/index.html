@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#201938" />
+    <meta name="description" content="90秒乘法挑戰：答題打怪、連擊擊敗Boss。免費遊玩九九乘法怪獸塔。" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>九九乘法怪獸塔｜Game Lab</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">✦</span><span>GAME LAB <b id="brand-title">/ 九九乘法怪獸塔</b></span></div>
+        <div class="top-actions"><label class="visually-hidden" for="language-select">Language</label><select id="language-select" aria-label="Language"><option value="zh-Hant">繁體中文</option><option value="en">English</option><option value="es">Español</option><option value="pt-BR">Português (BR)</option><option value="fr">Français</option><option value="ar">العربية</option><option value="sw">Kiswahili</option><option value="id">Bahasa Indonesia</option><option value="hi">हिन्दी</option></select><button id="sound-button" class="small-button" type="button" aria-pressed="false">音效：關</button></div>
+      </header>
+      <main class="game-shell">
+        <div class="hud"><div><small id="time-label">剩餘</small><strong id="time-value">90</strong></div><div><small id="score-label">分數</small><strong id="score-value">0</strong></div><div><small id="combo-label">連擊</small><strong id="combo-value">0</strong></div><div><small id="best-label">最佳</small><strong id="best-value">0</strong></div></div>
+        <section class="stage" aria-label="九九乘法怪獸塔遊戲">
+          <div class="arena"><div id="defeated-chip" class="defeated-chip">擊敗0</div><div class="arena-spark spark-a"></div><div class="arena-spark spark-b"></div><div id="monster" class="monster" role="img" aria-label="怪獸"><div class="horn horn-left"></div><div class="horn horn-right"></div><div class="monster-body"><div class="eyes"><span></span><span></span></div><div class="mouth"></div></div></div><div id="health" class="health" aria-label="怪獸生命值"></div><div id="wave" class="wave" aria-hidden="true"></div></div>
+          <div class="question-area"><div id="enemy-label" class="enemy-label">怪獸</div><div id="question" class="question" aria-live="polite">? × ? = ?</div></div>
+          <div id="answers" class="answers"><button type="button" data-answer="0"><kbd>1</kbd><span>?</span></button><button type="button" data-answer="1"><kbd>2</kbd><span>?</span></button><button type="button" data-answer="2"><kbd>3</kbd><span>?</span></button><button type="button" data-answer="3"><kbd>4</kbd><span>?</span></button></div>
+          <div id="feedback" class="feedback" role="status" aria-live="polite"></div>
+          <div id="ready-panel" class="overlay"><div class="overlay-card"><span id="ready-pill" class="pill">90秒快問快答</span><div class="ready-art" aria-hidden="true">×</div><h1 id="ready-title">答對乘法，打倒怪獸！</h1><p id="incoming-challenge" class="incoming-challenge hidden"></p><p id="ready-description">點答案或按1～4。每打倒5隻怪獸，就會遇到需要答對3題的Boss。答錯會中斷連擊。</p><button id="start-button" class="primary-button" type="button">開始挑戰 →</button></div></div>
+          <div id="pause-panel" class="overlay hidden"><div class="overlay-card"><span class="pill" id="pause-pill">暫停</span><h2 id="pause-title">先喘口氣</h2><button id="resume-button" class="primary-button" type="button">繼續</button></div></div>
+          <div id="result-panel" class="overlay hidden"><div class="overlay-card result-card"><span class="pill" id="result-pill">時間到</span><h2 id="result-title">打得漂亮！</h2><div class="result-number"><strong id="result-defeated">0</strong><span id="result-unit">隻怪獸</span></div><p id="result-summary"></p><div class="share-preview" aria-hidden="true"><span>GAME LAB</span><strong id="share-preview-number">0</strong><span id="share-preview-challenge">我90秒打倒0隻怪獸，你能超過嗎？</span></div><button id="share-button" class="primary-button share-button" type="button">分享戰績，挑戰朋友</button><div class="share-actions"><button id="download-button" type="button">下載圖卡</button><button id="copy-button" type="button">複製遊戲連結</button></div><p id="share-status" class="share-status" role="status" aria-live="polite"></p><button id="retry-button" class="retry-button" type="button">再挑戰一次 ↻</button></div></div>
+        </section>
+        <div class="below"><span id="hint">點選答案，或按鍵盤1～4</span><button id="pause-button" class="text-button hidden" type="button">暫停</button></div>
+      </main>
+      <footer id="footer">成績只存在這台裝置 · 首次載入後可離線遊玩</footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

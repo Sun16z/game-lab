@@ -6,7 +6,8 @@
     "voice:generate": "node scripts/generate-voice.mjs",
     "dev": "pnpm build:game && pnpm --filter @game-lab/portal dev",
     "dev:game": "pnpm --filter @game-lab/perfect-stack dev",
-    "build:game": "pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && node scripts/copy-game.mjs",
+    "dev:monster": "pnpm --filter @game-lab/monster-math dev",
+    "build:game": "pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && pnpm --filter @game-lab/monster-math build && node scripts/copy-game.mjs",
     "build": "pnpm build:game && pnpm --filter @game-lab/portal build",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test"

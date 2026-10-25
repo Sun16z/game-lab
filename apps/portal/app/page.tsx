@@ -7,7 +7,7 @@ export default function Home() {
       <header className="hero">
         <div className="eyebrow">GAME LAB / PLAYFUL EXPERIMENTS</div>
         <h1>每一局，都想再試一次。</h1>
-        <p>五款HTML5遊戲正在準備中。第一站是《完美疊塔》：抓準時機、疊得更高，挑戰自己的紀錄。</p>
+        <p>《完美疊塔》和《九九乘法怪獸塔》已開放遊玩。抓準時機疊高塔，或在90秒內打倒更多怪獸，挑戰自己的紀錄。</p>
         <div className="heroMeta"><span>5款企劃</span><span>手機觸控優先</span><span>免費遊玩</span></div>
       </header>
       <section aria-labelledby="games-heading" className="catalog">
@@ -26,7 +26,7 @@ export default function Home() {
           ))}
         </div>
       </section>
-      <footer>Game Lab · 第一款《完美疊塔》已開放試玩，其餘作品持續開發中。</footer>
+      <footer>Game Lab · 兩款遊戲已開放試玩，更多作品持續開發中。</footer>
     </main>
   );
 }
