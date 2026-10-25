@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
-import { standaloneAdapter } from "@game-lab/platform-adapters";
+import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
 import { getStreakPraise, getStreakPraiseCue } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
@@ -128,11 +128,13 @@ class StackScene extends Phaser.Scene {
   private lastGained: Achievement[] = [];
   private lastUnlocked: Theme[] = [];
   private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  private readonly touchPointer = touchPointerQuery();
 
   constructor() { super("perfect-stack"); }
 
   create(): void {
     this.graphics = this.add.graphics();
+    this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const select = element<HTMLSelectElement>("language-select");
     select.value = this.language;
     select.addEventListener("change", () => {
@@ -499,7 +501,7 @@ class StackScene extends Phaser.Scene {
     this.audioControls?.updateLanguage(this.language);
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").innerHTML = t.readyTitle;
-    element("ready-description").textContent = t.readyDescription;
+    element("ready-description").textContent = inputInstruction(t.readyDescription, t.readyDescriptionTouch, this.touchPointer.matches);
     element("start-label").textContent = t.start;
     element("pause-pill").textContent = t.pausePill;
     element("pause-title").textContent = t.pauseTitle;
@@ -511,7 +513,7 @@ class StackScene extends Phaser.Scene {
     element("download-card-button").textContent = s.downloadCard;
     element("copy-link-button").textContent = s.copyLink;
     element("pause-button").textContent = t.pause;
-    element("hint").textContent = t.hint;
+    element("hint").textContent = inputInstruction(t.hint, t.hintTouch, this.touchPointer.matches);
     element("footer-text").textContent = t.footer;
     this.refreshThemeSelectors();
     this.updateHud();

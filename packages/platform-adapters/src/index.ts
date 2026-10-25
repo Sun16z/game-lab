@@ -11,3 +11,13 @@ export const standaloneAdapter: PlatformAdapter = {
   gameplayStop: () => undefined,
   requestInterstitial: async () => "unavailable"
 };
+
+/** Pick the instruction that matches the primary input device. */
+export function inputInstruction(keyboard: string, touch: string, coarsePointer: boolean): string {
+  return coarsePointer ? touch : keyboard;
+}
+
+/** A shared query so every standalone game treats touch input the same way. */
+export function touchPointerQuery(): MediaQueryList {
+  return window.matchMedia("(pointer: coarse)");
+}
