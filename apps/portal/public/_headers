@@ -5,6 +5,10 @@
 
 /
   Cache-Control: no-cache
+/games/:slug/
+  Cache-Control: no-cache
+/play/:game/
+  Cache-Control: no-cache
 /*.html
   Cache-Control: no-cache
 /play/:game/sw.js
