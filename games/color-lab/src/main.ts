@@ -1,6 +1,6 @@
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
-import { standaloneAdapter } from "@game-lab/platform-adapters";
+import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
 import { createColorAudio } from "./audio";
@@ -84,8 +84,10 @@ class ColorLabGame {
   private readonly audio = createColorAudio(safeStorage());
   private audioControls?: ReturnType<typeof mountAudioControls>;
   private levelWasPlaying = false;
+  private readonly touchPointer = touchPointerQuery();
 
   init(): void {
+    this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const languageSelect = element<HTMLSelectElement>("language-select");
     languageSelect.value = this.language;
     languageSelect.addEventListener("change", () => {
@@ -146,6 +148,7 @@ class ColorLabGame {
     this.text("result-title", t.solved); this.text("next-button", `${t.next} →`); this.text("replay-button", t.replay);
     this.text("share-button", t.share); this.text("download-button", t.download); this.text("copy-button", t.copy);
     this.text("footer", t.footer);
+    document.querySelector<HTMLElement>(".keyboard-hint")!.textContent = inputInstruction("1–5 · U · H · Esc", t.touchHint, this.touchPointer.matches);
     this.audioControls?.updateLanguage(this.language);
     if (this.run.state === "READY" || this.run.state === "PLAYING") this.feedback(this.selected === null ? t.selectSource : t.selectTarget);
     if (this.run.state === "RESULT") this.renderResult();

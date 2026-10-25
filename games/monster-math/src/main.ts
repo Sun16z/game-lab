@@ -1,7 +1,7 @@
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
-import { standaloneAdapter } from "@game-lab/platform-adapters";
+import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
 import { getStreakPraise, getStreakPraiseCue } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
@@ -85,12 +85,14 @@ class MonsterMathGame {
   private readonly audio = createMonsterAudio(safeStorage());
   private audioControls?: ReturnType<typeof mountAudioControls>;
   private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  private readonly touchPointer = touchPointerQuery();
   private readonly incomingChallenge = (() => {
     const value = new URLSearchParams(location.search).get("challenge");
     return value && /^(0|[1-9]\d{0,3})$/.test(value) ? Number(value) : null;
   })();
 
   init(): void {
+    this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const languageSelect = element<HTMLSelectElement>("language-select");
     languageSelect.value = this.language;
     languageSelect.addEventListener("change", () => {
@@ -326,7 +328,7 @@ class MonsterMathGame {
     this.audioControls?.updateLanguage(this.language);
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").textContent = t.readyTitle;
-    element("ready-description").textContent = t.readyDescription;
+    element("ready-description").textContent = inputInstruction(t.readyDescription, t.readyDescriptionTouch, this.touchPointer.matches);
     element("incoming-challenge").classList.toggle("hidden", this.incomingChallenge === null);
     if (this.incomingChallenge !== null) element("incoming-challenge").textContent = `“${t.challenge(this.incomingChallenge)}”`;
     element("start-button").textContent = t.start;
@@ -334,7 +336,7 @@ class MonsterMathGame {
     element("pause-title").textContent = t.pauseTitle;
     element("resume-button").textContent = t.resume;
     element("pause-button").textContent = t.pause;
-    element("hint").textContent = t.hint;
+    element("hint").textContent = inputInstruction(t.hint, t.hintTouch, this.touchPointer.matches);
     element("result-pill").textContent = t.resultPill;
     element("retry-button").textContent = t.retry;
     element("share-button").textContent = t.shareCard;
