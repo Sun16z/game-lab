@@ -2,6 +2,7 @@ import { games } from "@game-lab/game-core";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { siteUrl } from "../../../lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -12,7 +13,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const game = games.find((item) => item.slug === slug);
-  return { title: game ? `${game.title}｜Game Lab` : "遊戲不存在｜Game Lab", description: game?.summary };
+  return {
+    title: game ? `${game.title}｜Game Lab` : "遊戲不存在｜Game Lab",
+    description: game?.summary,
+    alternates: { canonical: `${siteUrl}/games/${slug}/` },
+    openGraph: { url: `${siteUrl}/games/${slug}/`, title: game?.title, description: game?.summary }
+  };
 }
 
 export default async function GamePage({ params }: Props) {

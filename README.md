@@ -11,6 +11,6 @@ pnpm dev
 
 `pnpm build`先產生兩款獨立遊戲包，再匯出靜態網站到`apps/portal/out/`。遊戲載入後以Service Worker預先快取發行檔案。檢查指令：`pnpm typecheck`、`pnpm test`、`pnpm build`。
 
-推送到`main`後，GitHub Actions會以`NEXT_PUBLIC_BASE_PATH=/game-lab`建置並部署GitHub Pages。正式遊戲頁位於`https://sun16z.github.io/game-lab/play/perfect-stack/index.html`與`https://sun16z.github.io/game-lab/play/monster-math/index.html`。本機建置未設定此前綴，仍可在網站根路徑預覽。
+正式網址：`https://games.somewhen.life/`。PR由GitHub Actions部署Cloudflare預覽版本，合併到`main`後部署正式站；部署步驟見[`docs/DEPLOY.md`](docs/DEPLOY.md)。本機建置未設定路徑前綴，可在網站根路徑預覽。
 
 規格見 [docs/PRD.md](docs/PRD.md)，順序與完成條件見 [docs/ROADMAP.md](docs/ROADMAP.md)，20款玩法及兒童遊玩原則見 [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md)，多語與流量架構見 [docs/GLOBAL.md](docs/GLOBAL.md)。

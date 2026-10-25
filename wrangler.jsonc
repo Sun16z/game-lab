@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "game-lab",
+  "compatibility_date": "2026-10-25",
+  "assets": {
+    "directory": "./apps/portal/out",
+    "not_found_handling": "404-page"
+  },
+  "routes": [{ "pattern": "games.somewhen.life", "custom_domain": true }],
+  "workers_dev": true,
+  "preview_urls": true
+}

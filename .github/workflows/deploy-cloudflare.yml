@@ -1,0 +1,62 @@
+name: Deploy Cloudflare Workers
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'production' }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.2.2
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audio:check
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://games.somewhen.life
+      - name: Upload PR preview
+        if: github.event_name == 'pull_request'
+        id: preview
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload --preview-alias pr-${{ github.event.number }}
+      - name: Show preview URL
+        if: github.event_name == 'pull_request'
+        env:
+          PREVIEW_URL: ${{ steps.preview.outputs.deployment-url }}
+          COMMAND_OUTPUT: ${{ steps.preview.outputs.command-output }}
+        run: |
+          echo "## Cloudflare preview" >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "$PREVIEW_URL" ]; then
+            echo "[$PREVIEW_URL]($PREVIEW_URL)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'See the Wrangler upload output for the preview URL.' >> "$GITHUB_STEP_SUMMARY"
+            echo "$COMMAND_OUTPUT" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Deploy production
+        if: github.event_name != 'pull_request'
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
