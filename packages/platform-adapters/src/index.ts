@@ -41,7 +41,7 @@ export function mountHomeExit(actions: HTMLElement, language: string): { updateL
   link.className = "home-exit";
   link.href = "/";
   link.target = "_top";
-  link.innerHTML = '<span aria-hidden="true">⌂</span><span class="home-exit-text"></span>';
+  link.innerHTML = '<span aria-hidden="true">🏠</span><span class="home-exit-text"></span>';
   actions.prepend(link);
   const updateLanguage = (nextLanguage: string): void => {
     const label = homeExitLabel(nextLanguage);
