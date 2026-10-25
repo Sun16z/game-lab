@@ -22,7 +22,7 @@ export default async function GamePage({ params }: Props) {
   return (
     <main className="shell detail">
       <Link href="/" className="back">← 返回遊戲目錄</Link>
-      <div className="eyebrow">{game.id} / {game.priority}</div>
+      <div className="eyebrow">{game.id} / {game.category}</div>
       <h1>{game.title}</h1>
       <p className="lead">{game.summary}</p>
       {game.status === "playable" ? (
@@ -33,7 +33,7 @@ export default async function GamePage({ params }: Props) {
       ) : (
         <div className="notice" role="status">
           <strong>開發規劃中</strong>
-          <p>這款遊戲還沒有可玩版本。完成操作、結算和快速重玩驗收後，這裡會提供試玩入口。</p>
+          <p>玩法方向：{game.summary}想再玩一次的理由：{game.replay}。完成操作、結算和快速重玩驗收後，這裡會提供試玩入口。</p>
         </div>
       )}
       <section className="detailInfo">

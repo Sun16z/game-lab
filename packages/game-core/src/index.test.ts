@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createRun, transitionRun } from "./index";
+import { createRun, games, transitionRun } from "./index";
 
 describe("run lifecycle", () => {
   it("records start and end once", () => {
@@ -9,5 +9,14 @@ describe("run lifecycle", () => {
     expect(result.startedAt).toBe("2026-10-25T00:00:00Z");
     expect(result.endedAt).toBe("2026-10-25T00:01:00Z");
     expect(() => transitionRun(result, "PLAYING", "2026-10-25T00:02:00Z")).toThrow();
+  });
+});
+
+describe("game catalog", () => {
+  it("lists 20 distinct concepts and marks only released games playable", () => {
+    expect(games).toHaveLength(20);
+    expect(new Set(games.map((game) => game.id)).size).toBe(20);
+    expect(new Set(games.map((game) => game.slug)).size).toBe(20);
+    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002"]);
   });
 });
