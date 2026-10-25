@@ -1,7 +1,7 @@
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
-import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
+import { inputInstruction, mountHomeExit, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
 import { getStreakPraise, getStreakPraiseCue } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
@@ -11,6 +11,7 @@ import { answerQuestion, createQuestionStream, initialBattleState, ROUND_SECONDS
 import { loadReview, saveReview } from "./review";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
+import "@game-lab/platform-adapters/home-exit.css";
 
 const VERSION = "0.1.0";
 const EVENT_KEY = "game-lab:session-events";
@@ -84,6 +85,7 @@ class MonsterMathGame {
   private retryIndex = 0;
   private readonly audio = createMonsterAudio(safeStorage());
   private audioControls?: ReturnType<typeof mountAudioControls>;
+  private homeExit?: ReturnType<typeof mountHomeExit>;
   private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   private readonly touchPointer = touchPointerQuery();
   private readonly incomingChallenge = (() => {
@@ -92,6 +94,7 @@ class MonsterMathGame {
   })();
 
   init(): void {
+    this.homeExit = mountHomeExit(document.querySelector<HTMLElement>(".top-actions")!, this.language);
     this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const languageSelect = element<HTMLSelectElement>("language-select");
     languageSelect.value = this.language;
@@ -326,6 +329,7 @@ class MonsterMathGame {
     element("best-label").textContent = t.best;
     element("combo-label").textContent = t.combo;
     this.audioControls?.updateLanguage(this.language);
+    this.homeExit?.updateLanguage(this.language);
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").textContent = t.readyTitle;
     element("ready-description").textContent = inputInstruction(t.readyDescription, t.readyDescriptionTouch, this.touchPointer.matches);

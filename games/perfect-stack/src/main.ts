@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
-import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
+import { inputInstruction, mountHomeExit, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
 import { getStreakPraise, getStreakPraiseCue } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
@@ -15,6 +15,7 @@ import { advanceProgress, bestKeyForMode, isThemeUnlocked, loadMode, loadProgres
 import { INITIAL_WIDTH, movingX, placeBlock, sceneryForLayer, speedForLayer, startPhaseForLayer, type Block, type GameMode } from "./rules";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
+import "@game-lab/platform-adapters/home-exit.css";
 
 const WIDTH = 480;
 const HEIGHT = 720;
@@ -118,6 +119,7 @@ class StackScene extends Phaser.Scene {
   private voiceLocaleTag = new URLSearchParams(location.search).get("lang") ?? navigator.language;
   private readonly audio = createStackAudio(safeStorage());
   private audioControls?: ReturnType<typeof mountAudioControls>;
+  private homeExit?: ReturnType<typeof mountHomeExit>;
   private toastTimer: number | undefined;
   private failedX: number | null = null;
   private lastResultWasBest = false;
@@ -136,6 +138,7 @@ class StackScene extends Phaser.Scene {
 
   create(): void {
     this.graphics = this.add.graphics();
+    this.homeExit = mountHomeExit(document.querySelector<HTMLElement>(".top-actions")!, this.language);
     this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const select = element<HTMLSelectElement>("language-select");
     select.value = this.language;
@@ -512,6 +515,7 @@ class StackScene extends Phaser.Scene {
     element("score-label").textContent = t.score;
     element("best-label").textContent = t.best;
     this.audioControls?.updateLanguage(this.language);
+    this.homeExit?.updateLanguage(this.language);
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").innerHTML = t.readyTitle;
     element("ready-description").textContent = inputInstruction(t.readyDescription, t.readyDescriptionTouch, this.touchPointer.matches);

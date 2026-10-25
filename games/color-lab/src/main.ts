@@ -1,6 +1,6 @@
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
-import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
+import { inputInstruction, mountHomeExit, standaloneAdapter, touchPointerQuery } from "@game-lab/platform-adapters";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
 import { createColorAudio } from "./audio";
@@ -10,6 +10,7 @@ import { chooseLanguage, translations, type Language } from "./i18n";
 import { applyMove, cloneBoard, isSolved, legalMove, LEVELS, solve, starsFor, type Board, type Move } from "./rules";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
+import "@game-lab/platform-adapters/home-exit.css";
 
 const VERSION = "0.1.0";
 const PROGRESS_KEY = "game-lab:color-lab:progress";
@@ -88,10 +89,12 @@ class ColorLabGame {
   private best = readBest();
   private readonly audio = createColorAudio(safeStorage());
   private audioControls?: ReturnType<typeof mountAudioControls>;
+  private homeExit?: ReturnType<typeof mountHomeExit>;
   private levelWasPlaying = false;
   private readonly touchPointer = touchPointerQuery();
 
   init(): void {
+    this.homeExit = mountHomeExit(document.querySelector<HTMLElement>(".top-actions")!, this.language);
     this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const languageSelect = element<HTMLSelectElement>("language-select");
     languageSelect.value = this.language;
@@ -164,6 +167,7 @@ class ColorLabGame {
     this.text("footer", t.footer);
     document.querySelector<HTMLElement>(".keyboard-hint")!.textContent = inputInstruction("1–5 · U · H · Esc", t.touchHint, this.touchPointer.matches);
     this.audioControls?.updateLanguage(this.language);
+    this.homeExit?.updateLanguage(this.language);
     if (this.run.state === "READY" || this.run.state === "PLAYING") this.feedback(this.selected === null ? t.selectSource : t.selectTarget);
     if (this.run.state === "RESULT") this.renderResult();
     if (this.challenge && this.levelIndex === this.challenge.level - 1 && this.dailyDate === this.challenge.date) {

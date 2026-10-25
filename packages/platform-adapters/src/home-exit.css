@@ -1,0 +1,6 @@
+.home-exit { display: inline-flex; align-items: center; justify-content: center; gap: 5px; flex: none; min-width: 42px; min-height: 42px; padding: 5px 10px; border: 1px solid #f4cf89; border-radius: 999px; background: #233f49; color: #ffe3aa; font-size: 11px; font-weight: 800; line-height: 1.15; text-decoration: none; text-align: center; }
+.home-exit:hover { background: #355b61; }
+.home-exit:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.home-exit span:first-child { font-size: 22px; line-height: 1; }
+.home-exit-text { max-width: 80px; }
+@media (max-width: 560px) { .home-exit { width: 42px; height: 42px; padding: 4px; }.home-exit-text { display: none; } }
