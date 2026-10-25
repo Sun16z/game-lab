@@ -91,7 +91,7 @@
 把`deploy-pages.yml`改成（或新增）`deploy-cloudflare.yml`，沿用現有的檢查步驟（`audio:check`、`typecheck`、`test`、`build`），建置時不設`NEXT_PUBLIC_BASE_PATH`，然後用[cloudflare/wrangler-action](https://github.com/cloudflare/wrangler-action)（目前主版本v4，預設Wrangler v4）：
 
 - **push到main**：`command: deploy`，部署到正式網址。
-- **pull request**：`command: versions upload --preview-alias pr-${{ github.event.number }}`，產生預覽網址`pr-<編號>-game-lab.<子網域>.workers.dev`，並把網址留言到PR（或寫進job summary）。`--preview-alias`的旗標以當時Wrangler文件為準；別名只能用小寫英數與連字號、以字母開頭，含Worker名稱不超過63字元。
+- **pull request**：使用Wrangler 4.136.3以上的`preview --name pr-<編號>`建立獨立預覽，網址由Action寫入GitHub Deployment與job summary。首次部署前Worker尚未存在，`versions upload`會失敗，所以改用官方目前提供的Workers Previews流程。
 - Secrets：`CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID`。
 - `concurrency`照現在的做法，同一時間只跑一個正式部署。
 

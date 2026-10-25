@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  deployments: write
 
 concurrency:
   group: cloudflare-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'production' }}
@@ -39,11 +40,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: versions upload --preview-alias pr-${{ github.event.number }}
+          command: preview --name pr-${{ github.event.number }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
       - name: Show preview URL
         if: github.event_name == 'pull_request'
         env:
-          PREVIEW_URL: ${{ steps.preview.outputs.deployment-url }}
+          PREVIEW_URL: ${{ steps.preview.outputs.preview-url }}
           COMMAND_OUTPUT: ${{ steps.preview.outputs.command-output }}
         run: |
           echo "## Cloudflare preview" >> "$GITHUB_STEP_SUMMARY"
