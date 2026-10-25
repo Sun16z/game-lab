@@ -87,6 +87,7 @@ button:focus-visible, select:focus-visible { outline: 3px solid #fff; outline-of
 @keyframes wrong { 20%, 60% { translate: -7px 0; } 40%, 80% { translate: 7px 0; } }
 @keyframes vanish { to { opacity: 0; scale: .6; translate: 0 25px; } }
 @media (max-width: 420px) { .brand { font-size: 9px; gap: 4px; }.brand-mark { width: 22px; height: 22px; }.top-actions select, .small-button { max-width: 113px; padding: 6px 7px; font-size: 10px; }.stage { border-radius: 17px; }.overlay-card { padding: 19px 17px; }.result-card { padding-block: 14px; }.result-card h2 { margin: 7px 0; }.result-card p { margin-bottom: 9px; }.result-number strong { font-size: 58px; } }
+@media (max-width: 420px) { .brand b { display: none; } }
 @media (max-height: 680px) { .stage { min-height: 460px; }.monster { scale: .85; }.arena { min-height: 140px; }.answers button { min-height: 55px; } }
 @media (max-height: 500px) and (orientation: landscape) { .stage { height: 500px; } footer { display: none; } }
 @media (horizontal-viewport-segments: 2) { #app { width: env(viewport-segment-width 0 0); margin-left: env(viewport-segment-left 0 0); } }
