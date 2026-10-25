@@ -35,9 +35,9 @@ jobs:
       - run: pnpm build
         env:
           NEXT_PUBLIC_BASE_PATH: /game-lab
-      - run: touch apps/portal/out/.nojekyll
+      - run: node scripts/build-pages-redirect.mjs
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/portal/out
+          path: apps/portal/redirect-out
       - id: deployment
         uses: actions/deploy-pages@v4
