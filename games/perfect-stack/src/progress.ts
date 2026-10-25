@@ -1,3 +1,4 @@
+import type { GameMode } from "./rules";
 export type Theme = "classic" | "neon" | "cosmos";
 export type Achievement = "ten_layers" | "five_perfect" | "hundred_layers";
 
@@ -48,4 +49,15 @@ export function loadProgress(storage: Pick<Storage, "getItem"> | undefined): Pro
 
 export function saveProgress(storage: Pick<Storage, "setItem"> | undefined, progress: Progress): void {
   try { storage?.setItem(KEY, JSON.stringify(progress)); } catch { /* Optional local progress. */ }
+}
+
+const MODE_KEY = "game-lab:G001:mode";
+export function loadMode(storage: Pick<Storage, "getItem"> | undefined): GameMode {
+  try { return storage?.getItem(MODE_KEY) === "child" ? "child" : "standard"; } catch { return "standard"; }
+}
+export function saveMode(storage: Pick<Storage, "setItem"> | undefined, mode: GameMode): void {
+  try { storage?.setItem(MODE_KEY, mode); } catch { /* Optional preference. */ }
+}
+export function bestKeyForMode(mode: GameMode): string {
+  return mode === "child" ? "G001:layers:child" : "G001:layers";
 }

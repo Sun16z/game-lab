@@ -10,8 +10,9 @@ import { createStackAudio } from "./audio";
 import { chooseLanguage, translations, type Language } from "./i18n";
 import { shareTranslations } from "./share-i18n";
 import { progressCopy } from "./progress-i18n";
-import { advanceProgress, isThemeUnlocked, loadProgress, saveProgress, themeThresholds, type Achievement, type Theme } from "./progress";
-import { INITIAL_WIDTH, movingX, placeBlock, sceneryForLayer, speedForLayer, type Block } from "./rules";
+import { modeCopy } from "./mode-i18n";
+import { advanceProgress, bestKeyForMode, isThemeUnlocked, loadMode, loadProgress, saveMode, saveProgress, themeThresholds, type Achievement, type Theme } from "./progress";
+import { INITIAL_WIDTH, movingX, placeBlock, sceneryForLayer, speedForLayer, startPhaseForLayer, type Block, type GameMode } from "./rules";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
 
@@ -109,7 +110,8 @@ class StackScene extends Phaser.Scene {
   private bullseyes = 0;
   private repairCount = 0;
   private longestCombo = 0;
-  private bestLayers = this.scoreStorage.getBest("G001:layers") ?? 0;
+  private mode: GameMode = new URLSearchParams(location.search).get("mode") === "child" ? "child" : loadMode(safeStorage());
+  private bestLayers = this.scoreStorage.getBest(bestKeyForMode(this.mode)) ?? 0;
   private recordCelebrated = false;
   private retryIndex = 0;
   private language: Language = chooseLanguage(new URLSearchParams(location.search).get("lang") ?? savedLanguage() ?? navigator.language);
@@ -142,6 +144,14 @@ class StackScene extends Phaser.Scene {
       this.voiceLocaleTag = this.language === "zh-Hant" ? navigator.language : this.language;
       try { window.localStorage.setItem("game-lab:language", this.language); } catch { /* optional */ }
       this.applyLanguage();
+    });
+    const modeSelect = element<HTMLSelectElement>("mode-select");
+    modeSelect.value = this.mode;
+    modeSelect.addEventListener("change", () => {
+      this.mode = modeSelect.value === "child" ? "child" : "standard";
+      this.bestLayers = this.scoreStorage.getBest(bestKeyForMode(this.mode)) ?? 0;
+      saveMode(safeStorage(), this.mode);
+      this.updateHud();
     });
     for (const id of ["ready-theme-select", "result-theme-select"]) {
       element<HTMLSelectElement>(id).addEventListener("change", (event) => {
@@ -184,7 +194,7 @@ class StackScene extends Phaser.Scene {
   update(): void {
     if (this.run.state !== "PLAYING") return;
     this.activeElapsed = (performance.now() - this.activeStartedAt) / 1000;
-    this.activeX = movingX(this.activeElapsed, this.currentTarget().width, speedForLayer(this.layers()), this.fromRight());
+    this.activeX = movingX(this.activeElapsed, this.currentTarget().width, speedForLayer(this.layers(), this.mode), this.fromRight(), startPhaseForLayer(this.layers(), this.run.seed));
     this.draw();
   }
 
@@ -198,7 +208,7 @@ class StackScene extends Phaser.Scene {
     const color = this.palette.blocks[0];
     this.blocks = [{ x: (WIDTH - INITIAL_WIDTH) / 2, width: INITIAL_WIDTH, y: BASE_Y, color }];
     this.activeElapsed = 0;
-    this.activeX = movingX(0, INITIAL_WIDTH, speedForLayer(0), false);
+    this.activeX = movingX(0, INITIAL_WIDTH, speedForLayer(0, this.mode), false);
     this.score = 0;
     this.combo = 0;
     this.perfectDrops = 0;
@@ -239,9 +249,9 @@ class StackScene extends Phaser.Scene {
   private drop(): void {
     if (this.run.state !== "PLAYING") return;
     this.activeElapsed = (performance.now() - this.activeStartedAt) / 1000;
-    this.activeX = movingX(this.activeElapsed, this.currentTarget().width, speedForLayer(this.layers()), this.fromRight());
+    this.activeX = movingX(this.activeElapsed, this.currentTarget().width, speedForLayer(this.layers(), this.mode), this.fromRight(), startPhaseForLayer(this.layers(), this.run.seed));
     const moving = { x: this.activeX, width: this.currentTarget().width };
-    const outcome = placeBlock(this.currentTarget(), moving, this.combo);
+    const outcome = placeBlock(this.currentTarget(), moving, this.combo, this.mode);
     if (!outcome.success || !outcome.block) {
       this.failedX = this.activeX;
       this.finish("missed");
@@ -278,7 +288,7 @@ class StackScene extends Phaser.Scene {
     }
     this.activeElapsed = 0;
     this.activeStartedAt = performance.now();
-    this.activeX = movingX(0, outcome.block.width, speedForLayer(this.layers()), this.fromRight());
+    this.activeX = movingX(0, outcome.block.width, speedForLayer(this.layers(), this.mode), this.fromRight(), startPhaseForLayer(this.layers(), this.run.seed));
     this.updateHud();
     const t = translations[this.language];
     const justBeatRecord = this.bestLayers > 0 && !this.recordCelebrated && this.layers() > this.bestLayers;
@@ -307,7 +317,7 @@ class StackScene extends Phaser.Scene {
     this.lastResultWasBest = this.layers() > this.bestLayers;
     if (this.lastResultWasBest) {
       this.bestLayers = this.layers();
-      this.scoreStorage.saveBest("G001:layers", this.bestLayers);
+      this.scoreStorage.saveBest(bestKeyForMode(this.mode), this.bestLayers);
     }
     const nextProgress = advanceProgress(this.progress, this.layers(), this.longestCombo);
     this.progress = nextProgress.progress;
@@ -339,7 +349,10 @@ class StackScene extends Phaser.Scene {
   }
 
   private resultShareLink(): string {
-    return shareLink(location.href, this.language);
+    const link = new URL(shareLink(location.href, this.language));
+    if (this.mode === "child") link.searchParams.set("mode", "child");
+    else link.searchParams.delete("mode");
+    return link.toString();
   }
 
   private async shareResultCard(): Promise<void> {
@@ -502,6 +515,11 @@ class StackScene extends Phaser.Scene {
     element("ready-pill").textContent = t.readyPill;
     element("ready-title").innerHTML = t.readyTitle;
     element("ready-description").textContent = inputInstruction(t.readyDescription, t.readyDescriptionTouch, this.touchPointer.matches);
+    const mode = modeCopy[this.language];
+    element("mode-label").textContent = mode.label;
+    const modeSelect = element<HTMLSelectElement>("mode-select");
+    modeSelect.options[0].textContent = mode.standard;
+    modeSelect.options[1].textContent = mode.child;
     element("start-label").textContent = t.start;
     element("pause-pill").textContent = t.pausePill;
     element("pause-title").textContent = t.pauseTitle;

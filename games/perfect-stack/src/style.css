@@ -22,7 +22,7 @@ select { max-width: 145px; }
 .hud small { color: #a7c4c9; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
 .hud strong { font-size: clamp(22px, 5vw, 31px); line-height: 1; font-variant-numeric: tabular-nums; }
 .hud .score strong { color: #ffd48e; font-size: clamp(31px, 7vw, 43px); }
-.stage-frame { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 22px; overflow: hidden; box-shadow: 0 28px 75px #00121c88, 0 0 0 1px #ffffff30; background: #183442; }
+.stage-frame { position: relative; width: 100%; aspect-ratio: 2 / 3; container-type: size; border-radius: 22px; overflow: hidden; box-shadow: 0 28px 75px #00121c88, 0 0 0 1px #ffffff30; background: #183442; }
 .game-chip { position: absolute; z-index: 2; top: 16px; max-width: 46%; padding: 8px 11px; border: 1px solid #ffffff38; border-radius: 999px; background: #102b38dd; color: #fff1c7; font-size: 12px; font-weight: 800; line-height: 1.25; text-align: center; pointer-events: none; box-shadow: 0 5px 18px #03172455; }
 .combo-chip { left: 16px; }
 .record-chip { right: 16px; }
@@ -35,7 +35,10 @@ select { max-width: 145px; }
 h1 { font-size: clamp(34px, 8vw, 49px); line-height: 1.18; letter-spacing: -.035em; margin: 21px 0 17px; }
 h2 { font-size: clamp(29px, 7vw, 39px); line-height: 1.2; margin: 19px 0; }
 .overlay-card p { font-size: 15px; line-height: 1.7; color: #c4d8d9; margin: 0 0 26px; }
-.theme-picker { display: flex; align-items: center; justify-content: center; gap: 8px; margin: -7px 0 18px; color: #d8ebe5; font-size: 12px; font-weight: 800; }
+.mode-picker, .theme-picker { display: flex; align-items: center; justify-content: center; gap: 8px; color: #d8ebe5; font-size: 12px; font-weight: 800; }
+.mode-picker { margin: -7px 0 13px; }
+.theme-picker { margin: 0 0 18px; }
+.mode-picker select { max-width: 150px; padding: 6px 9px; }
 .theme-picker select { max-width: 150px; padding: 6px 9px; }
 .theme-picker small { color: #a7c4c9; font-size: 11px; }
 .result-theme { margin: 3px 0 9px; }
@@ -71,6 +74,18 @@ footer { color: #7da2a9; font-size: 11px; line-height: 1.5; text-align: center; 
 html[dir="rtl"] .brand, html[dir="rtl"] .below { direction: rtl; }
 html[dir="rtl"] .hud div:last-child { text-align: left; }
 @media (max-width: 520px) { #app { padding: 8px max(10px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); } .topbar { padding-bottom: 10px; } .brand { font-size: 10px; gap: 5px; } .brand-mark { width: 23px; height: 23px; } .top-actions { gap: 4px; } .icon-button, select { padding: 6px 8px; font-size: 11px; } select { max-width: 116px; } .stage-frame { border-radius: 16px; } .game-chip { top: 10px; max-width: 47%; padding: 6px 8px; font-size: 10px; } .combo-chip { left: 10px; } .record-chip { right: 10px; } .overlay { padding: 12px; } .overlay-card { padding: 20px 16px; } .overlay-card.compact { padding-block: 18px; } .overlay-card.compact h2 { margin: 10px 0; font-size: 28px; } .overlay-card.compact .result-number strong { font-size: 58px; } .overlay-card.compact .result-number { margin: 0 0 5px; } .overlay-card.compact p { margin-bottom: 9px; font-size: 13px; line-height: 1.35; } .share-preview { min-height: 76px; margin-bottom: 8px; } }
+@media (min-width: 521px) {
+  @container (max-height: 560px) {
+    .overlay { padding: 8px; }
+    .overlay-card { padding: 12px; border-radius: 17px; }
+    .pill { padding: 4px 8px; font-size: 10px; }
+    h1 { font-size: 27px; margin: 9px 0; }
+    .overlay-card p { font-size: 11px; line-height: 1.35; margin-bottom: 10px; }
+    .mode-picker, .theme-picker { gap: 5px; margin: 0 0 7px; font-size: 10px; }
+    .mode-picker select, .theme-picker select { padding: 3px 5px; font-size: 10px; }
+    .primary-button { min-height: 39px; min-width: 145px; font-size: 13px; }
+  }
+}
 @media (max-height: 690px) and (orientation: landscape) { .topbar { padding-bottom: 4px; } .hud { padding-bottom: 6px; } .below { padding-top: 4px; } footer { padding-top: 5px; } .overlay-card.compact { padding-block: 10px; } .share-preview { min-height: 64px; } }
 @media (max-height: 500px) and (orientation: landscape) { .game-wrap { width: min(100%, 280px); } footer { display: none; } }
 @media (max-width: 360px) { .game-wrap { width: min(100%, 280px); } }
