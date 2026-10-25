@@ -33,6 +33,7 @@ jobs:
       - run: pnpm build
         env:
           NEXT_PUBLIC_SITE_URL: https://games.somewhen.life
+      - run: pnpm size:check
       - name: Upload PR preview
         if: github.event_name == 'pull_request'
         id: preview

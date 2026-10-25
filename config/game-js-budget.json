@@ -1,0 +1,10 @@
+{
+  "defaultGzipBytes": 150000,
+  "exceptions": {
+    "perfect-stack": {
+      "maxGzipBytes": 425000,
+      "baselineGzipBytes": 400044,
+      "reason": "Existing Phaser bundle is about 400 KB gzip; reduce it in a later focused PR. No new game may use this exception."
+    }
+  }
+}

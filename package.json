@@ -12,7 +12,8 @@
     "build": "pnpm build:game && pnpm --filter @game-lab/portal build",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
-    "audio:check": "node scripts/check-audio.mjs"
+    "audio:check": "node scripts/check-audio.mjs",
+    "size:check": "node scripts/check-game-size.mjs"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
