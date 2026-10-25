@@ -46,7 +46,7 @@
       "modified": true
     },
     {
-      "file": "games/color-lab/public/audio/color-loop.webm",
+      "file": "games/color-lab/public/audio/color-loop-v2.webm",
       "kind": "music",
       "game": "color-lab",
       "sourceUrl": "https://kenney.nl/assets/music-jingles",
@@ -57,7 +57,7 @@
       "modified": true
     },
     {
-      "file": "games/color-lab/public/audio/color-loop.mp3",
+      "file": "games/color-lab/public/audio/color-loop-v2.mp3",
       "kind": "music",
       "game": "color-lab",
       "sourceUrl": "https://kenney.nl/assets/music-jingles",

@@ -10,6 +10,6 @@ export function createColorAudio(storage: Pick<Storage, "getItem" | "setItem"> |
       hint: [0.24, 0, 660, 0.005, 0.07, 0.18, 0, 1, 85],
       win: [0.31, 0, 560, 0.005, 0.09, 0.25, 0, 1, 130]
     },
-    music: { main: ["./audio/color-loop.webm", "./audio/color-loop.mp3"] }
+    music: { main: ["./audio/color-loop-v2.webm", "./audio/color-loop-v2.mp3"] }
   }, storage);
 }
