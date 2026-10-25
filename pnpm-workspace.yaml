@@ -4,3 +4,4 @@ packages:
   - games/*
 allowBuilds:
   esbuild: true
+  workerd: true
