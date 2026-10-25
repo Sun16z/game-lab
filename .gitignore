@@ -1,0 +1,13 @@
+node_modules/
+.pnpm-store/
+.playwright-mcp/
+.next/
+dist/
+out/
+coverage/
+release/
+apps/portal/public/play/
+*.tsbuildinfo
+.env*
+!.env.example
+.DS_Store

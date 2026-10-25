@@ -1,0 +1,9 @@
+{
+  "name": "@game-lab/game-analytics",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "dependencies": { "@game-lab/game-core": "workspace:*" }
+}

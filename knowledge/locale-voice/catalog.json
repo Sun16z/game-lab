@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "cue": "perfect_streak_3",
+  "context": "A short, encouraging toast after every third consecutive perfect block placement; visible for 1.2 seconds.",
+  "entries": [
+    { "locale": "zh-Hant", "scope": "Traditional Chinese, region-neutral fallback", "register": "friendly", "review": "native_review_pending", "phrases": ["太厲害了！", "這手真準！"] },
+    { "locale": "zh-TW", "scope": "Taiwan Traditional Chinese", "register": "casual", "review": "native_review_pending", "phrases": ["哇靠，超神！", "這手也太準！"] },
+    { "locale": "en", "scope": "General English", "register": "friendly", "review": "native_review_pending", "phrases": ["You're on fire!", "That was so clean!"] },
+    { "locale": "es", "scope": "Broad Spanish fallback; country variants needed for stronger slang", "register": "friendly", "review": "native_review_pending", "phrases": ["¡Qué buena racha!", "¡Qué precisión!"] },
+    { "locale": "pt-BR", "scope": "Brazilian Portuguese", "register": "casual", "review": "native_review_pending", "phrases": ["Mandou bem demais!", "Tá voando!"] },
+    { "locale": "fr", "scope": "General French", "register": "friendly", "review": "native_review_pending", "phrases": ["Trop fort !", "Quelle précision !"] },
+    { "locale": "ar", "scope": "Modern Standard Arabic fallback; no dialect assumed", "register": "friendly", "review": "native_review_pending", "phrases": ["يا سلام، إبداع!", "دقة مذهلة!"] },
+    { "locale": "sw", "scope": "General Swahili fallback; regional review needed", "register": "friendly", "review": "native_review_pending", "phrases": ["Umefanya vizuri sana!", "Umeweka kwa usahihi!"] },
+    { "locale": "id", "scope": "Indonesian", "register": "casual", "review": "native_review_pending", "phrases": ["Mantap banget!", "Jago banget!"] },
+    { "locale": "hi", "scope": "Hindi", "register": "friendly", "review": "native_review_pending", "phrases": ["वाह, क्या कमाल है!", "कमाल कर दिया!"] }
+  ]
+}

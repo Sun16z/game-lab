@@ -1,0 +1,23 @@
+{
+  "name": "@game-lab/perfect-stack",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && node scripts/create-sw.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@game-lab/game-core": "workspace:*",
+    "@game-lab/game-storage": "workspace:*",
+    "@game-lab/game-analytics": "workspace:*",
+    "@game-lab/locale-voice": "workspace:*",
+    "@game-lab/game-share": "workspace:*",
+    "@game-lab/platform-adapters": "workspace:*",
+    "phaser": "4.2.1"
+  },
+  "devDependencies": { "vite": "^7.1.0" }
+}
