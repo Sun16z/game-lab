@@ -28,6 +28,10 @@ const homeExitCopy = {
   ar: "اترك اللعبة وعد إلى الرئيسية", sw: "Acha mchezo, rudi mwanzo",
   id: "Keluar dari permainan, kembali ke beranda", hi: "खेल छोड़ें, होम पर जाएँ"
 } as const;
+const homeExitShortCopy: Record<keyof typeof homeExitCopy, string> = {
+  "zh-Hant": "回首頁", en: "Home", es: "Inicio", "pt-BR": "Início", fr: "Accueil",
+  ar: "الرئيسية", sw: "Mwanzo", id: "Beranda", hi: "होम"
+};
 
 export type HomeExitLanguage = keyof typeof homeExitCopy;
 
@@ -47,7 +51,7 @@ export function mountHomeExit(actions: HTMLElement, language: string): { updateL
     const label = homeExitLabel(nextLanguage);
     link.setAttribute("aria-label", label);
     link.title = label;
-    link.querySelector<HTMLElement>(".home-exit-text")!.textContent = label;
+    link.querySelector<HTMLElement>(".home-exit-text")!.textContent = homeExitShortCopy[nextLanguage as HomeExitLanguage] ?? homeExitShortCopy.en;
   };
   updateLanguage(language);
   return { updateLanguage };
