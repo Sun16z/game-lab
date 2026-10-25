@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { movingX, placeBlock, speedForLayer } from "./rules";
+import { movingX, placeBlock, sceneryForLayer, speedForLayer } from "./rules";
 
 describe("perfect stack rules", () => {
   const target = { x: 130, width: 220 };
@@ -20,6 +20,11 @@ describe("perfect stack rules", () => {
     });
   });
 
+  it("gives a separate bullseye reward inside one pixel", () => {
+    expect(placeBlock(target, { x: 130.9, width: 220 }, 0)).toMatchObject({ perfect: true, bullseye: true, points: 225 });
+    expect(placeBlock(target, { x: 132, width: 220 }, 0)).toMatchObject({ perfect: true, bullseye: false, points: 150 });
+  });
+
   it("clips overlap and resets combo", () => {
     expect(placeBlock(target, { x: 150, width: 220 }, 4)).toMatchObject({
       success: true, block: { x: 150, width: 200 }, combo: 0, points: 100, repairedPx: 0, deviationPx: 20
@@ -32,7 +37,7 @@ describe("perfect stack rules", () => {
   });
 
   it("caps combo bonus and speeds up every five layers", () => {
-    expect(placeBlock(target, target, 20).points).toBe(350);
+    expect(placeBlock(target, target, 20).points).toBe(425);
     expect(speedForLayer(4)).toBe(140);
     expect(speedForLayer(5)).toBeCloseTo(154);
   });
@@ -40,5 +45,9 @@ describe("perfect stack rules", () => {
   it("moves identically regardless of frame count", () => {
     expect(movingX(1.25, 220, 140, false)).toBe(movingX(0.5 + 0.75, 220, 140, false));
     expect(movingX(0, 220, 140, true)).toBe(244);
+  });
+
+  it("changes scenery at defined heights", () => {
+    expect([9, 10, 24, 25].map(sceneryForLayer)).toEqual(["ground", "sky", "sky", "space"]);
   });
 });

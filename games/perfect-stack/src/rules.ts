@@ -2,6 +2,7 @@ export const STAGE_WIDTH = 480;
 export const INITIAL_WIDTH = 220;
 export const MIN_WIDTH = 18;
 export const PERFECT_TOLERANCE = 6;
+export const BULLSEYE_TOLERANCE = 1;
 export const BASE_SPEED = 140;
 
 export interface Block { x: number; width: number }
@@ -9,6 +10,7 @@ export interface Placement {
   success: boolean;
   block: Block | null;
   perfect: boolean;
+  bullseye: boolean;
   combo: number;
   points: number;
   removed: Block | null;
@@ -34,6 +36,7 @@ export function movingX(elapsedSeconds: number, width: number, speed: number, fr
 export function placeBlock(target: Block, moving: Block, previousCombo: number): Placement {
   const offset = Math.abs((target.x + target.width / 2) - (moving.x + moving.width / 2));
   if (offset <= PERFECT_TOLERANCE) {
+    const bullseye = offset <= BULLSEYE_TOLERANCE;
     const combo = previousCombo + 1;
     const comboBonus = combo >= 3 ? Math.min(200, (combo - 2) * 50) : 0;
     const repairedPx = combo % 3 === 0 ? Math.min(6, INITIAL_WIDTH - target.width) : 0;
@@ -43,8 +46,9 @@ export function placeBlock(target: Block, moving: Block, previousCombo: number):
       success: true,
       block: { x, width },
       perfect: true,
+      bullseye,
       combo,
-      points: 150 + comboBonus,
+      points: 150 + comboBonus + (bullseye ? 75 : 0),
       removed: null,
       deviationPx: offset,
       repairedPx
@@ -55,10 +59,16 @@ export function placeBlock(target: Block, moving: Block, previousCombo: number):
   const right = Math.min(target.x + target.width, moving.x + moving.width);
   const width = Math.max(0, right - left);
   if (width < MIN_WIDTH) {
-    return { success: false, block: null, perfect: false, combo: 0, points: 0, removed: null, deviationPx: offset, repairedPx: 0 };
+    return { success: false, block: null, perfect: false, bullseye: false, combo: 0, points: 0, removed: null, deviationPx: offset, repairedPx: 0 };
   }
   const removed = moving.x < target.x
     ? { x: moving.x, width: target.x - moving.x }
     : { x: right, width: moving.x + moving.width - right };
-  return { success: true, block: { x: left, width }, perfect: false, combo: 0, points: 100, removed, deviationPx: offset, repairedPx: 0 };
+  return { success: true, block: { x: left, width }, perfect: false, bullseye: false, combo: 0, points: 100, removed, deviationPx: offset, repairedPx: 0 };
+}
+
+export function sceneryForLayer(layers: number): "ground" | "sky" | "space" {
+  if (layers >= 25) return "space";
+  if (layers >= 10) return "sky";
+  return "ground";
 }

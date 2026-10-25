@@ -7,14 +7,16 @@ import { getStreakPraise } from "@game-lab/locale-voice";
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { chooseLanguage, translations, type Language } from "./i18n";
 import { shareTranslations } from "./share-i18n";
-import { INITIAL_WIDTH, movingX, placeBlock, speedForLayer, type Block } from "./rules";
+import { progressCopy } from "./progress-i18n";
+import { advanceProgress, isThemeUnlocked, loadProgress, saveProgress, themeThresholds, type Achievement, type Theme } from "./progress";
+import { INITIAL_WIDTH, movingX, placeBlock, sceneryForLayer, speedForLayer, type Block } from "./rules";
 import "./style.css";
 
 const WIDTH = 480;
 const HEIGHT = 720;
 const BLOCK_HEIGHT = 34;
 const BASE_Y = 602;
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 const EVENT_KEY = "game-lab:session-events";
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
@@ -51,12 +53,15 @@ function recordEvent(event: GameEvent): void {
   } catch { /* Storage can be disabled; play remains available. */ }
 }
 
-function drawStackArtwork(ctx: CanvasRenderingContext2D): void {
+function drawStackArtwork(ctx: CanvasRenderingContext2D, theme: Theme): void {
+  const colors = theme === "neon" ? ["#34e4e1", "#ff5fb7", "#c37aff", "#8affde"]
+    : theme === "cosmos" ? ["#bdaaff", "#89b9ff", "#ffb9db", "#8ce0e7"]
+      : ["#ffbd86", "#f58f83", "#e4799d", "#b882c8"];
   for (let index = 0; index < 9; index += 1) {
     const width = 390 - index * 12;
     const x = 540 - width / 2 + Math.sin(index * 1.8) * 9;
     const y = 710 - index * 43;
-    ctx.fillStyle = ["#ffbd86", "#f58f83", "#e4799d", "#b882c8"][index % 4];
+    ctx.fillStyle = colors[index % 4];
     ctx.beginPath();
     ctx.roundRect(x, y, width, 39, 7);
     ctx.fill();
@@ -68,19 +73,27 @@ const PALETTES = [
     { background: 0x173a3e, blocks: [0xa7e0bb, 0x6dc5ae, 0x5daeb8, 0x8baccb], accent: 0xf1de92 },
     { background: 0x2d304e, blocks: [0xecc6a2, 0xdca5ba, 0xbba3dc, 0x9bb3e3], accent: 0xffdf91 }
 ];
+const THEME_PALETTES = {
+  neon: { background: 0x181d3d, blocks: [0x34e4e1, 0xff5fb7, 0xc37aff, 0x8affde], accent: 0xfaf46c },
+  cosmos: { background: 0x111830, blocks: [0xbdaaff, 0x89b9ff, 0xffb9db, 0x8ce0e7], accent: 0xffe9a8 }
+} as const;
 
-function paletteFor(seed: string): { background: number; blocks: number[]; accent: number } {
+function paletteFor(seed: string, theme: Theme): { background: number; blocks: readonly number[]; accent: number } {
+  if (theme !== "classic") return THEME_PALETTES[theme];
   const hash = [...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0);
   return PALETTES[hash % PALETTES.length];
 }
 
 type PlacedBlock = Block & { y: number; color: number };
 type FallingPiece = Block & { y: number; color: number; direction: number; startedAt: number };
+type Spark = { x: number; y: number; vx: number; vy: number; startedAt: number; color: number };
 
 class StackScene extends Phaser.Scene {
   private graphics!: Phaser.GameObjects.Graphics;
   private run: GameRun = createRun("G001", crypto.randomUUID(), crypto.randomUUID());
-  private palette = paletteFor(this.run.seed);
+  private progress = loadProgress(safeStorage());
+  private runTheme: Theme = this.progress.selectedTheme;
+  private palette = paletteFor(this.run.seed, this.runTheme);
   private readonly playerSessionId = sessionId();
   private readonly scoreStorage = createLocalScoreStorage(safeStorage());
   private blocks: PlacedBlock[] = [];
@@ -90,6 +103,7 @@ class StackScene extends Phaser.Scene {
   private score = 0;
   private combo = 0;
   private perfectDrops = 0;
+  private bullseyes = 0;
   private repairCount = 0;
   private longestCombo = 0;
   private bestLayers = this.scoreStorage.getBest("G001:layers") ?? 0;
@@ -105,7 +119,11 @@ class StackScene extends Phaser.Scene {
   private lastResultBestBefore = 0;
   private feedbackStartedAt = 0;
   private feedbackPerfect = false;
+  private feedbackBullseye = false;
   private fallingPieces: FallingPiece[] = [];
+  private sparks: Spark[] = [];
+  private lastGained: Achievement[] = [];
+  private lastUnlocked: Theme[] = [];
   private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   constructor() { super("perfect-stack"); }
@@ -120,6 +138,15 @@ class StackScene extends Phaser.Scene {
       try { window.localStorage.setItem("game-lab:language", this.language); } catch { /* optional */ }
       this.applyLanguage();
     });
+    for (const id of ["ready-theme-select", "result-theme-select"]) {
+      element<HTMLSelectElement>(id).addEventListener("change", (event) => {
+        const theme = (event.target as HTMLSelectElement).value as Theme;
+        if (!isThemeUnlocked(theme, this.progress.totalLayers)) return;
+        this.progress.selectedTheme = theme;
+        saveProgress(safeStorage(), this.progress);
+        this.refreshThemeSelectors();
+      });
+    }
     element("start-button").addEventListener("click", () => this.startRun());
     element("retry-button").addEventListener("click", () => this.retry());
     element("share-card-button").addEventListener("click", () => void this.shareResultCard());
@@ -164,7 +191,8 @@ class StackScene extends Phaser.Scene {
   private fromRight(): boolean { return this.layers() % 2 === 1; }
 
   private resetTower(): void {
-    this.palette = paletteFor(this.run.seed);
+    this.runTheme = this.progress.selectedTheme;
+    this.palette = paletteFor(this.run.seed, this.runTheme);
     const color = this.palette.blocks[0];
     this.blocks = [{ x: (WIDTH - INITIAL_WIDTH) / 2, width: INITIAL_WIDTH, y: BASE_Y, color }];
     this.activeElapsed = 0;
@@ -172,11 +200,15 @@ class StackScene extends Phaser.Scene {
     this.score = 0;
     this.combo = 0;
     this.perfectDrops = 0;
+    this.bullseyes = 0;
     this.repairCount = 0;
     this.longestCombo = 0;
     this.recordCelebrated = false;
     this.feedbackStartedAt = 0;
+    this.feedbackPerfect = false;
+    this.feedbackBullseye = false;
     this.fallingPieces = [];
+    this.sparks = [];
     this.failedX = null;
     if (this.toastTimer) window.clearTimeout(this.toastTimer);
     element("toast").classList.add("hidden");
@@ -222,10 +254,23 @@ class StackScene extends Phaser.Scene {
     this.score += outcome.points;
     this.combo = outcome.combo;
     if (outcome.perfect) this.perfectDrops += 1;
+    if (outcome.bullseye) this.bullseyes += 1;
     if (outcome.repairedPx > 0) this.repairCount += 1;
     this.longestCombo = Math.max(this.longestCombo, this.combo);
     this.feedbackStartedAt = performance.now();
     this.feedbackPerfect = outcome.perfect;
+    this.feedbackBullseye = outcome.bullseye;
+    if (!this.reducedMotion) {
+      this.cameras.main.shake(outcome.bullseye ? 95 : 55, outcome.bullseye ? 0.003 : 0.0015);
+      if (outcome.perfect) {
+        const center = outcome.block.x + outcome.block.width / 2;
+        const count = outcome.bullseye ? 18 : 10;
+        for (let index = 0; index < count; index++) {
+          const angle = (index / count) * Math.PI * 2;
+          this.sparks.push({ x: center, y: activeY + 12, vx: Math.cos(angle) * (75 + (index % 3) * 28), vy: Math.sin(angle) * 65 - 55, startedAt: performance.now(), color: index % 2 ? this.palette.accent : 0xffffff });
+        }
+      }
+    }
     this.activeElapsed = 0;
     this.activeStartedAt = performance.now();
     this.activeX = movingX(0, outcome.block.width, speedForLayer(this.layers()), this.fromRight());
@@ -236,12 +281,13 @@ class StackScene extends Phaser.Scene {
     const streakMilestone = outcome.perfect && outcome.combo % 3 === 0;
     const praise = streakMilestone ? getStreakPraise(this.language, outcome.combo, this.voiceLocaleTag) : "";
     const feedback = streakMilestone
-      ? `${praise}\n${outcome.repairedPx > 0 ? `${t.repair} +${outcome.repairedPx}px` : justBeatRecord ? t.newBest : `+${outcome.points}`}`
-      : justBeatRecord ? t.newBest
-        : outcome.perfect ? `${t.perfect} +${outcome.points}`
+      ? `${praise}\n${outcome.bullseye ? `${t.bullseye} ` : ""}+${outcome.points}${outcome.repairedPx > 0 ? ` · ${t.repair} +${outcome.repairedPx}px` : ""}`
+      : outcome.bullseye ? `${t.bullseye} +${outcome.points}`
+        : justBeatRecord ? t.newBest
+          : outcome.perfect ? `${t.perfect} +${outcome.points}`
           : `${t.placed} · ${Math.round(outcome.deviationPx)}px · +${outcome.points}`;
     this.showToast(feedback, streakMilestone ? 1200 : 850, streakMilestone);
-    this.playTone(outcome.perfect ? 740 + Math.min(this.combo, 6) * 35 : 520);
+    this.playPlacementMelody(outcome.perfect, outcome.bullseye, this.layers());
     this.draw();
   }
 
@@ -255,9 +301,14 @@ class StackScene extends Phaser.Scene {
       this.bestLayers = this.layers();
       this.scoreStorage.saveBest("G001:layers", this.bestLayers);
     }
+    const nextProgress = advanceProgress(this.progress, this.layers(), this.longestCombo);
+    this.progress = nextProgress.progress;
+    this.lastGained = nextProgress.gained;
+    this.lastUnlocked = nextProgress.unlocked;
+    saveProgress(safeStorage(), this.progress);
     this.emit("game_end", {
       reason, layers: this.layers(), score: this.score,
-      perfectDrops: this.perfectDrops, repairs: this.repairCount, longestCombo: this.longestCombo,
+      perfectDrops: this.perfectDrops, bullseyes: this.bullseyes, repairs: this.repairCount, longestCombo: this.longestCombo,
       durationSeconds: Math.max(0, (Date.parse(this.run.endedAt!) - Date.parse(this.run.startedAt!)) / 1000)
     });
     element("pause-button").classList.add("hidden");
@@ -308,7 +359,7 @@ class StackScene extends Phaser.Scene {
       title: t.title, score: String(this.layers()), scoreLabel: t.unit,
       best: String(this.bestLayers), bestLabel: s.bestLabel,
       invitation: s.challenge(this.layers()), url: this.resultShareLink(), language: this.language,
-      direction: this.language === "ar" ? "rtl" : "ltr", drawArtwork: drawStackArtwork
+      direction: this.language === "ar" ? "rtl" : "ltr", drawArtwork: (ctx) => drawStackArtwork(ctx, this.runTheme)
     });
   }
 
@@ -389,6 +440,7 @@ class StackScene extends Phaser.Scene {
 
   private updateResult(): void {
     const t = translations[this.language];
+    const p = progressCopy[this.language];
     element("result-title").textContent = this.lastResultWasBest ? t.newBest : t.resultTitle;
     element("result-layers").textContent = String(this.layers());
     element("share-preview-score").textContent = `${this.layers()} ${t.unit}`;
@@ -396,8 +448,33 @@ class StackScene extends Phaser.Scene {
     element("result-summary").textContent = this.lastResultWasBest
       ? t.newBestSummary(this.bestLayers)
       : this.lastResultBestBefore > 0
-        ? t.bestSummary(this.lastResultBestBefore, Math.max(0, this.lastResultBestBefore - this.layers()))
+        ? this.layers() === this.lastResultBestBefore
+          ? t.bestTiedSummary(this.lastResultBestBefore)
+          : t.bestSummary(this.lastResultBestBefore, Math.max(0, this.lastResultBestBefore - this.layers()))
         : t.noBest;
+    const achievementNote = element("result-achievements");
+    achievementNote.textContent = this.lastGained.length ? `${p.achievementLabel}：${this.lastGained.map((id) => p.achievements[id]).join("、")}` : "";
+    achievementNote.classList.toggle("hidden", this.lastGained.length === 0);
+    const unlockNote = element("result-unlocked");
+    unlockNote.textContent = this.lastUnlocked.length ? p.unlocked(this.lastUnlocked.map((id) => p.themes[id]).join("、")) : "";
+    unlockNote.classList.toggle("hidden", this.lastUnlocked.length === 0);
+    this.refreshThemeSelectors();
+  }
+
+  private refreshThemeSelectors(): void {
+    const p = progressCopy[this.language];
+    for (const location of ["ready", "result"]) {
+      const select = element<HTMLSelectElement>(`${location}-theme-select`);
+      select.value = this.progress.selectedTheme;
+      for (const option of Array.from(select.options)) {
+        const theme = option.value as Theme;
+        const threshold = themeThresholds[theme];
+        option.disabled = !isThemeUnlocked(theme, this.progress.totalLayers);
+        option.textContent = `${p.themes[theme]}${option.disabled ? ` · ${p.total(threshold)}` : ""}`;
+      }
+      element(`${location}-theme-label`).textContent = p.themeLabel;
+      element(`${location}-total`).textContent = p.total(this.progress.totalLayers);
+    }
   }
 
   private applyLanguage(): void {
@@ -429,6 +506,7 @@ class StackScene extends Phaser.Scene {
     element("pause-button").textContent = t.pause;
     element("hint").textContent = t.hint;
     element("footer-text").textContent = t.footer;
+    this.refreshThemeSelectors();
     this.updateHud();
     if (this.run.state === "RESULT") this.updateResult();
   }
@@ -442,19 +520,25 @@ class StackScene extends Phaser.Scene {
     this.toastTimer = window.setTimeout(() => toast.classList.add("hidden"), duration);
   }
 
-  private playTone(frequency: number): void {
+  private playPlacementMelody(perfect: boolean, bullseye: boolean, layers: number): void {
     if (!this.soundEnabled) return;
     try {
       this.audioContext ??= new AudioContext();
-      const oscillator = this.audioContext.createOscillator();
-      const volume = this.audioContext.createGain();
-      oscillator.type = "sine";
-      oscillator.frequency.value = frequency;
-      volume.gain.setValueAtTime(0.08, this.audioContext.currentTime);
-      volume.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.12);
-      oscillator.connect(volume).connect(this.audioContext.destination);
-      oscillator.start();
-      oscillator.stop(this.audioContext.currentTime + 0.12);
+      const scale = [0, 2, 4, 7, 9];
+      const notes = bullseye ? 3 : perfect ? 2 : 1;
+      for (let index = 0; index < notes; index++) {
+        const start = this.audioContext.currentTime + index * 0.055;
+        const semitone = scale[(layers + index) % scale.length] + (bullseye ? 12 : 0);
+        const oscillator = this.audioContext.createOscillator();
+        const volume = this.audioContext.createGain();
+        oscillator.type = "sine";
+        oscillator.frequency.value = 330 * Math.pow(2, semitone / 12);
+        volume.gain.setValueAtTime(0.055, start);
+        volume.gain.exponentialRampToValueAtTime(0.001, start + 0.11);
+        oscillator.connect(volume).connect(this.audioContext.destination);
+        oscillator.start(start);
+        oscillator.stop(start + 0.11);
+      }
     } catch { /* Sound is optional. */ }
   }
 
@@ -465,13 +549,19 @@ class StackScene extends Phaser.Scene {
     const now = performance.now();
     const feedbackAge = now - this.feedbackStartedAt;
     const bounce = this.reducedMotion || feedbackAge >= 180 ? 0 : 7 * Math.sin(Math.PI * feedbackAge / 180);
+    const scenery = sceneryForLayer(this.layers());
     g.clear();
-    g.fillStyle(palette.background, 1).fillRect(0, 0, WIDTH, HEIGHT);
-    g.fillStyle(0xffffff, 0.07);
-    for (let i = 0; i < 28; i++) {
-      const x = (i * 173 + 57) % WIDTH;
-      const y = (i * 91 + 36) % 535;
-      g.fillCircle(x, y, i % 4 === 0 ? 2 : 1);
+    g.fillStyle(scenery === "space" ? 0x10162e : scenery === "sky" ? 0x245572 : palette.background, 1).fillRect(0, 0, WIDTH, HEIGHT);
+    if (scenery === "sky") {
+      g.fillStyle(0xe3f7f3, 0.09);
+      for (let i = 0; i < 5; i++) g.fillRoundedRect((i * 137 + 45) % 490 - 25, 95 + i * 88, 145, 29, 15);
+    } else {
+      g.fillStyle(0xffffff, scenery === "space" ? 0.24 : 0.07);
+      for (let i = 0; i < 28; i++) {
+        const x = (i * 173 + 57) % WIDTH;
+        const y = (i * 91 + 36) % 535;
+        g.fillCircle(x, y, i % 4 === 0 ? 2 : 1);
+      }
     }
     g.fillStyle(0xffffff, 0.045).fillRoundedRect(34, 116, 412, 502, 22);
     g.fillStyle(0x0b1e29, 0.5).fillRect(0, 647, WIDTH, 73);
@@ -491,7 +581,7 @@ class StackScene extends Phaser.Scene {
       g.fillStyle(block.color, 1).fillRoundedRect(block.x, y, block.width, BLOCK_HEIGHT - 2, 5);
       g.fillStyle(0xffffff, 0.18).fillRoundedRect(block.x + 5, y + 4, Math.max(0, block.width - 10), 5, 3);
       if (this.feedbackPerfect && i === this.blocks.length - 1 && feedbackAge < 280 && !this.reducedMotion) {
-        g.fillStyle(0xffffff, 0.45 * (1 - feedbackAge / 280)).fillRoundedRect(block.x, y, block.width, BLOCK_HEIGHT - 2, 5);
+        g.fillStyle(this.feedbackBullseye ? palette.accent : 0xffffff, 0.5 * (1 - feedbackAge / 280)).fillRoundedRect(block.x, y, block.width, BLOCK_HEIGHT - 2, 5);
       }
     }
     this.fallingPieces = this.fallingPieces.filter((piece) => now - piece.startedAt < 420);
@@ -504,6 +594,11 @@ class StackScene extends Phaser.Scene {
         BLOCK_HEIGHT - 2,
         4
       );
+    }
+    this.sparks = this.sparks.filter((spark) => now - spark.startedAt < 480);
+    for (const spark of this.sparks) {
+      const age = (now - spark.startedAt) / 1000;
+      g.fillStyle(spark.color, 1 - age / 0.48).fillCircle(spark.x + spark.vx * age, spark.y + spark.vy * age + 260 * age * age, 3 * (1 - age / 0.48));
     }
     const activeY = BASE_Y - this.blocks.length * BLOCK_HEIGHT + offset;
     if (this.run.state !== "RESULT") {

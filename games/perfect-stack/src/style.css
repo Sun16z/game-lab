@@ -35,6 +35,11 @@ select { max-width: 145px; }
 h1 { font-size: clamp(34px, 8vw, 49px); line-height: 1.18; letter-spacing: -.035em; margin: 21px 0 17px; }
 h2 { font-size: clamp(29px, 7vw, 39px); line-height: 1.2; margin: 19px 0; }
 .overlay-card p { font-size: 15px; line-height: 1.7; color: #c4d8d9; margin: 0 0 26px; }
+.theme-picker { display: flex; align-items: center; justify-content: center; gap: 8px; margin: -7px 0 18px; color: #d8ebe5; font-size: 12px; font-weight: 800; }
+.theme-picker select { max-width: 150px; padding: 6px 9px; }
+.theme-picker small { color: #a7c4c9; font-size: 11px; }
+.result-theme { margin: 3px 0 9px; }
+.milestone-note { color: #ffe1a5 !important; font-weight: 800; margin-bottom: 4px !important; }
 .primary-button { min-width: 185px; min-height: 50px; border: 0; border-radius: 14px; background: #ffc77d; color: #26343d; font-weight: 850; font-size: 17px; box-shadow: 0 6px 0 #b37b4b; }
 .primary-button:hover { background: #ffdb9e; }
 .primary-button:active { transform: translateY(3px); box-shadow: 0 3px 0 #b37b4b; }
