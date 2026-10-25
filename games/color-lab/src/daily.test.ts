@@ -45,4 +45,7 @@ describe("daily challenge", () => {
     wrongDay.set("challenge", wrongDay.get("challenge")!.replace(date, "2026-10-27"));
     if (dailyLevel(date) !== dailyLevel("2026-10-27")) expect(decodeChallenge(`#${wrongDay}`)).toBeNull();
   });
+  it("accepts a completed challenge copied from the game UI", () => {
+    expect(decodeChallenge("#challenge=1%3A2026-10-25%3A16%3A6%3A032123413403")).not.toBeNull();
+  });
 });
