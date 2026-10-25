@@ -50,7 +50,7 @@ export function transitionRun(run: GameRun, next: RunState, now: string): GameRu
 export const games: readonly GameDefinition[] = [
   { id: "G001", slug: "perfect-stack", title: "完美疊塔", summary: "抓準時機放下方塊，挑戰最高層數。", category: "手感挑戰", replay: "再高一層、再準一點", motif: "▰", art: ["#ef9b7a", "#a964ac"], priority: "P0", status: "playable" },
   { id: "G002", slug: "monster-math", title: "九九乘法怪獸塔", summary: "90秒乘法快問快答，用連擊打倒怪獸與Boss。", category: "動腦解謎", replay: "連擊打Boss、刷新打倒數", motif: "✕", art: ["#8ac8a7", "#5e69b9"], priority: "P1", status: "playable" },
-  { id: "G003", slug: "color-lab", title: "顏色實驗室", summary: "倒轉試管，讓相同顏色住在一起。", category: "動腦解謎", replay: "用更少步數解出新關卡", motif: "◒", art: ["#70d1bc", "#5f92c1"], priority: "P1", status: "planned" },
+  { id: "G003", slug: "color-lab", title: "顏色實驗室", summary: "倒轉試管，讓相同顏色住在一起。", category: "動腦解謎", replay: "用更少步數解出新關卡", motif: "◒", art: ["#70d1bc", "#5f92c1"], priority: "P1", status: "playable" },
   { id: "G004", slug: "math-runner", title: "算術跑酷王", summary: "衝向正確答案的跑道，躲過障礙。", category: "手感挑戰", replay: "選出正確路線延續連勝", motif: "➜", art: ["#f4b363", "#e37d79"], priority: "P2", status: "planned" },
   { id: "G005", slug: "snow-rush", title: "雪山極速90秒", summary: "轉彎、跳躍、穿越旗門滑下雪山。", category: "手感挑戰", replay: "熟悉雪道走出最佳路線", motif: "❄", art: ["#a2d8e9", "#6888c5"], priority: "P3", status: "planned" },
   { id: "G006", slug: "shadow-friends", title: "影子變變變", summary: "轉動物件，用影子拼出奇妙動物。", category: "動腦解謎", replay: "發現同一關的不同解法", motif: "◕", art: ["#c4a3e8", "#786bb8"], priority: "P2", status: "planned" },

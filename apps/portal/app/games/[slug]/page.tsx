@@ -28,7 +28,7 @@ export default async function GamePage({ params }: Props) {
       {game.status === "playable" ? (
         <section className="playSection" aria-label={`${game.title}遊戲`}>
           <iframe className="gameEmbed" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`} title={`${game.title}試玩`} allow="fullscreen" />
-          <p>{game.id === "G001" ? "點擊畫面或按Space放置方塊。" : "點選答案或按1～4答題，90秒內盡量打倒怪獸。"}你也可以<a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`}>開啟獨立遊戲頁</a>，在遊戲內切換語言。</p>
+          <p>{game.id === "G001" ? "點擊畫面或按Space放置方塊。" : game.id === "G002" ? "點選答案或按1～4答題，90秒內盡量打倒怪獸。" : "選試管倒水，把相同顏色裝滿一管；可撤銷並挑戰更少步數。"}你也可以<a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`}>開啟獨立遊戲頁</a>，在遊戲內切換語言。</p>
         </section>
       ) : (
         <div className="notice" role="status">

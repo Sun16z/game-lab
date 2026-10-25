@@ -17,6 +17,6 @@ describe("game catalog", () => {
     expect(games).toHaveLength(20);
     expect(new Set(games.map((game) => game.id)).size).toBe(20);
     expect(new Set(games.map((game) => game.slug)).size).toBe(20);
-    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002"]);
+    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002", "G003"]);
   });
 });

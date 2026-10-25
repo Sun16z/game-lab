@@ -1,4 +1,4 @@
-"""Create two quiet 32-second loops using an original arrangement and Kenney CC0 steel jingle samples.
+"""Create quiet 32-second loops using original arrangements and Kenney CC0 steel jingle samples.
 
 Requires ffmpeg and the Kenney Music Jingles ZIP downloaded from
 https://kenney.nl/assets/music-jingles. Run manually; committed outputs are used at runtime.
@@ -79,3 +79,5 @@ if __name__ == '__main__':
            [261, 330, 392, 330, 293, 349, 392, 349], SOURCE / 'jingles_STEEL03.ogg', ROOT / 'games/perfect-stack/public/audio/stack-loop')
     render('monster', [[146.83, 174.61, 220.0], [130.81, 164.81, 196.0], [146.83, 196.0, 246.94], [130.81, 174.61, 220.0]],
            [293, 349, 440, 349, 330, 392, 493, 392], SOURCE / 'jingles_STEEL11.ogg', ROOT / 'games/monster-math/public/audio/monster-loop')
+    render('color', [[130.81, 196.0, 261.63], [146.83, 196.0, 293.66], [164.81, 220.0, 329.63], [130.81, 174.61, 261.63]],
+           [392, 440, 523, 440, 349, 440, 587, 440], SOURCE / 'jingles_STEEL05.ogg', ROOT / 'games/color-lab/public/audio/color-loop')
