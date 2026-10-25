@@ -1,6 +1,6 @@
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { mountHomeExit } from "@game-lab/platform-adapters";
-import { copyShareLink, createScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
+import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
 import { createIslandAudio } from "./audio";
 import { chooseLanguage, copy, type Language } from "./i18n";
@@ -84,14 +84,14 @@ class IslandGame {
     document.documentElement.dir = this.language === "ar" ? "rtl" : "ltr";
     document.title = `${t.title}｜Game Lab`;
     this.text("brand-title", `/ ${t.title}`); this.text("title", t.title); this.text("subtitle", t.subtitle); this.text("intro", t.intro);
-    this.text("mode-label", t.vsAi); this.text("mode-ai", t.vsAi); this.text("mode-local", t.local);
-    this.text("difficulty-label", t.normal); this.text("size-label", t.standard);
+    this.text("mode-label", t.mode); this.text("mode-ai", t.vsAi); this.text("mode-local", t.local);
+    this.text("difficulty-label", t.difficulty); this.text("size-label", t.islandSize);
     const difficulty = element<HTMLSelectElement>("difficulty-select");
     difficulty.options[0].textContent = t.easy; difficulty.options[1].textContent = t.normal; difficulty.options[2].textContent = t.hard;
     const size = element<HTMLSelectElement>("size-select");
     size.options[0].textContent = t.standard; size.options[1].textContent = t.child;
     this.text("start-button", `${t.start} →`); this.text("rotate-label", t.rotate);
-    this.text("wave-label", "P1"); this.text("coral-label", "P2");
+    this.text("wave-label", t.team0); this.text("coral-label", t.team1);
     this.text("replay-button", t.replay); this.text("share-button", t.share); this.text("copy-button", t.copy);
     this.homeExit?.updateLanguage(this.language); this.audioControls?.updateLanguage(this.language);
   }
@@ -118,7 +118,7 @@ class IslandGame {
     for (let index = 0; index < this.state.cells.length; index++) {
       const cell = this.state.cells[index];
       const button = document.createElement("button"); button.type = "button"; button.className = "cell";
-      button.setAttribute("role", "gridcell"); button.setAttribute("aria-label", `${index + 1} ${cell.terrain} ${cell.tile ? "path" : ""}`);
+      button.setAttribute("role", "gridcell"); button.setAttribute("aria-label", `${index + 1} ${cell.terrain === "rock" ? "🪨" : cell.terrain === "treasure" ? "💎" : ""} ${cell.tile ? this.t[cell.tile.piece] : ""}`.trim());
       button.disabled = this.run.state !== "PLAYING" || cell.terrain === "rock" || !!cell.tile || cell.flag !== null || this.mode === "ai" && this.state.turn === 1;
       if (cell.terrain === "rock") { button.classList.add("rock"); button.textContent = "🪨"; }
       else if (cell.tile) { button.classList.add(`owner-${cell.tile.player}`); button.innerHTML = pathSvg(cell.tile.piece, cell.tile.rotation); }
@@ -198,13 +198,19 @@ class IslandGame {
       const blob = await createScoreCard({ title: this.t.title, score: `${this.state.scores[0]} : ${this.state.scores[1]}`, scoreLabel: this.t.score,
         best: invitation, bestLabel: "", invitation: this.t.share, url: this.resultLink(), language: this.language,
         direction: this.language === "ar" ? "rtl" : "ltr", drawArtwork: drawIsland });
-      const outcome = await shareCardOrDownload(blob, "island-conquest.png", this.t.title, this.resultLink(), invitation);
-      if (outcome === "downloaded") this.text("share-status", this.t.copied);
-    } catch { this.text("share-status", this.t.invalid); }
+      try {
+        const outcome = await shareCardOrDownload(blob, "island-conquest.png", this.t.title, this.resultLink(), invitation);
+        if (outcome === "downloaded") this.text("share-status", this.t.imageSaved);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        downloadScoreCard(blob, "island-conquest.png");
+        this.text("share-status", this.t.imageSaved);
+      }
+    } catch { this.text("share-status", this.t.shareFailed); }
   }
   private async copyLink(): Promise<void> {
     try { await copyShareLink(this.resultLink()); this.text("share-status", this.t.copied); }
-    catch { this.text("share-status", this.t.invalid); }
+    catch { this.text("share-status", this.t.shareFailed); }
   }
 }
 
