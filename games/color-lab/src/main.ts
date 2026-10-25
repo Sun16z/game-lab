@@ -4,8 +4,10 @@ import { inputInstruction, standaloneAdapter, touchPointerQuery } from "@game-la
 import { copyShareLink, createScoreCard, downloadScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { mountAudioControls } from "@game-lab/game-audio/ui";
 import { createColorAudio } from "./audio";
+import { dailyLevel, decodeChallenge, encodeChallenge, utcDay, type Challenge } from "./daily";
+import { dailyCopy } from "./daily-i18n";
 import { chooseLanguage, translations, type Language } from "./i18n";
-import { applyMove, cloneBoard, isSolved, legalMove, LEVELS, solve, starsFor, type Board } from "./rules";
+import { applyMove, cloneBoard, isSolved, legalMove, LEVELS, solve, starsFor, type Board, type Move } from "./rules";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
 
@@ -46,11 +48,11 @@ function readBest(): (number | null)[] {
   } catch { return Array(LEVELS.length).fill(null); }
 }
 function storeBest(best: (number | null)[]): void { try { safeStorage()?.setItem(PROGRESS_KEY, JSON.stringify(best)); } catch { /* Play continues without storage. */ } }
-function incomingChallenge(): { level: number; moves: number } | null {
+function incomingChallenge(): Challenge | null {
   const params = new URLSearchParams(location.search);
   const level = Number(params.get("level"));
   const moves = Number(params.get("challenge"));
-  return Number.isInteger(level) && level >= 1 && level <= LEVELS.length && Number.isInteger(moves) && moves >= 1 && moves <= 999 ? { level, moves } : null;
+  return Number.isInteger(level) && level >= 1 && level <= LEVELS.length && Number.isInteger(moves) && moves >= 1 && moves <= 999 ? { level, moves, steps: [], date: null } : null;
 }
 function paintCard(ctx: CanvasRenderingContext2D): void {
   const colors = ["#f18d9c", "#f6c66e", "#9ca9ee"];
@@ -72,11 +74,14 @@ function paintCard(ctx: CanvasRenderingContext2D): void {
 class ColorLabGame {
   private readonly playerSessionId = sessionId();
   private language: Language = chooseLanguage(new URLSearchParams(location.search).get("lang") ?? savedLanguage() ?? navigator.language);
-  private readonly challenge = incomingChallenge();
+  private readonly challenge = decodeChallenge(location.hash) ?? incomingChallenge();
+  private dailyDate: string | null = this.challenge?.date ?? null;
   private levelIndex = this.challenge ? this.challenge.level - 1 : 0;
   private run: GameRun = this.newRun();
   private board: Board = cloneBoard(LEVELS[this.levelIndex].tubes);
   private history: Board[] = [];
+  private moveHistory: Move[] = [];
+  private replayToken = 0;
   private moves = 0;
   private selected: number | null = null;
   private hintMove: { source: number; target: number } | null = null;
@@ -104,6 +109,9 @@ class ColorLabGame {
     element("hint-button").addEventListener("click", () => this.hint());
     element("restart-button").addEventListener("click", () => this.restart());
     element("level-button").addEventListener("click", () => this.openLevelPicker());
+    element("daily-button").addEventListener("click", () => this.openDaily());
+    element("ready-daily-button").addEventListener("click", () => this.openDaily());
+    element("watch-button").addEventListener("click", () => void this.watchChallenge());
     element("level-close").addEventListener("click", () => this.closeLevelPicker());
     element("replay-button").addEventListener("click", () => this.restart());
     element("next-button").addEventListener("click", () => this.nextLevel());
@@ -144,6 +152,12 @@ class ColorLabGame {
     this.text("level-label", t.level); this.text("moves-label", t.moves); this.text("best-label", t.best); this.text("goal-label", t.goal);
     this.text("select-label", t.select); this.text("undo-label", t.undo); this.text("hint-label", t.hint); this.text("restart-label", t.restart); this.text("pause-label", t.pause);
     this.text("ready-title", t.tagline); this.text("ready-description", t.intro); this.text("start-button", `${t.start} →`);
+    const daily = dailyCopy[this.language];
+    this.text("daily-button", `☀ ${daily.daily}`);
+    this.text("ready-daily-button", `☀ ${daily.daily}`);
+    this.text("watch-button", daily.replay);
+    this.text("daily-banner", this.dailyDate ? daily.today(this.dailyDate) : "");
+    element("daily-banner").classList.toggle("hidden", !this.dailyDate);
     this.text("pause-title", t.pause); this.text("resume-button", t.resume); this.text("level-select-title", t.select);
     this.text("result-title", t.solved); this.text("next-button", `${t.next} →`); this.text("replay-button", t.replay);
     this.text("share-button", t.share); this.text("download-button", t.download); this.text("copy-button", t.copy);
@@ -152,10 +166,12 @@ class ColorLabGame {
     this.audioControls?.updateLanguage(this.language);
     if (this.run.state === "READY" || this.run.state === "PLAYING") this.feedback(this.selected === null ? t.selectSource : t.selectTarget);
     if (this.run.state === "RESULT") this.renderResult();
-    if (this.challenge && this.levelIndex === this.challenge.level - 1) {
+    if (this.challenge && this.levelIndex === this.challenge.level - 1 && this.dailyDate === this.challenge.date) {
       this.text("challenge-intro", t.challengeIntro(this.challenge.level, this.challenge.moves));
       element("challenge-intro").classList.remove("hidden");
+      element("watch-button").classList.toggle("hidden", this.challenge.steps.length === 0);
     } else element("challenge-intro").classList.add("hidden");
+    if (!this.challenge || this.levelIndex !== this.challenge.level - 1 || this.dailyDate !== this.challenge.date) element("watch-button").classList.add("hidden");
   }
 
   private render(): void {
@@ -163,7 +179,7 @@ class ColorLabGame {
     this.text("moves-value", String(this.moves));
     this.text("goal-value", String(LEVELS[this.levelIndex].optimal));
     this.text("best-value", this.best[this.levelIndex] === null ? "—" : String(this.best[this.levelIndex]));
-    this.text("ready-level", `${this.t.level} ${String(this.levelIndex + 1).padStart(2, "0")} / 30`);
+    this.text("ready-level", this.dailyDate ? dailyCopy[this.language].today(this.dailyDate) : `${this.t.level} ${String(this.levelIndex + 1).padStart(2, "0")} / 30`);
     this.text("result-level", `${this.t.level} ${String(this.levelIndex + 1).padStart(2, "0")}`);
     const holder = element("tubes");
     holder.replaceChildren();
@@ -199,7 +215,7 @@ class ColorLabGame {
   private showReady(): void {
     for (const id of ["pause-panel", "result-panel", "level-panel"]) element(id).classList.add("hidden");
     element("ready-panel").classList.remove("hidden");
-    this.text("ready-level", `${this.t.level} ${String(this.levelIndex + 1).padStart(2, "0")} / 30`);
+    this.text("ready-level", this.dailyDate ? dailyCopy[this.language].today(this.dailyDate) : `${this.t.level} ${String(this.levelIndex + 1).padStart(2, "0")} / 30`);
     this.applyLanguage();
   }
   private start(): void {
@@ -234,6 +250,7 @@ class ColorLabGame {
       return;
     }
     this.history.push(cloneBoard(this.board));
+    this.moveHistory.push(move);
     this.board = applyMove(this.board, move);
     this.moves++;
     this.selected = null;
@@ -247,7 +264,7 @@ class ColorLabGame {
     if (this.run.state !== "PLAYING") return;
     const previous = this.history.pop();
     if (!previous) { this.feedback(this.t.undoEmpty); return; }
-    this.board = previous; this.moves--; this.selected = null; this.hintMove = null;
+    this.board = previous; this.moveHistory.pop(); this.moves--; this.selected = null; this.hintMove = null;
     this.feedback(this.t.selectSource); this.audio.play("undo"); this.render();
   }
   private hint(): void {
@@ -295,9 +312,14 @@ class ColorLabGame {
     this.text("result-stars", "★".repeat(stars) + "☆".repeat(3 - stars));
     element("result-stars").setAttribute("aria-label", `${stars}/3`);
     this.text("result-description", this.t.result(this.moves, optimal));
+    if (this.challenge && this.levelIndex === this.challenge.level - 1 && this.dailyDate === this.challenge.date) {
+      const verdict = this.moves < this.challenge.moves ? dailyCopy[this.language].better
+        : this.moves === this.challenge.moves ? dailyCopy[this.language].tied : dailyCopy[this.language].keepTrying;
+      this.text("result-description", `${verdict} ${this.t.result(this.moves, optimal)}`);
+    }
     this.text("share-preview-number", String(this.moves));
     this.text("share-preview-copy", `${this.t.level} ${this.levelIndex + 1} · ${this.t.moves} ${this.moves}`);
-    element<HTMLButtonElement>("next-button").classList.toggle("hidden", this.levelIndex === LEVELS.length - 1);
+    element<HTMLButtonElement>("next-button").classList.toggle("hidden", !!this.dailyDate || this.levelIndex === LEVELS.length - 1);
   }
   private restart(): void {
     if (this.run.state === "READY") return;
@@ -308,17 +330,49 @@ class ColorLabGame {
   }
   private nextLevel(): void {
     if (this.run.state !== "RESULT" || this.levelIndex >= LEVELS.length - 1) return;
+    this.dailyDate = null;
     this.resetLevel(this.levelIndex + 1);
     this.start();
   }
+  private openDaily(): void {
+    this.replayToken++;
+    if (this.run.state === "PLAYING" || this.run.state === "PAUSED") this.closeRun("daily_change");
+    this.dailyDate = utcDay(new Date());
+    this.resetLevel(dailyLevel(this.dailyDate) - 1);
+  }
+  private async watchChallenge(): Promise<void> {
+    if (this.run.state !== "READY" || !this.challenge?.steps.length || this.levelIndex !== this.challenge.level - 1 || this.dailyDate !== this.challenge.date) return;
+    const token = ++this.replayToken;
+    this.board = cloneBoard(LEVELS[this.levelIndex].tubes);
+    element("ready-panel").classList.add("hidden");
+    this.feedback(dailyCopy[this.language].replaying);
+    for (const move of this.challenge.steps) {
+      await new Promise((resolve) => window.setTimeout(resolve, 520));
+      if (token !== this.replayToken) return;
+      this.board = applyMove(this.board, move);
+      this.render();
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 850));
+    if (token !== this.replayToken) return;
+    this.board = cloneBoard(LEVELS[this.levelIndex].tubes);
+    this.render();
+    this.showReady();
+  }
   private resetLevel(index: number): void {
+    this.replayToken++;
     this.levelIndex = index;
     this.board = cloneBoard(LEVELS[index].tubes);
-    this.history = []; this.moves = 0; this.selected = null; this.hintMove = null;
+    this.history = []; this.moveHistory = []; this.moves = 0; this.selected = null; this.hintMove = null;
     this.run = this.newRun();
     this.render(); this.showReady();
   }
   private openLevelPicker(): void {
+    if (this.run.state === "READY") {
+      this.replayToken++;
+      this.board = cloneBoard(LEVELS[this.levelIndex].tubes);
+      element("ready-panel").classList.remove("hidden");
+      this.render();
+    }
     this.levelWasPlaying = this.run.state === "PLAYING";
     if (this.levelWasPlaying) this.pause();
     const grid = element("level-grid"); grid.replaceChildren();
@@ -332,6 +386,7 @@ class ColorLabGame {
       button.addEventListener("click", () => {
         if (this.run.state === "PLAYING" || this.run.state === "PAUSED") this.closeRun("level_change");
         this.levelWasPlaying = false;
+        this.dailyDate = null;
         this.resetLevel(index);
       });
       grid.append(button);
@@ -360,8 +415,9 @@ class ColorLabGame {
   }
   private resultLink(): string {
     const url = new URL(shareLink(location.href, this.language));
-    url.searchParams.set("level", String(this.levelIndex + 1));
-    url.searchParams.set("challenge", String(this.moves));
+    url.searchParams.delete("level");
+    url.searchParams.delete("challenge");
+    url.hash = encodeChallenge({ date: this.dailyDate, level: this.levelIndex + 1, moves: this.moves, steps: this.moveHistory });
     return url.toString();
   }
   private async card(): Promise<Blob> {
