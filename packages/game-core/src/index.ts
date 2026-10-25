@@ -1,4 +1,4 @@
-export type GameId = `G${"001" | "002" | "003" | "004" | "005" | "006" | "007" | "008" | "009" | "010" | "011" | "012" | "013" | "014" | "015" | "016" | "017" | "018" | "019" | "020"}`;
+export type GameId = `G${"001" | "002" | "003" | "004" | "005" | "006" | "007" | "008" | "009" | "010" | "011" | "012" | "013" | "014" | "015" | "016" | "017" | "018" | "019" | "020"}` | "C001" | "C002";
 export type RunState = "READY" | "PLAYING" | "PAUSED" | "RESULT" | "ERROR";
 export type GameCategory = "手感挑戰" | "動腦解謎" | "創作實驗" | "探索同玩";
 
@@ -67,5 +67,6 @@ export const games: readonly GameDefinition[] = [
   { id: "G017", slug: "treasure-code", title: "寶藏密碼島", summary: "看圖案線索，拼出藏寶箱的密碼。", category: "動腦解謎", replay: "解鎖新線索與支線謎題", motif: "◇", art: ["#e8c672", "#bd8178"], priority: "P2", status: "planned" },
   { id: "G018", slug: "cloud-sculptor", title: "雲朵捏捏樂", summary: "推拉雲朵，做出心裡想像的形狀。", category: "創作實驗", replay: "保存作品、試新造型", motif: "☁", art: ["#b7d9e6", "#8da7d2"], priority: "P2", status: "planned" },
   { id: "G019", slug: "island-duo", title: "雙人小島任務", summary: "同一台裝置輪流操作，合作打開島上機關。", category: "探索同玩", replay: "和不同朋友找出合作方式", motif: "♧", art: ["#91d2a2", "#5d9db5"], priority: "P2", status: "planned" },
-  { id: "G020", slug: "pocket-planet", title: "口袋星球", summary: "放上山、水和生物，觀察自己的星球變化。", category: "探索同玩", replay: "嘗試不同組合與星球故事", motif: "◌", art: ["#b4a0e3", "#6d90c6"], priority: "P2", status: "planned" }
+  { id: "G020", slug: "pocket-planet", title: "口袋星球", summary: "放上山、水和生物，觀察自己的星球變化。", category: "探索同玩", replay: "嘗試不同組合與星球故事", motif: "◌", art: ["#b4a0e3", "#6d90c6"], priority: "P2", status: "planned" },
+  { id: "C001", slug: "island-conquest", title: "小島佔地王", summary: "輪流鋪路、圈住寶箱，和電腦或朋友搶地盤。", category: "探索同玩", replay: "換路線和對手，再挑戰一次", motif: "🏝", art: ["#80d7b0", "#4c8fb2"], priority: "P1", status: "playable" }
 ];

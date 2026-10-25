@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d4360" />
+    <meta name="description" content="小島佔地王：鋪路、圈地、搶寶箱。和電腦或朋友輪流玩。" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <title>小島佔地王｜Game Lab</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">🏝</span><span>GAME LAB <b id="brand-title">/ 小島佔地王</b></span></div>
+        <div class="top-actions"><label class="visually-hidden" for="language-select">Language</label><select id="language-select" aria-label="Language"><option value="zh-Hant">繁體中文</option><option value="en">English</option><option value="es">Español</option><option value="pt-BR">Português (BR)</option><option value="fr">Français</option><option value="ar">العربية</option><option value="sw">Kiswahili</option><option value="id">Bahasa Indonesia</option><option value="hi">हिन्दी</option></select><button id="sound-button" class="sound-button" type="button">🔊</button></div>
+      </header>
+      <main class="shell">
+        <div class="hero"><div><div class="eyebrow">C001 · ISLAND CONQUEST</div><h1 id="title">小島佔地王</h1><p id="subtitle">鋪路、圈地、搶寶箱！</p></div><div class="hero-art" aria-hidden="true"><span class="sun">☀</span><span class="island">🏝️</span><span class="wave">〰 〰 〰</span></div></div>
+        <section id="setup" class="setup-panel">
+          <p id="intro">輪流選一片路，轉好方向後放在小島上。連上自己的路會加分；圈住空地還能插旗再走一步！</p>
+          <div class="setup-options"><fieldset><legend id="mode-label">遊玩方式</legend><label><input type="radio" name="mode" value="ai" checked /><span id="mode-ai">對電腦</span></label><label><input type="radio" name="mode" value="local" /><span id="mode-local">同裝置雙人</span></label></fieldset><fieldset id="difficulty-field"><legend id="difficulty-label">電腦難度</legend><select id="difficulty-select"><option value="easy">輕鬆</option><option value="normal" selected>普通</option><option value="hard">高手</option></select></fieldset><fieldset><legend id="size-label">小島大小</legend><select id="size-select"><option value="6" selected>大島6×6</option><option value="4">小小島4×4</option></select></fieldset></div>
+          <button id="start-button" class="primary-button" type="button">登島開玩 →</button>
+        </section>
+        <section id="play-area" class="play-area hidden" aria-label="Island game">
+          <div class="scoreboard"><div class="team team-wave"><span>🌊</span><small id="wave-label">海浪隊</small><strong id="wave-score">0</strong></div><div id="turn-pill" class="turn-pill">輪到海浪隊</div><div class="team team-coral"><span>🪸</span><small id="coral-label">珊瑚隊</small><strong id="coral-score">1</strong></div></div>
+          <div id="board" class="board" role="grid" aria-label="Island board"></div>
+          <p id="feedback" class="feedback" role="status" aria-live="polite">先選一片路</p>
+          <div class="piece-tray"><div id="pieces" class="pieces" role="group"></div><button id="rotate-button" class="rotate-button" type="button"><span aria-hidden="true">↻</span><span id="rotate-label">旋轉路片</span></button></div>
+        </section>
+        <section id="result" class="result-panel hidden" role="status"><span class="result-icon" aria-hidden="true">🏆</span><h2 id="result-title">勝利！</h2><p id="result-score"></p><div class="result-actions"><button id="replay-button" class="primary-button" type="button">再玩一局</button><button id="share-button" class="secondary-button" type="button">分享戰果</button><button id="copy-button" class="secondary-button" type="button">複製挑戰連結</button></div><p id="share-status" aria-live="polite"></p></section>
+      </main>
+      <footer>Game Lab · C001 · Kenney CC0音樂採樣 · 不需帳號，可離線遊玩</footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
