@@ -47,7 +47,8 @@
   },
   "routes": [{ "pattern": "games.somewhen.life", "custom_domain": true }],
   "workers_dev": true,
-  "preview_urls": true
+  "preview_urls": true,
+  "previews": {}
 }
 ```
 
