@@ -8,6 +8,7 @@ import { chooseAiMove, createGame, legalMoves, playMove, winner, type Difficulty
 import "./style.css";
 import "@game-lab/game-audio/style.css";
 import "@game-lab/platform-adapters/home-exit.css";
+import "./nautical.css";
 
 const PIECES: Piece[] = ["straight", "corner", "tee"];
 const MASK: Record<Piece, number> = { straight: 5, corner: 3, tee: 7 };
