@@ -4,3 +4,13 @@
 .home-exit span:first-child { font-size: 22px; line-height: 1; }
 .home-exit-text { max-width: 80px; }
 @media (max-width: 560px) { .home-exit { width: 42px; height: 42px; padding: 4px; }.home-exit-text { display: none; } }
+
+.learning-benefit { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; margin: 12px 0; padding: 10px 12px; border: 2px solid currentColor; border-radius: 14px; background: #fff9df; color: #173b52; box-shadow: 3px 3px 0 currentColor; text-align: start; }
+.learning-benefit__art { min-width: 66px; padding: 8px 7px; border-radius: 10px; background: #f4cb69; color: #173b52; font-weight: 900; letter-spacing: 2px; text-align: center; transform: rotate(-2deg); }
+.learning-benefit strong,.learning-benefit small { display: block; }.learning-benefit strong { margin-bottom: 3px; font-size: 13px; letter-spacing: .05em; }.learning-benefit small { font-size: 12px; line-height: 1.45; }
+.learning-benefit--monster-math { background:#fff0fb; color:#472a68 }.learning-benefit--monster-math .learning-benefit__art { background:#ffcf4a; color:#472a68 }
+.learning-benefit--color-lab { background:#effff8; color:#145463 }.learning-benefit--color-lab .learning-benefit__art { background:linear-gradient(135deg,#ff8271 0 33%,#ffd15c 33% 66%,#6fd8c5 66%);color:#173b52 }
+.learning-benefit--island-conquest { background:#fff4cf; color:#164e63 }.learning-benefit--island-conquest .learning-benefit__art { background:#79d6c2 }
+.learning-benefit--memory-monsters { background:#fff1f8; color:#473d81 }.learning-benefit--memory-monsters .learning-benefit__art { background:#ffd565 }
+.learning-benefit--math-runner { background:#eefcf8; color:#173b52 }.learning-benefit--math-runner .learning-benefit__art { background:#8bd8c5 }
+@media (max-width:560px){.learning-benefit{gap:8px;margin:10px 0;padding:9px 10px}.learning-benefit__art{min-width:58px;font-size:12px}.learning-benefit small{font-size:11px}}
