@@ -1,0 +1,19 @@
+{
+  "name": "@game-lab/math-runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && node ../../scripts/create-game-sw.mjs math-runner",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@game-lab/game-audio": "workspace:*",
+    "@game-lab/game-core": "workspace:*",
+    "@game-lab/game-share": "workspace:*",
+    "@game-lab/platform-adapters": "workspace:*"
+  },
+  "devDependencies": { "vite": "^7.1.0" }
+}
