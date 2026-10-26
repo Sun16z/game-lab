@@ -462,6 +462,10 @@ class StackScene extends Phaser.Scene {
     const count=this.layers(),goal=count<10?10:count<25?25:Math.floor(count/25)*25+25;
     const copy=skyCopy[this.language],zone=count>=25?2:count>=10?1:0;
     element("journey-zone").textContent=copy.zones[zone];
+    for(const [index,id] of ["stop-ground","stop-cloud","stop-space"].entries()){
+      const label=element(id);label.textContent=copy.zones[index];label.parentElement!.dataset.reached=String(zone>=index);label.parentElement!.setAttribute("aria-current",zone===index?"step":"false");
+    }
+    element("journey-tip").textContent=copy.repair;
     element("journey-goal").textContent=`${copy.goal} · ${goal}${this.language==="zh-Hant"?"":" "}${translations[this.language].unit}`;
     const meter=element<HTMLProgressElement>("journey-progress");meter.max=goal;meter.value=count;meter.setAttribute("aria-label",copy.goal);
     element("stage-frame").dataset.zone=String(zone);
