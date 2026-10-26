@@ -13,7 +13,9 @@
         <div class="hud"><div><span id="score-label"></span><strong id="score">0</strong></div><div><span id="streak-label"></span><strong id="streak">0</strong></div><div><span id="shield-label"></span><strong id="shields" class="shield-pips" aria-label="3">●●●</strong></div><div><span id="time-label"></span><strong id="time">90</strong></div><button id="pause-button" class="pause-button" type="button"></button></div>
         <div id="stage" class="runner-stage" tabindex="0" aria-label="跑酷遊戲區">
           <div class="sky" aria-hidden="true"><i class="cloud c1"></i><i class="cloud c2"></i><i class="city-block b1"></i><i class="city-block b2"></i><i class="city-block b3"></i><i class="city-block b4"></i></div>
-          <div class="road" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="city-festival" aria-hidden="true"><i class="balloon"></i><i class="pennants"></i><i class="kiosk kiosk-left"><b>★</b></i><i class="kiosk kiosk-right"><b>♪</b></i><i class="spectator spectator-left"></i><i class="spectator spectator-right"></i></div>
+          <svg class="road-art" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M36 42L64 42L100 100H0Z" fill="#31586a"/><path d="M36 42L0 100M64 42L100 100" stroke="#f4cb69" stroke-width="1.4"/><path class="road-dashes" d="M45.33 42L33.78 100M54.67 42L66.22 100" stroke="#fff4cf" stroke-width=".65" stroke-dasharray="4 5"/><path d="M34 94H66" stroke="#8dd8bf" stroke-width=".6" opacity=".35"/></svg>
+          <div id="runner-shadow" class="runner-shadow" aria-hidden="true"></div>
           <div id="question" class="question-pill" role="status" aria-live="polite"></div>
           <div id="gate" class="answer-gate" aria-hidden="true"><span></span><span></span><span></span></div>
           <div id="obstacle" class="obstacle hurdle lane-1" aria-hidden="true"><i></i><i></i><b></b></div>
