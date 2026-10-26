@@ -11,17 +11,20 @@ import { chooseLanguage, translations, type Language } from "./i18n";
 import { shareTranslations } from "./share-i18n";
 import { progressCopy } from "./progress-i18n";
 import { modeCopy } from "./mode-i18n";
+import { drawHouseWindows, drawSkyWorkshop } from "./sky-art";
+import { dropCopy, skyCopy } from "./sky-i18n";
 import { advanceProgress, bestKeyForMode, isThemeUnlocked, loadMode, loadProgress, saveMode, saveProgress, themeThresholds, type Achievement, type Theme } from "./progress";
-import { INITIAL_WIDTH, movingX, placeBlock, sceneryForLayer, speedForLayer, startPhaseForLayer, type Block, type GameMode } from "./rules";
+import { INITIAL_WIDTH, movingX, placeBlock, speedForLayer, startPhaseForLayer, type Block, type GameMode } from "./rules";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
 import "@game-lab/platform-adapters/home-exit.css";
+import "./workshop.css";
 
 const WIDTH = 480;
 const HEIGHT = 720;
 const BLOCK_HEIGHT = 34;
 const BASE_Y = 602;
-const VERSION = "0.3.0";
+const VERSION = "0.4.0";
 const EVENT_KEY = "game-lab:session-events";
 
 function element<T extends HTMLElement = HTMLElement>(id: string): T {
@@ -61,7 +64,7 @@ function recordEvent(event: GameEvent): void {
 function drawStackArtwork(ctx: CanvasRenderingContext2D, theme: Theme): void {
   const colors = theme === "neon" ? ["#34e4e1", "#ff5fb7", "#c37aff", "#8affde"]
     : theme === "cosmos" ? ["#bdaaff", "#89b9ff", "#ffb9db", "#8ce0e7"]
-      : ["#ffbd86", "#f58f83", "#e4799d", "#b882c8"];
+      : ["#e2a96a", "#d88669", "#9ac2ad", "#e8c574"];
   for (let index = 0; index < 9; index += 1) {
     const width = 390 - index * 12;
     const x = 540 - width / 2 + Math.sin(index * 1.8) * 9;
@@ -70,13 +73,15 @@ function drawStackArtwork(ctx: CanvasRenderingContext2D, theme: Theme): void {
     ctx.beginPath();
     ctx.roundRect(x, y, width, 39, 7);
     ctx.fill();
+    ctx.fillStyle="#365b6c";
+    for(let windowX=x+20;windowX<x+width-12;windowX+=35){ctx.beginPath();ctx.roundRect(windowX,y+14,10,14,2);ctx.fill()}
   }
 }
 
 const PALETTES = [
-    { background: 0x183442, blocks: [0xffbd86, 0xf58f83, 0xe4799d, 0xb882c8], accent: 0xffdf91 },
-    { background: 0x173a3e, blocks: [0xa7e0bb, 0x6dc5ae, 0x5daeb8, 0x8baccb], accent: 0xf1de92 },
-    { background: 0x2d304e, blocks: [0xecc6a2, 0xdca5ba, 0xbba3dc, 0x9bb3e3], accent: 0xffdf91 }
+    { background: 0x91ced7, blocks: [0xe2a96a, 0xd88669, 0x9ac2ad, 0xe8c574], accent: 0xffd575 },
+    { background: 0x91ced7, blocks: [0x9ec7b7, 0xdda577, 0xb3bf97, 0xe5bc72], accent: 0xffd575 },
+    { background: 0x91ced7, blocks: [0xe7be7b, 0xc58e7f, 0x8fbdc2, 0xe2a16f], accent: 0xffd575 }
 ];
 const THEME_PALETTES = {
   neon: { background: 0x181d3d, blocks: [0x34e4e1, 0xff5fb7, 0xc37aff, 0x8affde], accent: 0xfaf46c },
@@ -166,6 +171,7 @@ class StackScene extends Phaser.Scene {
       });
     }
     element("start-button").addEventListener("click", () => this.startRun());
+    element("drop-button").addEventListener("click", () => this.drop());
     element("retry-button").addEventListener("click", () => this.retry());
     element("share-card-button").addEventListener("click", () => void this.shareResultCard());
     element("download-card-button").addEventListener("click", () => void this.downloadResultCard());
@@ -243,6 +249,7 @@ class StackScene extends Phaser.Scene {
     element("result-panel").classList.add("hidden");
     element("pause-panel").classList.add("hidden");
     element("pause-button").classList.remove("hidden");
+    element("drop-button").classList.remove("hidden");
     element("combo-chip").classList.remove("hidden");
     element("record-chip").classList.remove("hidden");
     this.updateHud();
@@ -305,7 +312,8 @@ class StackScene extends Phaser.Scene {
         : justBeatRecord ? t.newBest
           : outcome.perfect ? `${t.perfect} +${outcome.points}`
           : `${t.placed} · ${Math.round(outcome.deviationPx)}px · +${outcome.points}`;
-    this.showToast(feedback, streakMilestone ? 1200 : 850, streakMilestone);
+    const destination=this.layers()===10?skyCopy[this.language].zones[1]:this.layers()===25?skyCopy[this.language].zones[2]:"";
+    this.showToast(destination?`${destination}\n${feedback}`:feedback, destination?1500:streakMilestone?1200:850, streakMilestone||Boolean(destination));
     this.playPlacementMelody(outcome.perfect, outcome.bullseye, this.layers());
     this.draw();
   }
@@ -333,6 +341,7 @@ class StackScene extends Phaser.Scene {
       durationSeconds: Math.max(0, (Date.parse(this.run.endedAt!) - Date.parse(this.run.startedAt!)) / 1000)
     });
     element("pause-button").classList.add("hidden");
+    element("drop-button").classList.add("hidden");
     element("result-panel").classList.remove("hidden");
     element("toast").classList.add("hidden");
     element("combo-chip").classList.add("hidden");
@@ -416,6 +425,7 @@ class StackScene extends Phaser.Scene {
     this.run = transitionRun(this.run, "PAUSED", new Date().toISOString());
     standaloneAdapter.gameplayStop();
     element("pause-panel").classList.remove("hidden");
+    element("drop-button").classList.add("hidden");
     element("pause-button").classList.add("hidden");
     element("combo-chip").classList.add("hidden");
     element("record-chip").classList.add("hidden");
@@ -429,6 +439,7 @@ class StackScene extends Phaser.Scene {
     standaloneAdapter.gameplayStart();
     element("pause-panel").classList.add("hidden");
     element("pause-button").classList.remove("hidden");
+    element("drop-button").classList.remove("hidden");
     this.updateProgressChips();
   }
 
@@ -443,7 +454,17 @@ class StackScene extends Phaser.Scene {
     element("layers").textContent = String(this.layers());
     element("score").textContent = this.score.toLocaleString(this.language);
     element("best").textContent = String(this.bestLayers);
+    this.updateJourney();
     this.updateProgressChips();
+  }
+
+  private updateJourney(): void {
+    const count=this.layers(),goal=count<10?10:count<25?25:Math.floor(count/25)*25+25;
+    const copy=skyCopy[this.language],zone=count>=25?2:count>=10?1:0;
+    element("journey-zone").textContent=copy.zones[zone];
+    element("journey-goal").textContent=`${copy.goal} · ${goal}${this.language==="zh-Hant"?"":" "}${translations[this.language].unit}`;
+    const meter=element<HTMLProgressElement>("journey-progress");meter.max=goal;meter.value=count;meter.setAttribute("aria-label",copy.goal);
+    element("stage-frame").dataset.zone=String(zone);
   }
 
   private updateProgressChips(): void {
@@ -516,8 +537,11 @@ class StackScene extends Phaser.Scene {
     element("best-label").textContent = t.best;
     this.audioControls?.updateLanguage(this.language);
     this.homeExit?.updateLanguage(this.language);
-    element("ready-pill").textContent = t.readyPill;
-    element("ready-title").innerHTML = t.readyTitle;
+    element("ready-pill").textContent = skyCopy[this.language].journey;
+    element("ready-title").textContent = skyCopy[this.language].headline;
+    element("ready-repair").textContent = skyCopy[this.language].repair;
+    element("drop-button").textContent = dropCopy[this.language];
+    this.updateJourney();
     element("ready-description").textContent = inputInstruction(t.readyDescription, t.readyDescriptionTouch, this.touchPointer.matches);
     const mode = modeCopy[this.language];
     element("mode-label").textContent = mode.label;
@@ -563,23 +587,8 @@ class StackScene extends Phaser.Scene {
     const now = performance.now();
     const feedbackAge = now - this.feedbackStartedAt;
     const bounce = this.reducedMotion || feedbackAge >= 180 ? 0 : 7 * Math.sin(Math.PI * feedbackAge / 180);
-    const scenery = sceneryForLayer(this.layers());
     g.clear();
-    g.fillStyle(scenery === "space" ? 0x10162e : scenery === "sky" ? 0x245572 : palette.background, 1).fillRect(0, 0, WIDTH, HEIGHT);
-    if (scenery === "sky") {
-      g.fillStyle(0xe3f7f3, 0.09);
-      for (let i = 0; i < 5; i++) g.fillRoundedRect((i * 137 + 45) % 490 - 25, 95 + i * 88, 145, 29, 15);
-    } else {
-      g.fillStyle(0xffffff, scenery === "space" ? 0.24 : 0.07);
-      for (let i = 0; i < 28; i++) {
-        const x = (i * 173 + 57) % WIDTH;
-        const y = (i * 91 + 36) % 535;
-        g.fillCircle(x, y, i % 4 === 0 ? 2 : 1);
-      }
-    }
-    g.fillStyle(0xffffff, 0.045).fillRoundedRect(34, 116, 412, 502, 22);
-    g.fillStyle(0x0b1e29, 0.5).fillRect(0, 647, WIDTH, 73);
-    g.fillStyle(0xe4f3ef, 0.28).fillRect(0, 646, WIDTH, 2);
+    drawSkyWorkshop(g,this.layers(),this.runTheme,now,this.reducedMotion);
     if (this.bestLayers > 0 && this.run.state === "PLAYING") {
       const recordY = BASE_Y - this.bestLayers * BLOCK_HEIGHT + offset;
       if (recordY > 145 && recordY < 630) {
@@ -594,6 +603,7 @@ class StackScene extends Phaser.Scene {
       g.fillStyle(0x071d29, 0.22).fillRoundedRect(block.x + 3, y + 5, block.width, BLOCK_HEIGHT, 5);
       g.fillStyle(block.color, 1).fillRoundedRect(block.x, y, block.width, BLOCK_HEIGHT - 2, 5);
       g.fillStyle(0xffffff, 0.18).fillRoundedRect(block.x + 5, y + 4, Math.max(0, block.width - 10), 5, 3);
+      drawHouseWindows(g,block.x,y,block.width,i);
       if (this.feedbackPerfect && i === this.blocks.length - 1 && feedbackAge < 280 && !this.reducedMotion) {
         g.fillStyle(this.feedbackBullseye ? palette.accent : 0xffffff, 0.5 * (1 - feedbackAge / 280)).fillRoundedRect(block.x, y, block.width, BLOCK_HEIGHT - 2, 5);
       }
@@ -616,9 +626,13 @@ class StackScene extends Phaser.Scene {
     }
     const activeY = BASE_Y - this.blocks.length * BLOCK_HEIGHT + offset;
     if (this.run.state !== "RESULT") {
-      g.lineStyle(1, 0xffffff, 0.18).lineBetween(24, activeY + BLOCK_HEIGHT + 4, WIDTH - 24, activeY + BLOCK_HEIGHT + 4);
+      // The target footprint teaches alignment without changing the collision rule.
+      const target=this.currentTarget();
+      g.fillStyle(0xffffff,.12).fillRect(target.x,activeY,target.width,BLOCK_HEIGHT-2);
+      g.lineStyle(2,0x315568,.28).lineBetween(target.x,activeY-6,target.x,activeY+BLOCK_HEIGHT).lineBetween(target.x+target.width,activeY-6,target.x+target.width,activeY+BLOCK_HEIGHT);
       g.fillStyle(palette.accent, 1).fillRoundedRect(this.activeX, activeY, this.currentTarget().width, BLOCK_HEIGHT - 2, 5);
       g.fillStyle(0xffffff, 0.25).fillRoundedRect(this.activeX + 5, activeY + 4, Math.max(0, this.currentTarget().width - 10), 5, 3);
+      drawHouseWindows(g,this.activeX,activeY,this.currentTarget().width,this.blocks.length);
     } else if (this.failedX !== null) {
       g.fillStyle(0xff697b, 0.75).fillRoundedRect(this.failedX, activeY, this.currentTarget().width, BLOCK_HEIGHT - 2, 5);
     }
