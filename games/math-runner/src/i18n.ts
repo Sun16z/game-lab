@@ -24,3 +24,32 @@ export const challengeCopy:Record<Language,(target:number)=>string>={
   id:target=>`Temanmu mendapat ${target}. Bisa mengalahkannya?`,
   hi:target=>`आपके दोस्त ने ${target} बनाए। क्या आप आगे निकलेंगे?`
 };
+
+export type RunnerExtra={subject:string;math:string;mathCopy:string;english:string;englishCopy:string;grade:string;middle:string;middleCopy:string;upper:string;upperCopy:string;jump:string;boost:string;hurdle:string;barrier:string;clear:string;hit:string;boosted:string};
+export const runnerExtraCopy:Record<Language,RunnerExtra>={
+  "zh-Hant":{subject:"選擇科目",math:"數學跑酷",mathCopy:"運算與乘除",english:"英文跑酷",englishCopy:"情境句選字",grade:"選擇年級",middle:"中年級",middleCopy:"3～4年級",upper:"高年級",upperCopy:"5～6年級",jump:"跳躍",boost:"加速",hurdle:"跳過橫桿！",barrier:"換道閃避！",clear:"漂亮閃過！",hit:"撞到了，下一個追回來",boosted:"極速加分！"},
+  en:{subject:"Choose subject",math:"Math run",mathCopy:"Operations and times tables",english:"English run",englishCopy:"Sentence choices",grade:"Choose level",middle:"Middle",middleCopy:"Grades 3–4",upper:"Upper",upperCopy:"Grades 5–6",jump:"Jump",boost:"Boost",hurdle:"Jump the hurdle!",barrier:"Switch lanes!",clear:"Great dodge!",hit:"Bump! Catch the next one",boosted:"Speed bonus!"},
+  es:{subject:"Elige materia",math:"Carrera de mates",mathCopy:"Operaciones y tablas",english:"Carrera de inglés",englishCopy:"Frases y palabras",grade:"Elige nivel",middle:"Intermedio",middleCopy:"Grados 3–4",upper:"Avanzado",upperCopy:"Grados 5–6",jump:"Saltar",boost:"Acelerar",hurdle:"¡Salta la valla!",barrier:"¡Cambia de carril!",clear:"¡Buen esquive!",hit:"Choque. Recupera en la siguiente",boosted:"¡Bonus de velocidad!"},
+  "pt-BR":{subject:"Escolha a matéria",math:"Corrida de matemática",mathCopy:"Operações e tabuada",english:"Corrida de inglês",englishCopy:"Frases e palavras",grade:"Escolha o nível",middle:"Intermediário",middleCopy:"3º–4º ano",upper:"Avançado",upperCopy:"5º–6º ano",jump:"Pular",boost:"Acelerar",hurdle:"Pule a barreira!",barrier:"Troque de pista!",clear:"Belo desvio!",hit:"Bateu. Recupere na próxima",boosted:"Bônus de velocidade!"},
+  fr:{subject:"Choisis la matière",math:"Course de maths",mathCopy:"Calculs et tables",english:"Course d’anglais",englishCopy:"Phrases et mots",grade:"Choisis le niveau",middle:"Intermédiaire",middleCopy:"Niveaux 3–4",upper:"Avancé",upperCopy:"Niveaux 5–6",jump:"Sauter",boost:"Accélérer",hurdle:"Saute la haie !",barrier:"Change de voie !",clear:"Belle esquive !",hit:"Touché. Rattrape-toi",boosted:"Bonus vitesse !"},
+  ar:{subject:"اختر المادة",math:"سباق الرياضيات",mathCopy:"عمليات وجداول",english:"سباق الإنجليزية",englishCopy:"جمل وكلمات",grade:"اختر المستوى",middle:"متوسط",middleCopy:"الصفان 3–4",upper:"متقدم",upperCopy:"الصفان 5–6",jump:"اقفز",boost:"تسارع",hurdle:"اقفز فوق الحاجز!",barrier:"بدّل المسار!",clear:"مراوغة رائعة!",hit:"اصطدمت. عوّض لاحقًا",boosted:"نقاط سرعة!"},
+  sw:{subject:"Chagua somo",math:"Mbio za hesabu",mathCopy:"Hesabu na jedwali",english:"Mbio za Kiingereza",englishCopy:"Sentensi na maneno",grade:"Chagua kiwango",middle:"Kati",middleCopy:"Darasa 3–4",upper:"Juu",upperCopy:"Darasa 5–6",jump:"Ruka",boost:"Ongeza kasi",hurdle:"Ruka kizuizi!",barrier:"Badili njia!",clear:"Umekwepa vizuri!",hit:"Umegonga. Jaribu tena",boosted:"Bonasi ya kasi!"},
+  id:{subject:"Pilih pelajaran",math:"Lari matematika",mathCopy:"Operasi dan perkalian",english:"Lari bahasa Inggris",englishCopy:"Kalimat dan kata",grade:"Pilih tingkat",middle:"Menengah",middleCopy:"Kelas 3–4",upper:"Atas",upperCopy:"Kelas 5–6",jump:"Lompat",boost:"Percepat",hurdle:"Lompati rintangan!",barrier:"Pindah jalur!",clear:"Hindaran bagus!",hit:"Menabrak. Kejar berikutnya",boosted:"Bonus kecepatan!"},
+  hi:{subject:"विषय चुनें",math:"गणित दौड़",mathCopy:"गणना और पहाड़े",english:"अंग्रेज़ी दौड़",englishCopy:"वाक्य और शब्द",grade:"स्तर चुनें",middle:"मध्य",middleCopy:"कक्षा 3–4",upper:"उच्च",upperCopy:"कक्षा 5–6",jump:"कूदें",boost:"तेज़",hurdle:"बाधा के ऊपर कूदें!",barrier:"लेन बदलें!",clear:"बहुत बढ़िया बचाव!",hit:"टक्कर लगी। अगला पकड़ो",boosted:"गति बोनस!"}
+};
+
+export const englishIdentityCopy:Record<Language,{title:string;subtitle:string}>={
+  "zh-Hant":{title:"英文跑酷王",subtitle:"讀懂線索、衝向答案，穿越果凍城市！"},
+  en:{title:"English Runner",subtitle:"Read the clue, race to the answer, and cross Jelly City!"},
+  es:{title:"Rey del parkour inglés",subtitle:"¡Lee la pista, corre a la respuesta y cruza Ciudad Gelatina!"},
+  "pt-BR":{title:"Rei do parkour inglês",subtitle:"Leia a pista, corra até a resposta e atravesse a Cidade Gelatina!"},
+  fr:{title:"Roi du parkour anglais",subtitle:"Lis l’indice, fonce vers la réponse et traverse la Cité Gelée !"},
+  ar:{title:"ملك باركور الإنجليزية",subtitle:"اقرأ الدليل وانطلق نحو الإجابة واعبر مدينة الهلام!"},
+  sw:{title:"Mfalme wa mbio za Kiingereza",subtitle:"Soma kidokezo, kimbilia jibu na uvuke Jiji la Jeli!"},
+  id:{title:"Raja Lari Bahasa Inggris",subtitle:"Baca petunjuk, kejar jawaban, dan lintasi Kota Jeli!"},
+  hi:{title:"अंग्रेज़ी पार्कौर राजा",subtitle:"संकेत पढ़ें, उत्तर की ओर दौड़ें और जेली सिटी पार करें!"}
+};
+
+export const obstacleResultCopy:Record<Language,(count:number)=>string>={
+  "zh-Hant":n=>`閃過${n}個障礙`,en:n=>`${n} obstacles cleared`,es:n=>`${n} obstáculos superados`,"pt-BR":n=>`${n} obstáculos superados`,fr:n=>`${n} obstacles évités`,ar:n=>`تجاوزت ${n} عوائق`,sw:n=>`Vizuizi ${n} vimepitwa`,id:n=>`${n} rintangan dilewati`,hi:n=>`${n} बाधाएँ पार कीं`
+};
