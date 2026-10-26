@@ -1,0 +1,68 @@
+/* Sky Workshop: a building permit, rooftop houses, and a climb into the clouds. */
+:root{color:#284d61;background:#e2eff0;font-family:"Avenir Next","Noto Sans TC",system-ui,sans-serif}
+body{background:linear-gradient(#e6f1ef,#c9e0e1);color:#284d61}
+#app{padding-top:10px}
+.topbar{max-width:740px;padding-bottom:10px}
+.brand{letter-spacing:.07em;color:#284d61}.brand b{color:#587e84}.brand-mark{background:#284d61;color:#ffe4a6;border-radius:5px}
+.icon-button,select{min-height:44px;border:1px solid #72959b;border-radius:9px;background:#f5faf5;color:#284d61;font-size:12px;padding:8px 10px}
+.top-actions .home-exit{min-height:44px;background:#284d61;border-color:#284d61;color:#fff2ce}
+.game-wrap{width:min(100%,410px,calc(66.667dvh - 150px))}
+.hud{padding:5px 4px 10px;grid-template-columns:1fr 1fr 1fr}
+.hud small{color:#52757f;font-size:11px;letter-spacing:.06em}.hud strong{font-weight:900;color:#284d61;font-size:28px}.hud .score strong{color:#b35e41;font-size:34px}
+.journey-map{margin:0 0 10px;border-top:1px solid #82a4a6;padding-top:8px}.journey-map>div{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;font-weight:850}.journey-map small{font-size:10px;font-weight:650;color:#58757e}
+.journey-map progress{display:block;width:100%;height:5px;margin-top:6px;appearance:none;border:0;border-radius:8px;overflow:hidden;background:#afcdd0}.journey-map progress::-webkit-progress-bar{background:#afcdd0}.journey-map progress::-webkit-progress-value{background:#bd704e;border-radius:8px}.journey-map progress::-moz-progress-bar{background:#bd704e;border-radius:8px}
+.stage-frame{border:2px solid #658f98;border-radius:12px 12px 28px 12px;box-shadow:5px 7px 0 #91b2b5;background:#9acfd7}
+.overlay{padding:13px;background:#284d6118;align-items:center}
+.overlay-card{position:relative;padding:20px 19px;border:1px solid #b5bb9d;border-radius:7px 22px 7px 7px;background:#fff9e9f5;color:#284d61;box-shadow:5px 6px 0 #365b6c35}
+.overlay-card:before{content:"";position:absolute;top:9px;inset-inline-end:9px;width:9px;height:9px;border:1px solid #ba8664;border-radius:50%;background:#f4d28a}
+.pill{padding:5px 9px;border-radius:4px;background:#dce9d5;color:#365b6c;font-size:10px;letter-spacing:.09em}
+.workshop-emblem{display:block;width:100%;height:74px;margin:10px 0 0}
+.overlay-card h1{margin:5px 0 10px;font-size:29px;line-height:1.15;letter-spacing:-.04em;font-weight:950;text-wrap:balance}
+.overlay-card h2{font-size:28px;line-height:1.1}
+.overlay-card p{margin:0 0 9px;color:#456571;font-size:12px;line-height:1.55}
+.overlay-card .repair-note{padding:7px 9px;border-inline-start:3px solid #d89f55;background:#f4ebd4;font-size:11px;text-align:start}
+.overlay-card .learning-benefit{padding:8px;margin:10px 0;border:1px solid #a6bba5;border-radius:5px;box-shadow:none;background:#eef3e7}.overlay-card .learning-benefit__art{min-width:47px;font-size:10px;background:#e7cc84;border-radius:4px}.overlay-card .learning-benefit small{font-size:10px;line-height:1.4}.overlay-card .learning-benefit strong{font-size:11px}
+.mode-picker,.theme-picker{justify-content:space-between;color:#456571;gap:6px;font-size:11px;margin:8px 0}.mode-picker select,.theme-picker select{min-height:44px;padding:6px 9px;border-radius:7px;background:#fffdf6;font-size:11px;max-width:145px}.theme-picker small{font-size:9px;color:#58757e}
+.primary-button{width:100%;min-width:0;min-height:48px;border-radius:7px;background:#c56747;color:#fff9e9;box-shadow:0 4px 0 #8d4837;font-size:15px}.primary-button:hover{background:#af583d}.primary-button:active{box-shadow:0 1px 0 #8d4837}
+.game-chip{border:1px solid #71989b;background:#fff9e9eb;color:#284d61;border-radius:6px;box-shadow:2px 3px 0 #284d6120;font-size:10px;top:12px;padding:6px 8px}.combo-chip{left:10px}.record-chip{right:10px}
+.toast{top:16%;font-size:14px;border:1px solid #b89154;border-radius:7px;box-shadow:3px 4px 0 #284d6125}.toast.celebration{background:#ffdfa0;box-shadow:3px 4px 0 #284d6130}
+.below{display:grid;grid-template-columns:1fr auto;padding-top:12px;min-height:44px}.below p{grid-column:1/-1;color:#456571;font-size:11px}.below .primary-button{min-height:44px;font-size:14px}.text-button{min-height:44px;padding:4px 9px;background:#fff9e9;border:1px solid #86a4a5;border-radius:6px;color:#284d61;text-decoration:none}
+.overlay-card .result-number{color:#b35e41}.share-preview{background:#dcebe5;color:#284d61;border-color:#89a5a2;box-shadow:none}.share-preview-brand,.share-preview-score,.share-preview span:last-child{color:#284d61}.share-actions button{min-height:44px;background:#dfeae1;border-color:#9db8ac;color:#284d61}.retry-button{min-height:44px;color:#965336}.share-status{color:#537b70!important}.milestone-note{color:#965336!important}
+footer{color:#587b82;font-size:10px;margin-top:auto}
+.journey-passport{display:none}
+button:focus-visible,select:focus-visible{outline:3px solid #bd704e;outline-offset:3px}
+@media(max-width:520px){.brand>span:last-child{display:none}.brand-mark{width:32px;height:32px}.topbar{padding-bottom:7px}.top-actions{gap:6px}.top-actions select{max-width:140px}.game-wrap{width:min(100%,380px)}.hud{padding-bottom:8px}.stage-frame{border-radius:10px 10px 24px 10px}.overlay-card{padding:16px}.overlay-card h1{font-size:27px}.workshop-emblem{height:62px;margin-top:7px}.overlay{padding:12px}.game-chip{font-size:9px}.journey-map{margin-bottom:8px}.overlay-card .learning-benefit{margin:8px 0}}
+@media(min-width:521px) and (max-height:720px){.game-wrap{width:280px}.topbar{padding-bottom:3px}.hud strong{font-size:23px}.hud .score strong{font-size:27px}.hud small{font-size:10px}.journey-map{margin-bottom:7px;padding-top:5px}.overlay{padding:9px}.overlay-card{padding:12px}.overlay-card h1{font-size:23px;margin:4px 0 7px}.workshop-emblem{height:38px;margin:5px 0}.overlay-card p{font-size:10px;margin-bottom:6px}.overlay-card .repair-note{padding:5px 7px;font-size:10px}.overlay-card .learning-benefit{margin:6px 0;padding:6px}.overlay-card .learning-benefit small{font-size:9px}.mode-picker,.theme-picker{margin:5px 0;font-size:10px}.mode-picker select,.theme-picker select{min-height:44px}.primary-button{min-height:44px;font-size:13px}.below{padding-top:7px}footer{display:none}}
+@media(max-width:360px){.game-wrap{width:100%}.overlay-card{padding:12px}.workshop-emblem{height:40px}.overlay-card h1{font-size:24px}}
+@media(min-width:721px){
+  .game-wrap{--side-width:calc(min(740px,100vw - 32px) - 320px);width:min(100%,740px);display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:60px 46px 1fr;column-gap:20px;min-height:450px}
+  .stage-frame{grid-column:1;grid-row:1/4;width:300px;height:450px;overflow:visible;aspect-ratio:auto}
+  #game-canvas{overflow:hidden;border-radius:10px 10px 26px 10px}
+  .hud{grid-column:2;grid-row:1;align-self:start;padding-top:0}.journey-map{grid-column:2;grid-row:2;align-self:start}
+  .below{grid-column:2;grid-row:3;align-self:start;padding-top:15px;gap:12px}.below p{font-size:13px}.below .primary-button{min-height:50px;font-size:17px}
+  .overlay{inset:auto;left:320px;top:0;width:var(--side-width);max-height:450px;padding:0;background:none;overflow:auto;border-radius:8px}
+  #ready-panel{top:108px;max-height:342px}
+  .overlay-card{width:100%;max-width:none;padding:16px}
+  #ready-panel .overlay-card{display:grid;grid-template-columns:1fr 1fr;column-gap:12px;align-items:center;padding:12px}
+  #ready-panel .workshop-emblem{display:none}
+  #ready-panel .overlay-card>*{grid-column:1/-1}
+  #ready-panel .mode-picker{grid-column:1;display:grid;justify-content:stretch;text-align:start;margin:5px 0 10px}
+  #ready-panel .theme-picker{grid-column:2;display:grid;grid-template-columns:auto 1fr;justify-content:stretch;text-align:start;margin:5px 0 10px}
+  #ready-panel .theme-picker select{grid-column:1/-1;grid-row:2;max-width:100%;width:100%}
+  #ready-panel .theme-picker small{grid-column:2;grid-row:1;text-align:end}
+  #ready-panel .mode-picker select{max-width:100%;width:100%}
+  .game-wrap:has(#ready-panel:not(.hidden)) .below{display:none}
+  .journey-passport{display:block;grid-column:1/-1;margin-top:10px;padding:18px 14px 10px;border:1px dashed #8caa9d;border-radius:8px;background:#f1f4e9}
+  .journey-passport ol{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;list-style:none;margin:0;padding:0}
+  .journey-passport li{display:grid;justify-items:center;gap:6px;text-align:center;font-size:11px;color:#799091}
+  .journey-passport svg{width:46px;height:46px;padding:7px;border:1px dashed #a0b6ab;border-radius:50%;fill:none;stroke:#91a7a0;stroke-width:2}
+  .journey-passport li[data-reached="true"]{color:#284d61;font-weight:850}.journey-passport li[data-reached="true"] svg{background:#e8d9a8;stroke:#7b654a;border-style:solid;transform:rotate(-7deg)}
+  .journey-passport li small{font-variant-numeric:tabular-nums;font-size:10px}
+  .journey-passport #journey-tip{margin-top:13px;padding-top:10px;border-top:1px solid #ccd8c6;font-size:11px;line-height:1.5;color:#58757e}
+  .workshop-emblem{height:40px;margin:5px 0}.overlay-card h1{font-size:26px;margin:5px 0 8px}.overlay-card p{font-size:11px;line-height:1.45;margin-bottom:7px}
+  .overlay-card .learning-benefit{margin:7px 0;padding:7px}.overlay-card .learning-benefit small{font-size:10px}
+  #ready-panel .repair-note{font-size:10px;padding:5px 8px;margin:0}
+  .overlay-card .pill{justify-self:start}.primary-button{min-height:44px}
+  .overlay-card.compact{padding:20px}.overlay-card.compact p{font-size:12px}.overlay-card.compact .result-number strong{font-size:64px}
+  .topbar{width:min(100%,740px);padding-bottom:10px}footer{display:block;margin-top:auto;padding-top:12px}
+}
