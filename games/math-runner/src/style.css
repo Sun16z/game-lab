@@ -180,6 +180,9 @@ footer{text-align:center;color:#466572;font-size:12px;padding:26px 15px 36px}
 .runner-stage>.sky,.runner-stage>.city-festival,.runner-stage>.road-art,.runner-stage>.runner-shadow,.runner-stage>.runner,.runner-stage>.obstacle{display:none}
 .answer-gate span{width:29%;max-width:170px;font-size:27px;min-height:48px;box-shadow:2px 3px 0 #173b52;opacity:.9}
 .answer-gate span.chosen{outline:3px solid #173b52;outline-offset:3px;opacity:1}
+.runner-stage .feedback{top:auto;bottom:12px;max-width:92%;font-size:12px}
+.lane-controls{direction:ltr}
+.lane-controls b{unicode-bidi:plaintext}
 .runner-stage.english .answer-gate span{font-size:clamp(15px,2.8vw,23px);overflow-wrap:anywhere}
 .answer-gate span:after{display:none}
 .road-art{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.road-dashes{animation:dash-flow .9s linear infinite}.boosting .road-dashes{animation-duration:.35s}
