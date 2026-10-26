@@ -1,5 +1,6 @@
 /* A tactile sea chart: engraved land tiles, route pieces and stamped team flags. */
 :root{font-family:"Avenir Next","Noto Sans TC",system-ui,sans-serif;color:#fbf0ce;background:#164b63}
+.board{grid-template-rows:repeat(var(--size),minmax(0,1fr))}.cell .tile-svg{position:absolute;inset:6%;width:88%;height:88%}
 body{background:repeating-radial-gradient(ellipse at 50% 150%,transparent 0 36px,#91b9be0c 37px 39px,transparent 40px 72px),#164b63}
 #app{position:relative;isolation:isolate;max-width:960px}.nautical-backdrop{position:absolute;z-index:-1;inset:0;width:100%;height:100%;pointer-events:none;opacity:.35}
 .brand{color:#f1dfae}.brand b{color:#b7d0c3}.brand-mark{color:#e4c678;background:#315f6c;border:1px solid #89a7a3;border-radius:50%}.top-actions select,.sound-button{min-height:44px;background:#244f5e;color:#f5eac6;border-color:#819e98;border-radius:5px}.top-actions .home-exit{min-height:44px;background:#f0d79b;border-radius:5px;color:#234f5c;border-color:#f0d79b}
