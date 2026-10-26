@@ -13,10 +13,10 @@ describe("run lifecycle", () => {
 });
 
 describe("game catalog", () => {
-  it("lists 20 distinct concepts and marks only released games playable", () => {
-    expect(games).toHaveLength(20);
-    expect(new Set(games.map((game) => game.id)).size).toBe(20);
-    expect(new Set(games.map((game) => game.slug)).size).toBe(20);
-    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002", "G003"]);
+  it("keeps the 20 original ideas and lists candidate games separately", () => {
+    expect(games.filter((game) => game.id.startsWith("G"))).toHaveLength(20);
+    expect(new Set(games.map((game) => game.id)).size).toBe(games.length);
+    expect(new Set(games.map((game) => game.slug)).size).toBe(games.length);
+    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002", "G003", "C001"]);
   });
 });
