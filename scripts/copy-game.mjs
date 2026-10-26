@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-for (const slug of ["perfect-stack", "monster-math", "color-lab", "island-conquest"]) {
+for (const slug of ["perfect-stack", "monster-math", "color-lab", "island-conquest", "memory-monsters"]) {
   const source = resolve(root, `games/${slug}/dist`);
   const target = resolve(root, `apps/portal/public/play/${slug}`);
   rmSync(target, { recursive: true, force: true });

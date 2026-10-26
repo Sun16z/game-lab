@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "game": "memory-monsters",
+  "generatedAt": "2026-10-26",
+  "model": "OpenBMB/VoxCPM2@32279effe8c19989596f05d353d1447f51d9e915",
+  "license": "Apache-2.0",
+  "voiceDesign": "年輕台灣女聲，像幼兒園老師，溫暖活潑，語速稍慢，咬字清楚，不誇張，不催促",
+  "locales": {
+    "zh-Hant": {
+      "review": "preview_pending_native_review",
+      "clips": {
+        "listen": "仔細看看，記住大家喔！",
+        "choose": "翻一張，幫怪獸找朋友。",
+        "matched": "找到好朋友啦！",
+        "again": "差一點，再找找看。",
+        "complete": "太棒了，怪獸朋友全都找到了！"
+      }
+    }
+  },
+  "fallback": "未有已審語音的語言使用圖像、文字與非語言音效，玩法不依賴閱讀。"
+}

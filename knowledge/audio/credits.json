@@ -88,6 +88,78 @@
       "license": "CC0-1.0 sample + Project-owned arrangement",
       "obtainedAt": "2026-10-25",
       "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/memory-loop.webm",
+      "kind": "music",
+      "game": "memory-monsters",
+      "sourceUrl": "https://kenney.nl/assets/music-jingles",
+      "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg",
+      "author": "Kenney（採樣）與Game Lab（原創編曲）",
+      "license": "CC0-1.0 sample + Project-owned arrangement",
+      "obtainedAt": "2026-10-26",
+      "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/memory-loop.mp3",
+      "kind": "music",
+      "game": "memory-monsters",
+      "sourceUrl": "https://kenney.nl/assets/music-jingles",
+      "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg",
+      "author": "Kenney（採樣）與Game Lab（原創編曲）",
+      "license": "CC0-1.0 sample + Project-owned arrangement",
+      "obtainedAt": "2026-10-26",
+      "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-listen.webm",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-listen.mp3",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-choose.webm",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-choose.mp3",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-matched.webm",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-matched.mp3",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-again.webm",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-again.mp3",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-complete.webm",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
+    },
+    {
+      "file": "games/memory-monsters/public/audio/voice/zh-Hant-complete.mp3",
+      "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
+      "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
     }
   ]
 }
