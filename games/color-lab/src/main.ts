@@ -11,6 +11,7 @@ import { applyMove, cloneBoard, isSolved, legalMove, LEVELS, solve, starsFor, ty
 import "./style.css";
 import "@game-lab/game-audio/style.css";
 import "@game-lab/platform-adapters/home-exit.css";
+import "./botanical.css";
 
 const VERSION = "0.1.0";
 const PROGRESS_KEY = "game-lab:color-lab:progress";
@@ -192,6 +193,7 @@ class ColorLabGame {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "tube-button";
+      if(tube.length===4&&tube.every(color=>color===tube[0]))button.classList.add("completed");
       if (this.selected === index) button.classList.add("selected");
       if (this.hintMove?.source === index) button.classList.add("hint-source");
       if (this.hintMove?.target === index) button.classList.add("hint-target");
