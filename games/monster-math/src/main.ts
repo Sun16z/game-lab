@@ -12,6 +12,7 @@ import { loadReview, saveReview } from "./review";
 import "./style.css";
 import "@game-lab/game-audio/style.css";
 import "@game-lab/platform-adapters/home-exit.css";
+import "./arcade.css";
 
 const VERSION = "0.1.0";
 const EVENT_KEY = "game-lab:session-events";
