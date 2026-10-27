@@ -33,9 +33,9 @@ export default async function GamePage({ params }: Props) {
       <p className="lead">{game.summary}</p>
       {game.status === "playable" ? (
         <section className="playSection" aria-label={`${game.title}遊戲`}>
-          <a className="playDirect" href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`}>開啟遊戲 ↗</a>
-          <iframe className="gameEmbed" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`} title={`${game.title}試玩`} allow="fullscreen" />
-          <p>{game.id === "G001" ? "點擊畫面或按Space放置方塊。" : game.id === "G002" ? "點選答案或按1～4答題，90秒內盡量打倒怪獸。" : game.id === "G018" ? "拖動圓點捏出雲朵，加上貼紙，完成後分享給朋友。" : "進入遊戲後依畫面提示操作。"}你也可以<a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`}>開啟獨立遊戲頁</a>，在遊戲內切換語言。</p>
+          <a className="playDirect" href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/`}>開啟遊戲 ↗</a>
+          <iframe className="gameEmbed" src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/`} title={`${game.title}試玩`} allow="fullscreen" />
+          <p>{game.id === "G001" ? "點擊畫面或按Space放置方塊。" : game.id === "G002" ? "點選答案或按1～4答題，90秒內盡量打倒怪獸。" : game.id === "G018" ? "拖動圓點捏出雲朵，加上貼紙，完成後分享給朋友。" : "進入遊戲後依畫面提示操作。"}你也可以<a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/`}>開啟獨立遊戲頁</a>，在遊戲內切換語言。</p>
         </section>
       ) : (
         <div className="notice" role="status">

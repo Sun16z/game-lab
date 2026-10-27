@@ -20,7 +20,7 @@ function GameCard({ game, compact = false }: { game: GameDefinition; compact?: b
         <p>{game.summary}</p>
         <div className="replay">↻ {game.replay}</div>
         {game.status === "playable" ? (
-          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`} aria-label={`遊玩${game.title}`}>
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/`} aria-label={`遊玩${game.title}`}>
             開始遊玩 <span aria-hidden="true">↗</span>
           </a>
         ) : (
