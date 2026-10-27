@@ -10,7 +10,7 @@
     "dev:color": "pnpm --filter @game-lab/color-lab dev",
     "dev:memory": "pnpm --filter @game-lab/memory-monsters dev",
     "dev:runner": "pnpm --filter @game-lab/math-runner dev",
-    "build:game": "pnpm audio:check && pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && pnpm --filter @game-lab/monster-math build && pnpm --filter @game-lab/color-lab build && pnpm --filter @game-lab/island-conquest build && pnpm --filter @game-lab/memory-monsters build && pnpm --filter @game-lab/math-runner build && pnpm --filter @game-lab/cloud-sculptor build && pnpm --filter @game-lab/island-duo build && pnpm --filter @game-lab/shadow-friends build && node scripts/copy-game.mjs",
+    "build:game": "pnpm audio:check && pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && pnpm --filter @game-lab/monster-math build && pnpm --filter @game-lab/color-lab build && pnpm --filter @game-lab/island-conquest build && pnpm --filter @game-lab/memory-monsters build && pnpm --filter @game-lab/math-runner build && pnpm --filter @game-lab/cloud-sculptor build && pnpm --filter @game-lab/island-duo build && pnpm --filter @game-lab/shadow-friends build && pnpm --filter @game-lab/rhythm-garden build && node scripts/copy-game.mjs",
     "build": "pnpm build:game && pnpm --filter @game-lab/portal build",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
