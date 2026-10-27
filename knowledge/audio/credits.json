@@ -200,6 +200,8 @@
       "license": "CC0-1.0 sample + Project-owned arrangement",
       "obtainedAt": "2026-10-26",
       "modified": true
-    }
+    },
+    {"file": "games/tiny-chef/public/audio/memory-loop.webm", "kind": "music", "game": "tiny-chef", "sourceUrl": "https://kenney.nl/assets/music-jingles", "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg", "author": "Kenney（採樣）與Game Lab（原創編曲）", "license": "CC0-1.0 sample + Project-owned arrangement", "obtainedAt": "2026-10-26", "modified": true},
+    {"file": "games/tiny-chef/public/audio/memory-loop.mp3", "kind": "music", "game": "tiny-chef", "sourceUrl": "https://kenney.nl/assets/music-jingles", "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg", "author": "Kenney（採樣）與Game Lab（原創編曲）", "license": "CC0-1.0 sample + Project-owned arrangement", "obtainedAt": "2026-10-26", "modified": true}
   ]
 }
