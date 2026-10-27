@@ -11,7 +11,7 @@ import "./style.css";
 function el<T extends HTMLElement=HTMLElement>(id:string):T { const node=document.getElementById(id); if(!node)throw Error(`Missing ${id}`); return node as T; }
 function storage():Storage|undefined { try { return localStorage; } catch { return undefined; } }
 const icons:Record<StickerKind,string>={star:"✦",rain:"💧",rainbow:"🌈"};
-const audio=new GameAudio({ cues:{ start:[.18,0,520,.01,.06,.18,0,1,90], edit:[.12,0,510,.01,.04,.12,0,1,60], sticker:[.16,0,650,.01,.06,.2,0,1,120], finish:[.2,0,620,.01,.1,.25,0,1,150] }, music:{} },storage());
+const audio=new GameAudio({ cues:{ start:[.18,0,520,.01,.06,.18,0,1,90], edit:[.12,0,510,.01,.04,.12,0,1,60], sticker:[.16,0,650,.01,.06,.2,0,1,120], finish:[.2,0,620,.01,.1,.25,0,1,150] }, music:{main:["./audio/memory-loop.webm","./audio/memory-loop.mp3"]} },storage());
 
 class CloudGame {
   private language:Language=chooseLanguage(new URLSearchParams(location.search).get("lang")??storage()?.getItem("game-lab:language")??navigator.language);
@@ -34,8 +34,8 @@ class CloudGame {
     for(const [id,key] of [["title","title"],["play-title","title"],["intro","intro"],["learning","learning"],["start","start"],["hint","hint"],["help","help"],["star","star"],["rain","rain"],["rainbow","rainbow"],["undo","undo"],["clear","clear"],["finish","finish"],["result-title","result"],["again","again"],["share","share"],["copy","copy"]] as const)el(id).textContent=this.t[key];
     this.home.updateLanguage(this.language);this.controls.updateLanguage(this.language);
   }
-  private start(){this.seed=crypto.randomUUID();this.run=transitionRun(createRun("G018",this.seed,crypto.randomUUID()),"PLAYING",new Date().toISOString());const shared=decodeArtwork(new URLSearchParams(location.hash.slice(1)).get("art")??"");this.art=shared??initialArtwork();this.history=[];this.nextId=this.art.stickers.length;el("setup").classList.add("hidden");el("result").classList.add("hidden");el("play").classList.remove("hidden");audio.unlock();audio.resume();audio.play("start");this.render();}
-  private restart(){this.run=createRun("G018",crypto.randomUUID(),crypto.randomUUID());audio.pause();el("play").classList.add("hidden");el("result").classList.add("hidden");el("setup").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+  private start(){this.seed=crypto.randomUUID();this.run=transitionRun(createRun("G018",this.seed,crypto.randomUUID()),"PLAYING",new Date().toISOString());const shared=decodeArtwork(new URLSearchParams(location.hash.slice(1)).get("art")??"");this.art=shared??initialArtwork();this.history=[];this.nextId=this.art.stickers.length;el("setup").classList.add("hidden");el("result").classList.add("hidden");el("play").classList.remove("hidden");audio.unlock();audio.resume();audio.music("main");audio.play("start");this.render();}
+  private restart(){this.run=createRun("G018",crypto.randomUUID(),crypto.randomUUID());audio.pause();if(location.hash)history.replaceState(null,"",location.pathname+location.search);el("play").classList.add("hidden");el("result").classList.add("hidden");el("setup").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
   private save(){this.history.push(this.art);if(this.history.length>40)this.history.shift();}
   private undo(){const previous=this.history.pop();if(previous){this.art=previous;audio.play("edit");this.render();}}
   private resetArt(){this.save();this.art=initialArtwork();audio.play("edit");this.render();}
@@ -60,3 +60,4 @@ class CloudGame {
   private async share(){try{const art=this.art,blob=await createScoreCard({title:this.t.title,score:"☁",scoreLabel:this.t.art,best:String(art.stickers.length),bestLabel:this.t.sticker,invitation:this.t.share,url:this.link(),language:this.language,direction:this.language==="ar"?"rtl":"ltr",accent:"#f0b77e",drawArtwork(ctx){ctx.fillStyle="#d4ebea";ctx.fillRect(190,320,700,430);ctx.save();ctx.translate(190,320);ctx.scale(.7,.7);ctx.fillStyle="#fffaf0";ctx.fill(new Path2D(cloudPath(art.points,1000,600)));ctx.textAlign="center";ctx.font="72px sans-serif";for(const s of art.stickers)ctx.fillText(icons[s.kind],s.point.x*1000,s.point.y*600);ctx.restore();}});const result=await shareCardOrDownload(blob,"cloud-sculptor.png",this.t.title,this.link(),this.t.result);if(result==="downloaded")el("share-status").textContent=this.t.saved;}catch(error){if(!(error instanceof DOMException&&error.name==="AbortError"))el("share-status").textContent=this.t.failed;}}
 }
 new CloudGame().init();
+if (import.meta.env.PROD && "serviceWorker" in navigator) void navigator.serviceWorker.register("./sw.js").catch(()=>{});

@@ -5,7 +5,7 @@ export type Sticker = Readonly<{ id: number; kind: StickerKind; point: Point }>;
 export type Artwork = Readonly<{ points: readonly Point[]; stickers: readonly Sticker[] }>;
 
 export const initialArtwork = (): Artwork => ({
-  points: [{ x: .18, y: .56 }, { x: .28, y: .32 }, { x: .45, y: .26 }, { x: .62, y: .3 }, { x: .78, y: .38 }, { x: .83, y: .56 }, { x: .68, y: .7 }, { x: .48, y: .73 }, { x: .28, y: .7 }],
+  points: [{ x: .12, y: .59 }, { x: .19, y: .36 }, { x: .32, y: .42 }, { x: .4, y: .19 }, { x: .54, y: .3 }, { x: .65, y: .22 }, { x: .82, y: .39 }, { x: .88, y: .61 }, { x: .5, y: .73 }],
   stickers: []
 });
 

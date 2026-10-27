@@ -4,7 +4,7 @@ import { addSticker, cloudPath, initialArtwork, movePoint, moveSticker } from ".
 describe("cloud artwork", () => {
   it("keeps edits inside the canvas without mutating the previous artwork", () => {
     const before = initialArtwork(), after = movePoint(before, 0, { x: -20, y: 4 });
-    expect(before.points[0]).toEqual({ x: .18, y: .56 });
+    expect(before.points[0]).toEqual({ x: .12, y: .59 });
     expect(after.points[0]).toEqual({ x: .04, y: .92 });
     expect(movePoint(after, -1, { x: 1, y: 1 })).toBe(after);
     expect(cloudPath(after.points, 300, 200)).toMatch(/^M .* Z$/);
