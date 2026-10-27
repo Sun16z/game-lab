@@ -12,7 +12,7 @@ function GameCard({ game, compact = false }: { game: GameDefinition; compact?: b
   return (
     <article className={`card${compact ? " cardCompact" : ""}`}>
       <div className="art" style={{ background: `linear-gradient(135deg, ${game.art[0]}, ${game.art[1]})` }} aria-hidden="true">
-        <span className="artMotif">{game.motif}</span><span className="artNumber">{game.id.slice(1)}</span>
+        <span className="artMotif">{game.motif}</span><span className="artNumber">{(game.displayId ?? game.id).slice(1)}</span>
       </div>
       <div className="cardBody">
         <div className="cardTop"><span className="tag">{game.category}</span><span className="status">{game.status === "playable" ? "立即遊玩" : "開發規劃中"}</span></div>

@@ -28,7 +28,7 @@ export default async function GamePage({ params }: Props) {
   return (
     <main className="shell detail">
       <Link href="/" className="back">← 返回遊戲目錄</Link>
-      <div className="eyebrow">{game.id} / {game.category}</div>
+      <div className="eyebrow">{game.displayId ?? game.id} / {game.category}</div>
       <h1>{game.title}</h1>
       <p className="lead">{game.summary}</p>
       {game.status === "playable" ? (
