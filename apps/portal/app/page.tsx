@@ -35,13 +35,14 @@ function GameCard({ game, compact = false }: { game: GameDefinition; compact?: b
 
 export default function Home() {
   const playable = games.filter((game) => game.status === "playable");
+  const planned = games.filter((game) => game.status === "planned");
   return (
     <main className="shell">
       <header className="hero">
-        <div className="eyebrow">GAME LAB / {games.length} GAME IDEAS</div>
+        <div className="eyebrow">GAME LAB / {playable.length}款可玩 · {planned.length}款開發中</div>
         <h1>每一局，都有新玩法。</h1>
-        <p>從疊塔、打怪，到造橋、做音樂、探索星球。以20款上線遊戲為目標，目前有{games.length}個企劃與候選；先玩已開放的{playable.length}款。</p>
-        <div className="heroMeta"><span>{playable.length}款已開放</span><span>{games.length}款企劃</span><span>手機觸控優先</span><span>免費遊玩</span></div>
+        <p>從疊塔、打怪，到造橋、做音樂、探索星球。目前有{playable.length}款可玩，另有{planned.length}款開發中。</p>
+        <div className="heroMeta"><span>{playable.length}款可玩</span><span>{planned.length}款開發中</span><span>手機觸控優先</span><span>免費遊玩</span></div>
         <a className="heroAction" href="#play-now">先玩遊戲 ↓</a>
       </header>
       <section id="play-now" aria-labelledby="play-heading" className="catalog">
@@ -60,7 +61,7 @@ export default function Home() {
           ) : null;
         })}
       </section>
-      <footer>Game Lab · {playable.length}款已開放，以20款不同玩法上線為目標。</footer>
+      <footer>Game Lab · {playable.length}款可玩 · {planned.length}款開發中。</footer>
     </main>
   );
 }
