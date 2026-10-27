@@ -55,7 +55,7 @@ export const games: readonly GameDefinition[] = [
   { id: "G005", slug: "snow-rush", title: "雪山極速90秒", summary: "轉彎、跳躍、穿越旗門滑下雪山。", category: "手感挑戰", replay: "熟悉雪道走出最佳路線", motif: "❄", art: ["#a2d8e9", "#6888c5"], priority: "P3", status: "planned" },
   { id: "G006", slug: "shadow-friends", title: "影子變變變", summary: "轉動物件，用影子拼出奇妙動物。", category: "動腦解謎", replay: "發現同一關的不同解法", motif: "◕", art: ["#c4a3e8", "#786bb8"], priority: "P2", status: "playable" },
   { id: "G007", slug: "rhythm-garden", title: "節奏花園", summary: "跟著節拍點亮花朵，讓花園開滿色彩。", category: "手感挑戰", replay: "聽懂節奏、完成更長的旋律", motif: "♫", art: ["#f7a5b5", "#b87cc1"], priority: "P2", status: "playable" },
-  { id: "G008", slug: "paper-plane", title: "紙飛機郵差", summary: "調整飛行角度，乘著風把信送到朋友家。", category: "手感挑戰", replay: "探索不同風向與飛行路線", motif: "✈", art: ["#91d9cf", "#579dc1"], priority: "P2", status: "planned" },
+  { id: "G008", slug: "paper-plane", title: "紙飛機郵差", summary: "調整飛行角度，乘著風把信送到朋友家。", category: "手感挑戰", replay: "探索不同風向與飛行路線", motif: "✈", art: ["#91d9cf", "#579dc1"], priority: "P2", status: "playable" },
   { id: "G009", slug: "bridge-builder", title: "小小造橋師", summary: "用有限積木搭橋，送小動物過河。", category: "創作實驗", replay: "用更少材料造出穩固的橋", motif: "⌒", art: ["#d5b073", "#8d8dba"], priority: "P2", status: "planned" },
   { id: "G010", slug: "tiny-chef", title: "迷你料理屋", summary: "組合食材、顏色和形狀，完成客人的點子。", category: "創作實驗", replay: "做出自己的創意菜單", motif: "✿", art: ["#ffc875", "#e98280"], priority: "P2", status: "planned" },
   { id: "G011", slug: "star-map", title: "星星連線家", summary: "連起夜空星點，找出藏起來的星座。", category: "探索同玩", replay: "收集星空故事與隱藏圖案", motif: "✦", art: ["#7889d5", "#463c8e"], priority: "P2", status: "planned" },
