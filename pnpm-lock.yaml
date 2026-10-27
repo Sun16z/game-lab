@@ -215,6 +215,34 @@ importers:
         specifier: ^7.1.0
         version: 7.3.7(@types/node@22.20.5)
 
+  games/paper-plane:
+    dependencies:
+      '@game-lab/game-analytics':
+        specifier: workspace:*
+        version: link:../../packages/game-analytics
+      '@game-lab/game-audio':
+        specifier: workspace:*
+        version: link:../../packages/game-audio
+      '@game-lab/game-core':
+        specifier: workspace:*
+        version: link:../../packages/game-core
+      '@game-lab/game-share':
+        specifier: workspace:*
+        version: link:../../packages/game-share
+      '@game-lab/platform-adapters':
+        specifier: workspace:*
+        version: link:../../packages/platform-adapters
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.3.7
+        version: 7.3.7(@types/node@22.20.5)
+      vitest:
+        specifier: ^3.2.7
+        version: 3.2.7(@types/node@22.20.5)
+
   games/perfect-stack:
     dependencies:
       '@game-lab/game-analytics':
