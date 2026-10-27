@@ -195,3 +195,7 @@ footer{text-align:center;color:#466572;font-size:12px;padding:26px 15px 36px}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 }
 
+
+/* Keep controls clear of display cutouts and the home indicator. */
+@media (max-width: 850px) { header { padding-top: max(12px, env(safe-area-inset-top)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); } body { padding-bottom: env(safe-area-inset-bottom); } }
+@media (max-width: 850px) { .run-controls { padding-bottom: env(safe-area-inset-bottom); } }
