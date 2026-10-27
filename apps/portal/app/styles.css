@@ -18,7 +18,7 @@ h1 { font-size: clamp(36px, 6vw, 68px); line-height: 1.13; letter-spacing: -.04e
 .sectionHead p { color: #a9bdc7; }
 .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .playableGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.card { overflow: hidden; border-radius: 22px; background: #1b2b36; border: 1px solid #314552; }
+.card { position: relative; overflow: hidden; border-radius: 22px; background: #1b2b36; border: 1px solid #314552; }
 .art { position: relative; height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden; color: #fff; }
 .art::before, .art::after { content: ""; position: absolute; border: 1px solid #ffffff60; border-radius: 50%; width: 180px; height: 180px; transform: translate(100px, -45px); }
 .art::after { width: 120px; height: 120px; transform: translate(-115px, 60px); }
@@ -31,7 +31,9 @@ h1 { font-size: clamp(36px, 6vw, 68px); line-height: 1.13; letter-spacing: -.04e
 .card h3 { font-size: 24px; margin: 20px 0 8px; }
 .card p { color: #b5c7cf; min-height: 48px; line-height: 1.6; margin: 0 0 18px; }
 .card .replay { margin: -4px 0 18px; color: #edce9a; font-size: 13px; font-weight: 700; }
-.card a { color: #9fe9d7; font-weight: 700; text-decoration: none; }
+.card a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; color: #9fe9d7; font-weight: 700; text-decoration: none; }
+.card a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.card:has(a:focus-visible) { outline: 3px solid #9fe9d7; outline-offset: 3px; }
 .card a:hover, .back:hover { text-decoration: underline; }
 .coming { margin-top: 68px; }
 .categoryGroup { margin-top: 32px; }
