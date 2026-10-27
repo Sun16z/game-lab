@@ -1,0 +1,2 @@
+import {describe,it,expect} from "vitest";import {melodies,initialState,tap} from "./rules";
+describe("garden melodies",()=>{it("keeps progress after a wrong note",()=>{const a=initialState(),r=tap(a,3);expect(r.correct).toBe(false);expect(r.state.position).toBe(0);expect(r.state.errors).toBe(1)});it("completes each melody in order",()=>{let s=initialState();for(const melody of melodies)for(const note of melody)s=tap(s,note).state;expect(s.complete).toBe(true);expect(s.round).toBe(2);expect(tap(s,0).state).toBe(s)})});
