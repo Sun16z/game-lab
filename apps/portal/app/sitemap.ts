@@ -7,6 +7,9 @@ export const dynamic = "force-static";
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${siteUrl}/` },
-    ...games.map(({ slug }) => ({ url: `${siteUrl}/games/${slug}/` }))
+    ...games.filter(game => game.status === "playable").flatMap(({ slug }) => [
+      { url: `${siteUrl}/games/${slug}/` },
+      { url: `${siteUrl}/play/${slug}/` }
+    ])
   ];
 }
