@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: game ? `${game.title}｜Game Lab` : "遊戲不存在｜Game Lab",
     description: game?.summary,
+    robots: game?.status === "planned" ? { index: false, follow: true } : undefined,
     alternates: { canonical: `${siteUrl}/games/${slug}/` },
     openGraph: { url: `${siteUrl}/games/${slug}/`, title: game?.title, description: game?.summary }
   };
