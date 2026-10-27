@@ -1,3 +1,4 @@
+export { utcDay, validUtcDay, dailyIndex } from "./daily";
 export type GameId = `G${"001" | "002" | "003" | "004" | "005" | "006" | "007" | "008" | "009" | "010" | "011" | "012" | "013" | "014" | "015" | "016" | "017" | "018" | "019" | "020"}` | "C001" | "C002";
 export type RunState = "READY" | "PLAYING" | "PAUSED" | "RESULT" | "ERROR";
 export type GameCategory = "手感挑戰" | "動腦解謎" | "創作實驗" | "探索同玩";

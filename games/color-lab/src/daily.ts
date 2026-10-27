@@ -1,18 +1,15 @@
 import { applyMove, cloneBoard, isSolved, legalMove, LEVELS, type Move } from "./rules";
+import { utcDay, validUtcDay, dailyIndex } from "@game-lab/game-core";
+export { utcDay };
 
 export type Challenge = { level: number; moves: number; steps: Move[]; date: string | null };
 
-export function utcDay(date: Date): string { return date.toISOString().slice(0, 10); }
-
 export function dailyLevel(day: string): number {
-  let hash = 2166136261;
-  for (const character of day) hash = Math.imul(hash ^ character.charCodeAt(0), 16777619);
-  return (hash >>> 0) % LEVELS.length + 1;
+  return dailyIndex(day, LEVELS.length) + 1;
 }
 
 function validDay(day: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(day) && !Number.isNaN(Date.parse(`${day}T00:00:00Z`))
-    && utcDay(new Date(`${day}T00:00:00Z`)) === day;
+  return validUtcDay(day);
 }
 
 export function encodeChallenge(challenge: Challenge): string {
