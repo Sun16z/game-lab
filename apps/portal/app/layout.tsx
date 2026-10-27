@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   title: "Game Lab｜HTML5遊戲實驗室",
   description,
   alternates: { canonical: "/" },
-  openGraph: { url: "/", title: "Game Lab｜HTML5遊戲實驗室", description },
+  openGraph: { url: "/", title: "Game Lab｜HTML5遊戲實驗室", description, images: [{ url: "/og.png", width: 1200, height: 630 }] },
+  twitter: { card: "summary_large_image", images: ["/og.png"] },
   icons: { icon: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/icon.svg` }
 };
 
