@@ -35,7 +35,7 @@ class CloudGame {
     this.home.updateLanguage(this.language);this.controls.updateLanguage(this.language);
   }
   private start(){this.seed=crypto.randomUUID();this.run=transitionRun(createRun("G018",this.seed,crypto.randomUUID()),"PLAYING",new Date().toISOString());const shared=decodeArtwork(new URLSearchParams(location.hash.slice(1)).get("art")??"");this.art=shared??initialArtwork();this.history=[];this.nextId=this.art.stickers.length;el("setup").classList.add("hidden");el("result").classList.add("hidden");el("play").classList.remove("hidden");audio.unlock();audio.resume();audio.music("main");audio.play("start");this.render();}
-  private restart(){this.run=createRun("G018",crypto.randomUUID(),crypto.randomUUID());audio.pause();if(location.hash)history.replaceState(null,"",location.pathname+location.search);el("play").classList.add("hidden");el("result").classList.add("hidden");el("setup").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+  private restart(){this.run=createRun("G018",crypto.randomUUID(),crypto.randomUUID());audio.pause();if(location.hash)history.replaceState(null,"",location.pathname+location.search);el("play").classList.add("hidden");el("result").classList.add("hidden");el("setup").classList.remove("hidden");window.scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}
   private save(){this.history.push(this.art);if(this.history.length>40)this.history.shift();}
   private undo(){const previous=this.history.pop();if(previous){this.art=previous;audio.play("edit");this.render();}}
   private resetArt(){this.save();this.art=initialArtwork();audio.play("edit");this.render();}

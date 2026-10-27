@@ -3,3 +3,5 @@
 
 /* Keep controls clear of display cutouts and the home indicator. */
 @media (max-width: 850px) { header, header[class] { padding-top: max(12px, env(safe-area-inset-top)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); } body { padding-bottom: env(safe-area-inset-bottom); } }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
