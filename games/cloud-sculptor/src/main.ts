@@ -5,6 +5,7 @@ import { mountAudioControls } from "@game-lab/game-audio/ui";
 import { copyShareLink, createScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
 import { addSticker, cloudPath, initialArtwork, movePoint, moveSticker, type Artwork, type Point, type StickerKind } from "./rules";
 import { chooseLanguage, copy, type Language } from "./i18n";
+import { decodeArtwork, encodeArtwork } from "./challenge";
 import "./style.css";
 
 function el<T extends HTMLElement=HTMLElement>(id:string):T { const node=document.getElementById(id); if(!node)throw Error(`Missing ${id}`); return node as T; }
@@ -33,7 +34,7 @@ class CloudGame {
     for(const [id,key] of [["title","title"],["play-title","title"],["intro","intro"],["learning","learning"],["start","start"],["hint","hint"],["help","help"],["star","star"],["rain","rain"],["rainbow","rainbow"],["undo","undo"],["clear","clear"],["finish","finish"],["result-title","result"],["again","again"],["share","share"],["copy","copy"]] as const)el(id).textContent=this.t[key];
     this.home.updateLanguage(this.language);this.controls.updateLanguage(this.language);
   }
-  private start(){this.seed=crypto.randomUUID();this.run=transitionRun(createRun("G018",this.seed,crypto.randomUUID()),"PLAYING",new Date().toISOString());this.art=initialArtwork();this.history=[];this.nextId=0;el("setup").classList.add("hidden");el("result").classList.add("hidden");el("play").classList.remove("hidden");audio.unlock();audio.resume();audio.play("start");this.render();}
+  private start(){this.seed=crypto.randomUUID();this.run=transitionRun(createRun("G018",this.seed,crypto.randomUUID()),"PLAYING",new Date().toISOString());const shared=decodeArtwork(new URLSearchParams(location.hash.slice(1)).get("art")??"");this.art=shared??initialArtwork();this.history=[];this.nextId=this.art.stickers.length;el("setup").classList.add("hidden");el("result").classList.add("hidden");el("play").classList.remove("hidden");audio.unlock();audio.resume();audio.play("start");this.render();}
   private restart(){this.run=createRun("G018",crypto.randomUUID(),crypto.randomUUID());audio.pause();el("play").classList.add("hidden");el("result").classList.add("hidden");el("setup").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
   private save(){this.history.push(this.art);if(this.history.length>40)this.history.shift();}
   private undo(){const previous=this.history.pop();if(previous){this.art=previous;audio.play("edit");this.render();}}
@@ -54,7 +55,7 @@ class CloudGame {
     el<HTMLButtonElement>("undo").disabled=this.history.length===0;
   }
   private finish(){if(this.run.state!=="PLAYING")return;this.run=transitionRun(this.run,"RESULT",new Date().toISOString());audio.play("finish");audio.pause();el("play").classList.add("hidden");el("result").classList.remove("hidden");const result=el("result-art");result.innerHTML=`<svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${this.t.art}"><path fill="#fffaf0" stroke="#608b91" stroke-width="6" d="${cloudPath(this.art.points,1000,600)}"></path>${this.art.stickers.map(s=>`<text x="${s.point.x*1000}" y="${s.point.y*600}" text-anchor="middle" font-size="72">${icons[s.kind]}</text>`).join("")}</svg>`;}
-  private link(){const url=new URL(shareLink(location.href,this.language));url.searchParams.set("seed",this.seed);return url.toString();}
+  private link(){const url=new URL(shareLink(location.href,this.language));url.hash=new URLSearchParams({art:encodeArtwork(this.art)}).toString();return url.toString();}
   private async copyLink(){try{await copyShareLink(this.link());el("share-status").textContent=this.t.copied}catch{el("share-status").textContent=this.t.failed}}
   private async share(){try{const art=this.art,blob=await createScoreCard({title:this.t.title,score:"☁",scoreLabel:this.t.art,best:String(art.stickers.length),bestLabel:this.t.sticker,invitation:this.t.share,url:this.link(),language:this.language,direction:this.language==="ar"?"rtl":"ltr",accent:"#f0b77e",drawArtwork(ctx){ctx.fillStyle="#d4ebea";ctx.fillRect(190,320,700,430);ctx.save();ctx.translate(190,320);ctx.scale(.7,.7);ctx.fillStyle="#fffaf0";ctx.fill(new Path2D(cloudPath(art.points,1000,600)));ctx.textAlign="center";ctx.font="72px sans-serif";for(const s of art.stickers)ctx.fillText(icons[s.kind],s.point.x*1000,s.point.y*600);ctx.restore();}});const result=await shareCardOrDownload(blob,"cloud-sculptor.png",this.t.title,this.link(),this.t.result);if(result==="downloaded")el("share-status").textContent=this.t.saved;}catch(error){if(!(error instanceof DOMException&&error.name==="AbortError"))el("share-status").textContent=this.t.failed;}}
 }
