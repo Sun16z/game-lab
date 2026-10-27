@@ -27,4 +27,4 @@ button:focus-visible,select:focus-visible,.card:focus-visible{outline:3px solid 
 @media(min-width:721px) and (max-height:760px){html[lang="zh-Hant"] .hero h1{font-size:44px;text-wrap:wrap}}
 
 /* Keep controls clear of display cutouts and the home indicator. */
-@media (max-width: 850px) { header { padding-top: max(12px, env(safe-area-inset-top)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); } body { padding-bottom: env(safe-area-inset-bottom); } }
+@media (max-width: 850px) { header, header[class] { padding-top: max(12px, env(safe-area-inset-top)); padding-left: max(12px, env(safe-area-inset-left)); padding-right: max(12px, env(safe-area-inset-right)); } body { padding-bottom: env(safe-area-inset-bottom); } }
