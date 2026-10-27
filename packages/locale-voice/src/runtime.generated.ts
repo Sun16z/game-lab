@@ -5,7 +5,7 @@ export const praisePhrases = {
     "這手真準！"
   ],
   "zh-TW": [
-    "哇靠，超神！",
+    "太神啦！",
     "這手也太準！"
   ],
   "en": [

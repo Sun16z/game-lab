@@ -4,7 +4,7 @@ import { praisePhrases } from "./runtime.generated";
 
 describe("shared locale voice", () => {
   it("uses Taiwan wording only for an explicit Taiwan language tag", () => {
-    expect(getStreakPraise("zh-Hant", 3, "zh-TW")).toBe("哇靠，超神！");
+    expect(getStreakPraise("zh-Hant", 3, "zh-TW")).toBe("太神啦！");
     expect(getStreakPraise("zh-Hant", 3, "zh-HK")).toBe("太厲害了！");
   });
   it("rotates at each three-perfect milestone and falls back safely", () => {
