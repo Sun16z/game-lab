@@ -16,7 +16,7 @@ export function createGame(index:number):State {
 }
 const delta:Record<Direction,Position>={up:{x:0,y:-1},down:{x:0,y:1},left:{x:-1,y:0},right:{x:1,y:0}};
 export function move(state:State,direction:Direction):State {
-  if(state.won || !(direction in delta))return state;
+  if(state.won || !Object.hasOwn(delta,direction))return state;
   const current=state.players[state.turn], step=delta[direction], target={x:current.x+step.x,y:current.y+step.y};
   if(target.x<0||target.y<0||target.x>=state.board.width||target.y>=state.board.height||state.board.walls.some(p=>same(p,target)))return state;
   const gate=state.board.gates.findIndex(p=>same(p,target));

@@ -4,6 +4,7 @@ import { boards, createGame, move, type State } from "./rules";
 describe("island duo cooperation",()=>{
   it("rejects walls and closed bridges without spending a turn",()=>{
     const s=createGame(0);expect(move(s,"left")).toBe(s);
+    expect(move(s,"toString" as never)).toBe(s);
     const before:State={...s,players:[{x:2,y:1},{x:0,y:3}],turn:0};
     expect(move(before,"right")).toBe(before);
   });
