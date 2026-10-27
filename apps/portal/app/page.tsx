@@ -19,9 +19,15 @@ function GameCard({ game, compact = false }: { game: GameDefinition; compact?: b
         <h3>{game.title}</h3>
         <p>{game.summary}</p>
         <div className="replay">↻ {game.replay}</div>
-        <Link href={`/games/${game.slug}`} aria-label={`${game.status === "playable" ? "遊玩" : "查看"}${game.title}`}>
-          {game.status === "playable" ? "開始遊玩" : "查看玩法企劃"} <span aria-hidden="true">↗</span>
-        </Link>
+        {game.status === "playable" ? (
+          <a href={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/play/${game.slug}/index.html`} aria-label={`遊玩${game.title}`}>
+            開始遊玩 <span aria-hidden="true">↗</span>
+          </a>
+        ) : (
+          <Link href={`/games/${game.slug}`} aria-label={`查看${game.title}`}>
+            查看玩法企劃 <span aria-hidden="true">↗</span>
+          </Link>
+        )}
       </div>
     </article>
   );
