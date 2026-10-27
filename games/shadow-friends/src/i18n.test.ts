@@ -1,0 +1,2 @@
+import {describe,it,expect} from "vitest";import {copy,chooseLanguage} from "./i18n";
+describe("translations",()=>{it("covers every interface field",()=>{for(const c of Object.values(copy))for(const key of Object.keys(copy.en) as (keyof typeof copy.en)[])expect(c[key]?.trim()).toBeTruthy()});it("handles locale variants",()=>{expect(chooseLanguage("zh-TW")).toBe("zh-Hant");expect(chooseLanguage("ar-EG")).toBe("ar");expect(chooseLanguage("ja")).toBe("en")})});
