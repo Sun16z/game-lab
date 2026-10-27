@@ -52,6 +52,7 @@ footer { margin-top: 52px; color: #92a9b4; font-size: 13px; }
 .notice p, .detailInfo p { line-height: 1.8; color: #c1d1d8; }
 .detailInfo { max-width: 720px; margin-top: 42px; }
 .playSection { margin-top: 32px; max-width: 580px; }
+.playSection .playDirect { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; margin: 0 0 16px; border-radius: 12px; background: #9fe9d7; color: #10242b; font-weight: 700; }
 .gameEmbed { width: 100%; height: 900px; border: 1px solid #53717c; border-radius: 20px; background: #0f2430; }
 .playSection p { color: #c1d1d8; line-height: 1.7; }
 .playSection a { color: #9fe9d7; margin-left: 4px; }
