@@ -7,7 +7,7 @@ export interface Cloud {id:number;x:number;y:number;w:number;kind:CloudKind;main
 export interface Route {level:number;seed:number;biome:Biome;clouds:Cloud[];goal:number;endless:boolean}
 export interface Climb {x:number;y:number;vx:number;vy:number;time:number;highest:number;checkpoint:number;lastCloud:number;landings:number;perfect:number;combo:number;stars:number;rescues:number;rescueAt:number;landedAt:number;status:'playing'|'won'|'fell';spent:number[];visited:number[]}
 const paths=[
-[240,240,225,250,220,260,235,275,245,280,250,240],
+[240,240,215,165,120,165,220,275,330,360,305,245],
 [240,205,170,205,245,285,250,210,175,215,250,280,250],
 [240,280,320,275,235,195,230,275,315,275,230,200,240],
 [240,205,165,200,245,285,325,280,235,190,230,270,240],

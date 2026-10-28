@@ -3,7 +3,8 @@
 New candidate C003/G023 preserves the20original ideas and existing C001/C002. Standalone `/play/cloud-climb/`,12routes/fourbiomes,apprentice/standard, equalability characters, onePiprescue and unlockableendless. No backend/account/ranking/ads. Brand sprites and licensed Mozart arrangement are packaged locally.
 
 ## Verification
-- Fullworkspace `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm size:check` passed. Newgame40tests; JS37,987bytesgzip/150,000budget.
+- Fullworkspace `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm size:check` passed. Newgame41tests; JS37,987bytesgzip/150,000budget.
+- Tutorial spread now requires steering: an unattended60second simulation cannot win.
 - All12authored routes ×2difficulty simulations finish using actualsteering/collisionphysics withoutrescue. Tutorial≈29.92sec; later≈46.5–59.2sec. Tests cover sweptlanding/underside/ice/jelly,optionalrewarddetour,wind,500secondsboundedendless,profile/input/challenges.
 - Browser375×812: actualpointerdragcontroller completedtutorial in29.925simulatedseconds, rescueunused; result/retry yieldedfreshRunID. Simulation usedvirtualclock plus actualDOMpointerevents, not direct state replacement.
 - Browser800×600 and1024×768: keyboardsteer,pause/resume andscreenbounds verified; worldremains480×640. Desktopstage343×457 and469×625 respectively, controlsbesideit. Phone341×455stage. No horizontaloverflow.
