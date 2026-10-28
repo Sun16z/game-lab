@@ -73,6 +73,9 @@ importers:
 
   games/cloud-sculptor:
     dependencies:
+      '@game-lab/game-analytics':
+        specifier: workspace:*
+        version: link:../../packages/game-analytics
       '@game-lab/game-audio':
         specifier: workspace:*
         version: link:../../packages/game-audio

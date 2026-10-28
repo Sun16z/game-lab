@@ -2,7 +2,7 @@
 export type Point = Readonly<{ x: number; y: number }>;
 export type StickerKind = "star" | "rain" | "rainbow";
 export type Sticker = Readonly<{ id: number; kind: StickerKind; point: Point }>;
-export type Artwork = Readonly<{ points: readonly Point[]; stickers: readonly Sticker[] }>;
+export type Artwork = Readonly<{ points: readonly Point[]; stickers: readonly Sticker[]; color?: "cream"|"pink"|"mint"|"blue"; hole?: boolean; secondColor?: "cream"|"pink"|"mint"|"blue" }>;
 
 export const initialArtwork = (): Artwork => ({
   points: [{ x: .12, y: .59 }, { x: .19, y: .36 }, { x: .32, y: .42 }, { x: .4, y: .19 }, { x: .54, y: .3 }, { x: .65, y: .22 }, { x: .82, y: .39 }, { x: .88, y: .61 }, { x: .5, y: .73 }],

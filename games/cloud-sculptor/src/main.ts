@@ -1,63 +1,414 @@
-import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
-import { mountHomeExit } from "@game-lab/platform-adapters";
-import { GameAudio } from "@game-lab/game-audio";
-import { mountAudioControls } from "@game-lab/game-audio/ui";
-import { copyShareLink, createScoreCard, shareCardOrDownload, shareLink } from "@game-lab/game-share";
-import { addSticker, cloudPath, initialArtwork, movePoint, moveSticker, type Artwork, type Point, type StickerKind } from "./rules";
-import { chooseLanguage, copy, type Language } from "./i18n";
-import { decodeArtwork, encodeArtwork } from "./challenge";
-import "./style.css";
-
-function el<T extends HTMLElement=HTMLElement>(id:string):T { const node=document.getElementById(id); if(!node)throw Error(`Missing ${id}`); return node as T; }
-function storage():Storage|undefined { try { return localStorage; } catch { return undefined; } }
-const icons:Record<StickerKind,string>={star:"✦",rain:"💧",rainbow:"🌈"};
-const audio=new GameAudio({ cues:{ start:[.18,0,520,.01,.06,.18,0,1,90], edit:[.12,0,510,.01,.04,.12,0,1,60], sticker:[.16,0,650,.01,.06,.2,0,1,120], finish:[.2,0,620,.01,.1,.25,0,1,150] }, music:{main:["./audio/bach-bwv846.webm","./audio/bach-bwv846.mp3"]} },storage());
-
-class CloudGame {
-  private language:Language=chooseLanguage(new URLSearchParams(location.search).get("lang")??storage()?.getItem("game-lab:language")??navigator.language);
-  private seed=crypto.randomUUID(); private run:GameRun=createRun("G018",this.seed,crypto.randomUUID());
-  private art:Artwork=initialArtwork(); private history:Artwork[]=[]; private nextId=0;
-  private home=mountHomeExit(document.querySelector<HTMLElement>(".top-actions")!,this.language);
-  private controls=mountAudioControls(el<HTMLButtonElement>("sound"),audio,this.language);
-  private drag?:{kind:"point"|"sticker"; id:number; pointer:number};
-  private get t(){ return copy[this.language]; }
-  init(){
-    const select=el<HTMLSelectElement>("language");select.value=this.language;
-    select.addEventListener("change",()=>{this.language=chooseLanguage(select.value);try{storage()?.setItem("game-lab:language",this.language)}catch{}this.localize();this.render()});
-    el("start").addEventListener("click",()=>this.start());el("undo").addEventListener("click",()=>this.undo());el("clear").addEventListener("click",()=>this.resetArt());el("finish").addEventListener("click",()=>this.finish());el("again").addEventListener("click",()=>this.restart());el("share").addEventListener("click",()=>void this.share());el("copy").addEventListener("click",()=>void this.copyLink());
-    document.querySelectorAll<HTMLButtonElement>("[data-sticker]").forEach(button=>button.addEventListener("click",()=>this.insert(button.dataset.sticker as StickerKind)));
-    const board=el("board");board.addEventListener("pointermove",event=>{if(this.drag?.pointer!==event.pointerId)return;this.move(this.drag.kind,this.drag.id,this.pointerPoint(event));});board.addEventListener("pointerup",event=>{if(this.drag?.pointer===event.pointerId)this.drag=undefined;});board.addEventListener("pointercancel",()=>{this.drag=undefined;});
-    document.addEventListener("visibilitychange",()=>{if(document.hidden)audio.pause();else if(this.run.state==="PLAYING")audio.resume()});this.localize();this.render();
-  }
-  private localize(){
-    document.documentElement.lang=this.language;document.documentElement.dir=this.language==="ar"?"rtl":"ltr";document.title=`${this.t.title}｜Game Lab`;
-    for(const [id,key] of [["title","title"],["play-title","title"],["intro","intro"],["learning","learning"],["start","start"],["hint","hint"],["help","help"],["star","star"],["rain","rain"],["rainbow","rainbow"],["undo","undo"],["clear","clear"],["finish","finish"],["result-title","result"],["again","again"],["share","share"],["copy","copy"]] as const)el(id).textContent=this.t[key];
-    this.home.updateLanguage(this.language);this.controls.updateLanguage(this.language);
-  }
-  private start(){this.seed=crypto.randomUUID();this.run=transitionRun(createRun("G018",this.seed,crypto.randomUUID()),"PLAYING",new Date().toISOString());const shared=decodeArtwork(new URLSearchParams(location.hash.slice(1)).get("art")??"");this.art=shared??initialArtwork();this.history=[];this.nextId=this.art.stickers.length;el("setup").classList.add("hidden");el("result").classList.add("hidden");el("play").classList.remove("hidden");audio.unlock();audio.resume();audio.music("main");audio.play("start");this.render();}
-  private restart(){this.run=createRun("G018",crypto.randomUUID(),crypto.randomUUID());audio.pause();if(location.hash)history.replaceState(null,"",location.pathname+location.search);el("play").classList.add("hidden");el("result").classList.add("hidden");el("setup").classList.remove("hidden");window.scrollTo({top:0,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});}
-  private save(){this.history.push(this.art);if(this.history.length>40)this.history.shift();}
-  private undo(){const previous=this.history.pop();if(previous){this.art=previous;audio.play("edit");this.render();}}
-  private resetArt(){this.save();this.art=initialArtwork();audio.play("edit");this.render();}
-  private insert(kind:StickerKind){const next=addSticker(this.art,kind,this.nextId);if(next!==this.art){this.save();this.art=next;this.nextId++;audio.play("sticker");this.render();}}
-  private pointerPoint(event:PointerEvent):Point{const r=el("board").getBoundingClientRect();return{x:(event.clientX-r.left)/r.width,y:(event.clientY-r.top)/r.height};}
-  private move(kind:"point"|"sticker",id:number,point:Point){this.art=kind==="point"?movePoint(this.art,id,point):moveSticker(this.art,id,point);this.render(false);}
-  private attach(button:HTMLButtonElement,kind:"point"|"sticker",id:number){
-    button.addEventListener("pointerdown",event=>{if(this.run.state!=="PLAYING")return;event.preventDefault();this.save();this.drag={kind,id,pointer:event.pointerId};el("board").setPointerCapture(event.pointerId);audio.play("edit");});
-    button.addEventListener("keydown",event=>{const delta:Record<string,Point>={ArrowLeft:{x:-.025,y:0},ArrowRight:{x:.025,y:0},ArrowUp:{x:0,y:-.025},ArrowDown:{x:0,y:.025}};const d=delta[event.key];if(!d)return;event.preventDefault();const p=kind==="point"?this.art.points[id]:this.art.stickers.find(item=>item.id===id)?.point;if(!p)return;this.save();this.move(kind,id,{x:p.x+d.x,y:p.y+d.y});audio.play("edit");});
-  }
-  private render(rebuild=true){
-    const d=cloudPath(this.art.points,1000,600);document.getElementById("cloud-shape")!.setAttribute("d",d);document.getElementById("cloud-shadow")!.setAttribute("d",d);
-    const handles=el("handles"),stickers=el("stickers");
-    if(rebuild){handles.replaceChildren();stickers.replaceChildren();this.art.points.forEach((_,i)=>{const b=document.createElement("button");b.type="button";b.className="handle";b.dataset.id=String(i);b.textContent="✦";b.setAttribute("aria-label",`${this.t.point} ${i+1}`);this.attach(b,"point",i);handles.append(b)});this.art.stickers.forEach(sticker=>{const b=document.createElement("button");b.type="button";b.className="sticker";b.dataset.id=String(sticker.id);b.textContent=icons[sticker.kind];b.setAttribute("aria-label",`${this.t.sticker}: ${this.t[sticker.kind]}`);this.attach(b,"sticker",sticker.id);stickers.append(b)});}
-    this.art.points.forEach((point,i)=>{const b=handles.querySelector<HTMLElement>(`[data-id="${i}"]`);if(b){b.style.left=`${point.x*100}%`;b.style.top=`${point.y*100}%`;}});
-    this.art.stickers.forEach(sticker=>{const b=stickers.querySelector<HTMLElement>(`[data-id="${sticker.id}"]`);if(b){b.style.left=`${sticker.point.x*100}%`;b.style.top=`${sticker.point.y*100}%`;}});
-    el<HTMLButtonElement>("undo").disabled=this.history.length===0;
-  }
-  private finish(){if(this.run.state!=="PLAYING")return;this.run=transitionRun(this.run,"RESULT",new Date().toISOString());audio.play("finish");audio.pause();el("play").classList.add("hidden");el("result").classList.remove("hidden");const result=el("result-art");result.innerHTML=`<svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${this.t.art}"><path fill="#fffaf0" stroke="#608b91" stroke-width="6" d="${cloudPath(this.art.points,1000,600)}"></path>${this.art.stickers.map(s=>`<text x="${s.point.x*1000}" y="${s.point.y*600}" text-anchor="middle" font-size="72">${icons[s.kind]}</text>`).join("")}</svg>`;}
-  private link(){const url=new URL(shareLink(location.href,this.language));url.hash=new URLSearchParams({art:encodeArtwork(this.art)}).toString();return url.toString();}
-  private async copyLink(){try{await copyShareLink(this.link());el("share-status").textContent=this.t.copied}catch{el("share-status").textContent=this.t.failed}}
-  private async share(){try{const art=this.art,blob=await createScoreCard({title:this.t.title,score:"☁",scoreLabel:this.t.art,best:String(art.stickers.length),bestLabel:this.t.sticker,invitation:this.t.share,url:this.link(),language:this.language,direction:this.language==="ar"?"rtl":"ltr",accent:"#f0b77e",drawArtwork(ctx){ctx.fillStyle="#d4ebea";ctx.fillRect(190,320,700,430);ctx.save();ctx.translate(190,320);ctx.scale(.7,.7);ctx.fillStyle="#fffaf0";ctx.fill(new Path2D(cloudPath(art.points,1000,600)));ctx.textAlign="center";ctx.font="72px sans-serif";for(const s of art.stickers)ctx.fillText(icons[s.kind],s.point.x*1000,s.point.y*600);ctx.restore();}});const result=await shareCardOrDownload(blob,"cloud-sculptor.png",this.t.title,this.link(),this.t.result);if(result==="downloaded")el("share-status").textContent=this.t.saved;}catch(error){if(!(error instanceof DOMException&&error.name==="AbortError"))el("share-status").textContent=this.t.failed;}}
+import { createRun, transitionRun, type GameRun } from '@game-lab/game-core';
+import { noOpEventSink, type GameEventName } from '@game-lab/game-analytics';
+import { mountHomeExit } from '@game-lab/platform-adapters';
+import { GameAudio } from '@game-lab/game-audio';
+import { mountAudioControls } from '@game-lab/game-audio/ui';
+import { copyShareLink, createScoreCard, shareCardOrDownload, shareLink } from '@game-lab/game-share';
+import { addSticker, type StickerKind } from './rules';
+import { blankArt, COLORS, ORDERS, SHAPES, shapePoints, targetArt, starterArt, silhouetteMinimum, scoreOrder, scaleArt, pushUndo, dailyOrder, freeDescription, sculpt, type CloudArt, type Shape } from './cafe-rules';
+import { chooseLanguage, copy, type Language } from './i18n';
+import { cafeCopy, shapeNames, colorNames } from './cafe-i18n';
+import { extra } from './cafe-extra';
+import { decodeArtwork, encodeArtwork } from './challenge';
+import { storage, readProgress, saveProgress } from './cafe-storage';
+import { artworkSvg, drawArtwork, paints, stickerIcons } from './render';
+import { CloudEditor } from './editor';
+import { ServiceClock } from './clock';
+import './style.css';
+const $ = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
+const audio = new GameAudio({ cues: { start: [.18, 0, 520, .01, .06, .18, 0, 1, 90], edit: [.1, 0, 510, .01, .04, .12, 0, 1, 60], finish: [.2, 0, 620, .01, .1, .25, 0, 1, 150] }, music: { main: ['./audio/bach-bwv846.webm', './audio/bach-bwv846.mp3'] } }, storage());
+type Mode = 'standard' | 'practice' | 'challenge';
+type Screen = 'menu' | 'read' | 'play' | 'result';
+class CloudCafe {
+    private language: Language = chooseLanguage(new URLSearchParams(location.search).get('lang') ?? this.savedLanguage());
+    private screen: Screen = 'menu';
+    private orderIndex = 0;
+    private free = false;
+    private mode: Mode = 'standard';
+    private art: CloudArt = blankArt();
+    private history: CloudArt[] = [];
+    private progress = readProgress();
+    private guide = true;
+    private run: GameRun = createRun('G018', 'cafe', crypto.randomUUID());
+    private ended = true;
+    private session = crypto.randomUUID();
+    private editor?: CloudEditor;
+    private clock = new ServiceClock();
+    private expired = false;
+    private paused = false;
+    private elapsed = 0;
+    private windBeat = 0;
+    private lastTick = performance.now();
+    private sharedArt?: CloudArt;
+    private day?: string;
+    private home = mountHomeExit(document.querySelector<HTMLElement>('.top-actions')!, this.language);
+    private sound = mountAudioControls($<HTMLButtonElement>('sound'), audio, this.language);
+    private get t() { return cafeCopy[this.language]; }
+    private get old() { return copy[this.language]; }
+    private get x() { return extra(this.language); }
+    private get order() { return ORDERS[this.orderIndex]; }
+    private get names() { return shapeNames(this.language); }
+    init() {
+        const hash = new URLSearchParams(location.hash.slice(1));
+        const art = decodeArtwork(hash.get('art') ?? '');
+        if (art)
+            this.sharedArt = { ...art, color: art.color ?? 'cream', hole: art.hole ?? false };
+        const o = Number(hash.get('order'));
+        if (Number.isInteger(o) && o >= 1 && o <= 24) {
+            this.orderIndex = o - 1;
+            this.free = false;
+            this.screen = 'read';
+        }
+        else if (art) {
+            this.free = true;
+            this.screen = 'read';
+        }
+        if (hash.get('mode') === 'practice' || hash.get('mode') === 'challenge')
+            this.mode = hash.get('mode') as Mode;
+        const day = hash.get('day');
+        if (day && /^\d{4}-\d{2}-\d{2}$/.test(day))
+            this.day = day;
+        $<HTMLSelectElement>('language').value = this.language;
+        $('language').addEventListener('change', () => {
+            this.language = chooseLanguage($<HTMLSelectElement>('language').value);
+            try {
+                storage()?.setItem('game-lab:language', this.language);
+            }
+            catch { }
+            this.render();
+        });
+        document.addEventListener('visibilitychange', () => {
+            this.lastTick = performance.now();
+            if (document.hidden) {
+                this.editor?.clear();
+                if (this.screen === 'play' && !this.paused) {
+                    this.paused = true;
+                    if (this.run.state === 'PLAYING')
+                        this.run = transitionRun(this.run, 'PAUSED', new Date().toISOString());
+                    this.render();
+                }
+                audio.pause();
+            }
+        });
+        document.querySelectorAll('.home-exit,.brand').forEach(link => link.addEventListener('click', () => this.end('abandoned')));
+        window.addEventListener('pagehide', () => this.end('abandoned'));
+        // A restored browser-history document must not resurrect an ended run.
+        window.addEventListener('pageshow', event => {
+            if (event.persisted && this.screen === 'play' && this.ended) {
+                this.editor?.clear();
+                this.paused = false;
+                this.expired = false;
+                this.screen = 'menu';
+                audio.pause();
+                this.render();
+            }
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && this.screen === 'play' && !this.expired)
+                this.togglePause();
+        });
+        this.render();
+        if (import.meta.env.DEV)
+            Object.assign(window, { __cloudCafe: { inspect: () => ({ order: this.free ? 0 : this.order.id, mode: this.mode, screen: this.screen, run: this.run, art: this.art, remaining: this.clock.remaining, score: scoreOrder(this.art, this.order) }), target: () => {
+                        if (this.screen === 'play') {
+                            this.art = targetArt(this.order);
+                            this.draw();
+                        }
+                    }, expire: () => {
+                        if (this.screen === 'play')
+                            this.clock.start(.001, performance.now());
+                    } } });
+        requestAnimationFrame(now => this.tick(now));
+    }
+    private savedLanguage() {
+        try {
+            return storage()?.getItem('game-lab:language') ?? navigator.language;
+        }
+        catch {
+            return navigator.language;
+        }
+    }
+    private emit(eventName: GameEventName, properties: Record<string, string | number | boolean | null> = {}) { const event = { eventId: crypto.randomUUID(), eventName, gameId: 'G018' as const, runId: this.run.id, sessionId: this.session, timestamp: new Date().toISOString(), gameVersion: '0.3.0', properties }; void noOpEventSink.emit(event); window.dispatchEvent(new CustomEvent('game-lab:event', { detail: event })); }
+    private end(reason: string) {
+        if (this.ended)
+            return;
+        this.ended = true;
+        if (this.run.state === 'PLAYING' || this.run.state === 'PAUSED')
+            this.run = transitionRun(this.run, 'RESULT', new Date().toISOString());
+        this.emit('game_end', { reason, order: this.free ? 0 : this.order.id });
+    }
+    private friends() { return `<div class="friends" aria-hidden="true"><img src="./friends/dodo.webp" alt=""><img src="./friends/lili.webp" alt=""><img src="./friends/pip.webp" alt=""></div>`; }
+    private button(id: string, text: string, primary = false) { return `<button type="button" id="${id}" class="${primary ? 'primary' : ''}">${text}</button>`; }
+    private bind(id: string, fn: () => void) { $(id)?.addEventListener('click', fn); }
+    private orderTitle() { return `${String(this.order.id).padStart(2, '0')} · ${this.names[SHAPES.indexOf(this.order.shape)]}`; }
+    private requirements(result = false) { const score = scoreOrder(this.art, this.order), colors = colorNames(this.language); return `<ul class="criteria">${[[this.t.shape, this.names[SHAPES.indexOf(this.order.shape)] + (result ? ` · ${Math.round(score.similarity * 100)}% / ${Math.round(silhouetteMinimum(this.order.shape) * 100)}%` : ''), score.silhouette], [this.t.holes, this.order.hole ? this.t.oneHole : this.t.noHole, score.topology], [this.t.details, `${colors[COLORS.indexOf(this.order.color)]}${this.order.secondColor ? ' + ' + colors[COLORS.indexOf(this.order.secondColor)] : ''} · ${this.order.count ? this.order.count + ' × ' + this.old[this.order.sticker!] : this.t.noSticker}`, score.detail]].map(([label, value, ok]) => `<li class="${result ? (ok ? 'met' : 'unmet') : ''}"><span>${result ? (ok ? '★' : '☆') : '○'} ${label}</span><b>${value}</b></li>`).join('')}</ul>`; }
+    private render() {
+        document.documentElement.lang = this.language;
+        document.documentElement.dir = this.language === 'ar' ? 'rtl' : 'ltr';
+        document.title = `${this.t.title} | Game Lab`;
+        this.home.updateLanguage(this.language);
+        this.sound.updateLanguage(this.language);
+        if (this.screen === 'menu')
+            this.menu();
+        else if (this.screen === 'read')
+            this.read();
+        else if (this.screen === 'play')
+            this.play();
+        else
+            this.result();
+    }
+    private menu() {
+        $('app').innerHTML = `<section class="welcome paper">${this.friends()}<p class="eyebrow">G018 · ☁</p><h1>${this.t.title}</h1><p>${this.t.intro}</p><p class="learning-benefit">${this.old.learning}</p><div class="welcome-actions">${this.button('free', this.t.free, true)}${this.button('daily', this.t.daily)}</div></section><section class="menu-book"><h2>${this.t.orders}</h2>${[0, 1, 2].map(stage => `<section class="stage-page"><h3><span>${stage + 1}</span> ${this.t.stages.split(',')[stage]}</h3><div class="orders">${ORDERS.filter(o => o.stage === stage).map(o => `<button type="button" class="order-tile" data-order="${o.id - 1}" aria-label="${o.id} ${this.names[SHAPES.indexOf(o.shape)]}"><div class="mini-art">${artworkSvg(targetArt(o))}</div><b>${String(o.id).padStart(2, '0')} · ${this.names[SHAPES.indexOf(o.shape)]}</b><span class="mini-stars">${'★'.repeat(this.progress.best[o.id - 1])}${'☆'.repeat(3 - this.progress.best[o.id - 1])}</span></button>`).join('')}</div></section>`).join('')}</section><section class="paper album"><h2>${this.t.album}</h2>${this.progress.album.length ? `<div class="album-grid">${this.progress.album.map((item, i) => `<button type="button" data-album="${i}" aria-label="${this.old.art} ${i + 1}">${artworkSvg(item.art)}<span>${item.order ? '#' + item.order : '☁'} ${'★'.repeat(item.stars)}</span></button>`).join('')}</div>` : `<p>${this.t.empty}</p>`}</section>`;
+        this.bind('free', () => { this.free = true; this.day = undefined; this.sharedArt = undefined; this.screen = 'read'; this.render(); });
+        this.bind('daily', () => { this.day = new Date().toISOString().slice(0, 10); this.orderIndex = dailyOrder(this.day); this.free = false; this.sharedArt = undefined; this.screen = 'read'; this.render(); });
+        document.querySelectorAll<HTMLElement>('[data-order]').forEach(b => b.addEventListener('click', () => { this.orderIndex = Number(b.dataset.order); this.free = false; this.day = undefined; this.sharedArt = undefined; this.screen = 'read'; this.render(); }));
+        document.querySelectorAll<HTMLElement>('[data-album]').forEach(b => b.addEventListener('click', () => { this.sharedArt = this.progress.album[Number(b.dataset.album)].art; this.free = true; this.screen = 'read'; this.render(); }));
+    }
+    private read() {
+        const received = !this.free && this.sharedArt ? `<aside class="received-art"><div><h2>${this.x.received}</h2><div class="received-preview">${artworkSvg(this.sharedArt)}</div></div>${this.button('open-received', this.x.openReceived)}</aside>` : '';
+        $('app').innerHTML = `<section class="paper briefing"><p class="eyebrow">${this.t.review}${this.day ? ' · ' + this.day + ' UTC' : ''}</p><h1>${this.free ? this.t.free : this.orderTitle()}</h1><div class="briefing-body"><div class="customer"><img src="./friends/${this.free ? 'dodo' : this.order.customer}.webp" alt="${this.free ? 'Dodo' : this.order.customer}"/><div class="target-art">${artworkSvg(this.free ? (this.sharedArt ?? blankArt()) : targetArt(this.order))}</div></div><div>${this.free ? `<p>${this.t.intro}</p>` : this.requirements()}<p class="reading-note">${this.t.ready}</p>${this.free ? '' : `<label class="mode-label"><select id="mode">${(['standard', 'practice', 'challenge'] as const).map(mode => `<option value="${mode}" ${mode === this.mode ? 'selected' : ''}>${this.t[mode]}</option>`).join('')}</select></label>`}<p class="input-help">${this.t.drag}</p></div></div>${received}<div class="actions">${this.button('begin', this.t.begin, true)}${this.button('menu', this.t.menu)}</div></section>`;
+        this.bind('open-received', () => { this.free = true; this.day = undefined; this.start(); });
+        this.bind('begin', () => {
+            const mode = $<HTMLSelectElement>('mode');
+            if (mode)
+                this.mode = mode.value as Mode;
+            this.start();
+        });
+        this.bind('menu', () => { this.screen = 'menu'; this.render(); });
+    }
+    private start(retry = false) {
+        this.end('abandoned');
+        if (retry)
+            this.emit('retry_click');
+        this.art = this.free ? (this.sharedArt ?? blankArt()) : starterArt(this.order);
+        this.history = [];
+        this.elapsed = 0;
+        this.windBeat = 0;
+        this.expired = false;
+        this.paused = false;
+        this.clock.start(this.free || this.mode === 'practice' ? null : this.mode === 'challenge' ? 30 : 45, performance.now());
+        this.run = transitionRun(createRun('G018', this.day ?? `order-${this.free ? 0 : this.order.id}-${this.mode}`, crypto.randomUUID()), 'PLAYING', new Date().toISOString());
+        this.ended = false;
+        this.emit('game_start', { order: this.free ? 0 : this.order.id, mode: this.free ? 'free' : this.mode });
+        this.screen = 'play';
+        audio.unlock();
+        audio.resume();
+        audio.music('main');
+        audio.play('start');
+        this.render();
+        scrollTo({ top: 0, behavior: 'instant' });
+    }
+    private checkpoint() { this.history = pushUndo(this.history, this.art); }
+    private edit(next: CloudArt) {
+        if (this.paused || this.expired)
+            return;
+        this.art = next;
+        this.draw();
+    }
+    private transform(fn: (art: CloudArt) => CloudArt) {
+        if (this.paused || this.expired)
+            return;
+        this.checkpoint();
+        this.edit(fn(this.art));
+        audio.play('edit');
+    }
+    private play() {
+        const advanced = this.free || this.order.stage > 0, blend = this.free || this.order.stage === 2;
+        $('app').innerHTML = `<div class="play-heading"><div><p class="eyebrow">☁ ${this.t.title}</p><h1>${this.free ? this.t.free : this.orderTitle()}</h1></div><div class="play-actions"><output id="timer"></output>${this.button('pause', this.t.pause)}${this.button('menu', this.t.menu)}</div></div><div class="cafe-workspace"><aside class="order-receipt">${this.free ? this.friends() : `<img class="customer-face" src="./friends/${this.order.customer}.webp" alt="${this.order.customer}"/><div class="receipt-target">${artworkSvg(targetArt(this.order))}</div>${this.requirements()}`}${this.free ? '' : `<label class="guide-toggle"><input id="guide" type="checkbox" ${this.guide ? 'checked' : ''}>${this.t.guide}</label>`}<p class="wind-note" id="wind"></p></aside><section class="studio"><div id="board" class="board" tabindex="0" role="group" aria-label="${this.old.art}"><div class="sky-grain"></div><div id="guide-art" class="guide-art"></div><div id="cloud-art" class="cloud-art"></div><div id="art-stickers" class="art-stickers"></div><div class="contour-areas">${Array.from({ length: 8 }, (_, i) => `<button type="button" class="contour-area" data-area="${i}" aria-label="${this.x.area} ${i + 1}"></button>`).join('')}</div></div><div class="counter"><span aria-hidden="true">☕</span><span>☁</span><span aria-hidden="true">✿</span></div><p class="input-help">${this.t.drag}<br>${this.t.keyboard}</p></section></div><section class="paper tool-tray"><div class="tool-group"><span>${this.t.mold}</span><div class="molds">${((this.free ? SHAPES : ['round', 'wide', 'tall']) as Shape[]).map(shape => `<button type="button" data-mold="${shape}" aria-label="${this.names[SHAPES.indexOf(shape)]}"><div>${artworkSvg({ ...blankArt(), points: shapePoints(shape) })}</div></button>`).join('')}</div></div><div class="tool-group compact"><span>${this.t.shape}</span><div class="tool-buttons">${this.button('bigger', '＋')}${this.button('smaller', '−')}${advanced ? this.button('hole', this.t.hole) : ''}</div></div>${advanced ? `<div class="tool-group"><span>${this.t.color}</span><div class="swatches">${COLORS.map((c, i) => `<button type="button" data-color="${c}" style="--paint:${paints[c]}" aria-label="${colorNames(this.language)[i]}"></button>`).join('')}</div>${blend ? `<label class="blend-label">${this.x.second}<select id="second"><option value="">${this.x.none}</option>${COLORS.map((c, i) => `<option value="${c}" ${c === this.art.secondColor ? 'selected' : ''}>${colorNames(this.language)[i]}</option>`).join('')}</select></label>` : ''}</div><div class="tool-group"><span>${this.t.stickers}</span><div class="tool-buttons">${(['star', 'rain', 'rainbow'] as StickerKind[]).map(kind => `<button type="button" data-add="${kind}" aria-label="${this.old[kind]}">${stickerIcons[kind]}</button>`).join('')}${this.button('remove', '×')}</div></div>` : ''}<div class="final-actions">${this.button('undo', this.old.undo)}${this.button('clear', this.old.clear)}${this.button('serve', this.t.serve, true)}</div></section><div id="pause-overlay" class="local-overlay ${this.paused || this.expired ? '' : 'hidden'}"><section class="paper"><h2>${this.expired ? this.t.timeout : this.t.pause}</h2><div class="actions">${this.button('resume', this.expired ? this.t.continue : this.t.resume, true)}${this.expired ? this.button('serve-time', this.t.serve) : ''}${this.button('leave', this.t.menu)}</div></section></div>`;
+        this.editor = new CloudEditor($('board'), () => this.art, art => this.edit(art), () => this.checkpoint(), () => !this.paused && !this.expired && this.screen === 'play', () => !this.free && this.order.shape === 'rabbit' ? .10 : .17);
+        document.querySelectorAll<HTMLElement>('[data-area]').forEach(b => { b.addEventListener('focus', () => this.editor?.select(Number(b.dataset.area))); });
+        this.bind('pause', () => this.togglePause());
+        this.bind('menu', () => this.leave());
+        this.bind('leave', () => this.leave());
+        this.bind('resume', () => {
+            if (this.expired) {
+                this.mode = 'practice';
+                this.clock.start(null, performance.now());
+                this.expired = false;
+            }
+            this.paused = false;
+            if (this.run.state === 'PAUSED')
+                this.run = transitionRun(this.run, 'PLAYING', new Date().toISOString());
+            audio.resume();
+            this.render();
+        });
+        this.bind('serve-time', () => this.finish());
+        this.bind('serve', () => this.finish());
+        this.bind('bigger', () => this.transform(a => scaleArt(a, 1.07)));
+        this.bind('smaller', () => this.transform(a => scaleArt(a, .93)));
+        this.bind('hole', () => this.transform(a => ({ ...a, hole: !a.hole })));
+        this.bind('undo', () => {
+            if (this.paused || this.expired)
+                return;
+            const prev = this.history.pop();
+            if (prev) {
+                this.art = prev;
+                this.draw();
+            }
+        });
+        this.bind('clear', () => this.transform(() => this.free ? blankArt() : starterArt(this.order)));
+        this.bind('remove', () => this.transform(a => ({ ...a, stickers: [] })));
+        document.querySelectorAll<HTMLElement>('[data-mold]').forEach(b => b.addEventListener('click', () => this.transform(a => ({ ...a, points: shapePoints(b.dataset.mold as Shape) }))));
+        document.querySelectorAll<HTMLElement>('[data-color]').forEach(b => b.addEventListener('click', () => this.transform(a => ({ ...a, color: b.dataset.color as CloudArt['color'] }))));
+        document.querySelectorAll<HTMLElement>('[data-add]').forEach(b => b.addEventListener('click', () => this.transform(a => { const id = Math.max(-1, ...a.stickers.map(s => s.id)) + 1; const next = addSticker(a, b.dataset.add as StickerKind, id); return { ...next, stickers: next.stickers.map(s => s.id === id ? { ...s, point: { x: .38 + (a.stickers.length % 3) * .12, y: .46 + Math.floor(a.stickers.length / 3) * .09 } } : s) } as CloudArt; })));
+        $('second')?.addEventListener('change', () => this.transform(a => ({ ...a, secondColor: ($<HTMLSelectElement>('second').value || undefined) as CloudArt['secondColor'] })));
+        $('guide')?.addEventListener('change', () => { this.guide = $<HTMLInputElement>('guide').checked; this.draw(); });
+        $('bigger').title = this.t.bigger;
+        $('smaller').title = this.t.smaller;
+        if ($('remove'))
+            $('remove').title = this.t.remove;
+        this.draw();
+    }
+    private draw() {
+        if (this.screen !== 'play')
+            return;
+        const withoutStickers = { ...this.art, stickers: [] };
+        $('cloud-art').innerHTML = artworkSvg(withoutStickers);
+        $('guide-art').innerHTML = this.guide && !this.free ? artworkSvg(targetArt(this.order), true) : '';
+        const container = $('art-stickers');
+        for (const node of Array.from(container.children) as HTMLElement[])
+            if (!this.art.stickers.some(s => s.id === Number(node.dataset.artSticker)))
+                node.remove();
+        for (const s of this.art.stickers) {
+            let b = container.querySelector<HTMLButtonElement>(`[data-art-sticker="${s.id}"]`);
+            if (!b) {
+                b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'art-sticker';
+                b.dataset.artSticker = String(s.id);
+                b.textContent = stickerIcons[s.kind];
+                b.setAttribute('aria-label', this.old[s.kind]);
+                b.addEventListener('keydown', e => {
+                    const d: Record<string, [
+                        number,
+                        number
+                    ]> = { ArrowLeft: [-.02, 0], ArrowRight: [.02, 0], ArrowUp: [0, -.02], ArrowDown: [0, .02] };
+                    if (!d[e.key])
+                        return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.transform(a => ({ ...a, stickers: a.stickers.map(item => item.id === s.id ? { ...item, point: { x: Math.max(.04, Math.min(.96, item.point.x + d[e.key][0])), y: Math.max(.08, Math.min(.92, item.point.y + d[e.key][1])) } } : item) }));
+                });
+                container.append(b);
+            }
+            b.style.left = `${s.point.x * 100}%`;
+            b.style.top = `${s.point.y * 100}%`;
+        }
+        document.querySelectorAll<HTMLElement>('[data-area]').forEach((b, i) => { const p = this.art.points[Math.floor(i * this.art.points.length / 8)]; b.style.left = `${p.x * 100}%`; b.style.top = `${p.y * 100}%`; });
+        $<HTMLButtonElement>('undo').disabled = !this.history.length;
+        $('hole')?.setAttribute('aria-pressed', String(this.art.hole));
+        if ($('second'))
+            $<HTMLSelectElement>('second').value = this.art.secondColor ?? '';
+        document.querySelectorAll<HTMLElement>('[data-color]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.color === this.art.color)));
+        $<HTMLButtonElement>('remove')?.setAttribute('aria-label', this.t.remove);
+        this.timer();
+    }
+    private timer() {
+        if (!$('timer'))
+            return;
+        $('timer').textContent = this.clock.remaining === null ? '∞' : `${Math.ceil(this.clock.remaining)}s`;
+        $('timer').setAttribute('aria-label', this.clock.remaining === null ? this.t.practice : String(Math.ceil(this.clock.remaining)));
+        if ($('wind'))
+            $('wind').textContent = !this.free && this.order.wind ? (this.mode === 'practice' ? this.x.practice : `${Math.floor(this.elapsed / 6) % 2 === 0 ? '→ ' + this.x.right : '← ' + this.x.left} · ${Math.max(1, 6 - Math.floor(this.elapsed % 6))}`) : '';
+    }
+    private tick(now: number) {
+        const delta = Math.max(0, Math.min(.2, (now - this.lastTick) / 1000));
+        this.lastTick = now;
+        const running = this.screen === 'play' && !this.paused && !this.expired && !document.hidden;
+        const timeout = this.clock.tick(now, running);
+        if (running) {
+            this.elapsed += delta;
+            if (!this.free && this.order.wind && this.mode !== 'practice') {
+                const beat = Math.floor(this.elapsed / 6);
+                if (beat > this.windBeat) {
+                    this.windBeat = beat;
+                    this.checkpoint();
+                    this.art = sculpt(this.art, { x: .5, y: .35 }, { x: beat % 2 === 1 ? .018 : -.018, y: 0 }, .5);
+                    this.draw();
+                }
+            }
+            this.timer();
+            if (timeout) {
+                this.expired = true;
+                this.editor?.clear();
+                if (this.run.state === 'PLAYING')
+                    this.run = transitionRun(this.run, 'PAUSED', new Date().toISOString());
+                audio.pause();
+                this.render();
+            }
+        }
+        requestAnimationFrame(next => this.tick(next));
+    }
+    private togglePause() {
+        if (this.expired)
+            return;
+        this.paused = !this.paused;
+        this.editor?.clear();
+        this.run = transitionRun(this.run, this.paused ? 'PAUSED' : 'PLAYING', new Date().toISOString());
+        if (this.paused)
+            audio.pause();
+        else
+            audio.resume();
+        this.render();
+    }
+    private leave() { this.end('abandoned'); audio.pause(); this.screen = 'menu'; this.render(); }
+    private finish() {
+        if (this.screen !== 'play')
+            return;
+        this.end('served');
+        audio.play('finish');
+        audio.pause();
+        const stars = this.free ? 0 : scoreOrder(this.art, this.order).stars;
+        if (!this.free)
+            this.progress.best[this.orderIndex] = Math.max(stars, this.progress.best[this.orderIndex]);
+        this.progress.album.push({ art: this.art, order: this.free ? 0 : this.order.id, stars });
+        this.progress.album = this.progress.album.slice(-12);
+        saveProgress(this.progress);
+        this.screen = 'result';
+        this.render();
+        scrollTo({ top: 0, behavior: 'instant' });
+    }
+    private result() {
+        const score = scoreOrder(this.art, this.order), description = freeDescription(this.art);
+        $('app').innerHTML = `<section class="paper result">${this.friends()}<p class="eyebrow">☁ ${this.t.title}</p><h1>${this.free ? this.old.result : this.orderTitle()}</h1>${this.free ? `<p>${this.t.freeFeedback} ${this.names[SHAPES.indexOf(description.shape)]} · ${this.art.stickers.length} ${this.t.stickers}</p>` : `<p class="result-stars" aria-label="${score.stars} / 3">${'★'.repeat(score.stars)}${'☆'.repeat(3 - score.stars)}</p><p>${score.passed ? this.x.complete : this.t.feedback}</p>`}<div class="result-art">${artworkSvg(this.art)}</div>${this.free ? '' : this.requirements(true)}<p class="saved-note">${this.t.saved}</p><div class="actions">${this.button('again', this.t.retry, true)}${!this.free && score.passed && this.orderIndex < 23 ? this.button('next', this.t.next, true) : ''}${this.button('menu', this.t.menu)}</div><div class="share-actions">${this.button('share', this.old.share)}${this.button('copy', this.old.copy)}</div><p id="share-status" role="status"></p></section>`;
+        const primaryActions = document.querySelector('.result .actions');
+        if (primaryActions)
+            document.querySelector('.result-art')?.before(primaryActions);
+        this.bind('again', () => this.start(true));
+        this.bind('menu', () => { this.screen = 'menu'; this.render(); });
+        this.bind('next', () => { this.orderIndex++; this.sharedArt = undefined; this.screen = 'read'; this.render(); });
+        this.bind('copy', () => void this.copy());
+        this.bind('share', () => void this.share());
+    }
+    private link() { const url = new URL(shareLink(location.href, this.language)); url.hash = new URLSearchParams({ art: encodeArtwork(this.art), ...(this.free ? {} : { order: String(this.order.id), mode: this.mode }), ...(this.day ? { day: this.day } : {}) }).toString(); return url.toString(); }
+    private async copy() {
+        try {
+            await copyShareLink(this.link());
+            $('share-status').textContent = this.old.copied;
+        }
+        catch {
+            $('share-status').textContent = this.old.failed;
+        }
+    }
+    private async share() {
+        const title = this.t.title, link = this.link(), labels = this.old, language = this.language;
+        const scoreLabel = this.free ? labels.art : this.orderTitle();
+        try {
+            const art = this.art, score = this.free ? '☁' : `${scoreOrder(art, this.order).stars} / 3`;
+            const blob = await createScoreCard({ title, score, scoreLabel, best: '☁', bestLabel: title, invitation: labels.share, url: link, language, direction: language === 'ar' ? 'rtl' : 'ltr', accent: '#e5b592', drawArtwork(ctx) { ctx.fillStyle = '#d7e9e3'; ctx.fillRect(190, 320, 700, 430); ctx.save(); ctx.translate(190, 290); ctx.scale(.7, .7); drawArtwork(ctx, art); ctx.restore(); } });
+            const status = await shareCardOrDownload(blob, 'cloud-cafe.png', title, link, labels.art);
+            const node = $('share-status');
+            if (status === 'downloaded' && node)
+                node.textContent = labels.saved;
+        }
+        catch (error) {
+            if (!(error instanceof DOMException && error.name === 'AbortError')) {
+                const node = $('share-status');
+                if (node) node.textContent = labels.failed;
+            }
+        }
+    }
 }
-new CloudGame().init();
-if (import.meta.env.PROD && "serviceWorker" in navigator) void navigator.serviceWorker.register("./sw.js").catch(()=>{});
+new CloudCafe().init();
+if (import.meta.env.PROD && 'serviceWorker' in navigator)
+    void navigator.serviceWorker.register('./sw.js').catch(() => { });
