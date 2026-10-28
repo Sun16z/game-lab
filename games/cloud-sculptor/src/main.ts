@@ -11,7 +11,7 @@ import "./style.css";
 function el<T extends HTMLElement=HTMLElement>(id:string):T { const node=document.getElementById(id); if(!node)throw Error(`Missing ${id}`); return node as T; }
 function storage():Storage|undefined { try { return localStorage; } catch { return undefined; } }
 const icons:Record<StickerKind,string>={star:"✦",rain:"💧",rainbow:"🌈"};
-const audio=new GameAudio({ cues:{ start:[.18,0,520,.01,.06,.18,0,1,90], edit:[.12,0,510,.01,.04,.12,0,1,60], sticker:[.16,0,650,.01,.06,.2,0,1,120], finish:[.2,0,620,.01,.1,.25,0,1,150] }, music:{main:["./audio/memory-loop.webm","./audio/memory-loop.mp3"]} },storage());
+const audio=new GameAudio({ cues:{ start:[.18,0,520,.01,.06,.18,0,1,90], edit:[.12,0,510,.01,.04,.12,0,1,60], sticker:[.16,0,650,.01,.06,.2,0,1,120], finish:[.2,0,620,.01,.1,.25,0,1,150] }, music:{main:["./audio/bach-bwv846.webm","./audio/bach-bwv846.mp3"]} },storage());
 
 class CloudGame {
   private language:Language=chooseLanguage(new URLSearchParams(location.search).get("lang")??storage()?.getItem("game-lab:language")??navigator.language);
