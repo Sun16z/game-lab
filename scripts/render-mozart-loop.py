@@ -2,10 +2,15 @@
 MIDI transcription: Alejandro Sierra / Mutopia Project, CC BY-SA 3.0;
 see knowledge/audio/source/mozart-k545-1.md for provenance and license.
 """
-import math, struct, wave
+import argparse, math, struct, wave
 from pathlib import Path
 
-raw=Path('knowledge/audio/source/mozart-k545-1.mid').read_bytes()
+parser=argparse.ArgumentParser()
+parser.add_argument('--input',default='knowledge/audio/source/mozart-k545-1.mid')
+parser.add_argument('--output',default='/tmp/game-lab-mozart-k545.wav')
+parser.add_argument('--duration',type=int,default=36,choices=range(30,91))
+args=parser.parse_args()
+raw=Path(args.input).read_bytes()
 assert raw[:4]==b'MThd'
 header_length=struct.unpack_from('>I',raw,4)[0]
 _,tracks,division=struct.unpack_from('>HHH',raw,8)
@@ -47,7 +52,7 @@ for tick,kind,channel,value in all_events:
     if velocity and (key not in active):active[key]=(seconds,velocity)
     elif key in active:
         start,vel=active.pop(key);notes.append((start,seconds,note,vel))
-rate=22050;duration=36;out=[0.0]*(rate*duration)
+rate=22050;duration=args.duration;out=[0.0]*(rate*duration)
 for start,end,note,velocity in notes:
     if start>=duration:continue
     frequency=440*2**((note-69)/12);stop=min(duration,end+.25,start+3)
@@ -56,7 +61,7 @@ for start,end,note,velocity in notes:
     for i in range(first,last):
         t=i/rate-start;release=max(0,min(1,(stop-i/rate)/.22));envelope=min(1,t/.018)*math.exp(-1.15*t)*release
         out[i]+=volume*envelope*(math.sin(2*math.pi*frequency*t)+.20*math.sin(4*math.pi*frequency*t)+.05*math.sin(6*math.pi*frequency*t))
-with wave.open('/tmp/game-lab-mozart-k545.wav','wb') as f:
+with wave.open(args.output,'wb') as f:
     f.setparams((1,2,rate,0,'NONE','not compressed'));buf=bytearray()
     for i,sample in enumerate(out):
         t=i/rate;fade=max(0,min(1,t/.35,(duration-t)/1.0));buf.extend(struct.pack('<h',max(-32767,min(32767,int(sample*fade*32767)))))

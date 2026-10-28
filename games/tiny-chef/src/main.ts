@@ -14,7 +14,7 @@ function el<T extends HTMLElement=HTMLElement>(id:string):T{const node=document.
 function storage():Storage|undefined{try{return localStorage}catch{return undefined}}
 const icons:Record<Ingredient,string>={tomato:'🍅',lemon:'🍋',leaf:'🌿',star:'⭐'};
 const shapes:Record<Ingredient,'tomatoShape'|'lemonShape'|'leafShape'|'starShape'>={tomato:'tomatoShape',lemon:'lemonShape',leaf:'leafShape',star:'starShape'};
-const audio=new GameAudio({cues:{start:[.18,0,510,.01,.06,.18,0,1,90],place:[.12,0,440,.01,.03,.1,0,1,30],wrong:[.1,0,260,.01,.05,.12,0,1,-20],success:[.22,0,720,.01,.08,.2,0,1,110]},music:{main:['./audio/memory-loop.webm','./audio/memory-loop.mp3']}},storage());
+const audio=new GameAudio({cues:{start:[.18,0,510,.01,.06,.18,0,1,90],place:[.12,0,440,.01,.03,.1,0,1,30],wrong:[.1,0,260,.01,.05,.12,0,1,-20],success:[.22,0,720,.01,.08,.2,0,1,110]},music:{main:['./audio/fur-elise.webm','./audio/fur-elise.mp3']}},storage());
 class Game{
  private language:Language=chooseLanguage(new URLSearchParams(location.search).get('lang')??storage()?.getItem('game-lab:language')??navigator.language);
  private target=new URLSearchParams(location.search).get('v')==='2'?challengeTarget(new URLSearchParams(location.search).get('target')):undefined;private plate:Plate=emptyPlate();private selected:Ingredient='tomato';private history:Plate[]=[];private completed=0;private free=false;private served=false;private moves=0;private ended=false;
