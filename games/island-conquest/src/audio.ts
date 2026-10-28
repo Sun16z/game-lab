@@ -10,6 +10,6 @@ export function createIslandAudio(storage: Pick<Storage, "getItem" | "setItem"> 
       claim: [0.3, 0, 650, 0.005, 0.08, 0.25, 0, 1, 170],
       finish: [0.27, 0, 560, 0.008, 0.1, 0.28, 0, 1, 120]
     },
-    music: { main: ["./audio/island-loop.webm", "./audio/island-loop.mp3"] }
+    music: { main: ["./audio/bach-bwv846.webm", "./audio/bach-bwv846.mp3"] }
   }, storage);
 }

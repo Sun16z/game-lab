@@ -1,6 +1,8 @@
 {
   "version": 1,
   "files": [
+    {"file":"games/island-conquest/public/audio/bach-bwv846.webm","kind":"music","game":"island-conquest","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5","sourceFile":"knowledge/audio/source/bach-bwv846.mid","author":"J. S. Bach；MIDI：Tobias Erbsland / Mutopia；合成編曲：Game Lab","license":"Public Domain source + Project-owned arrangement","obtainedAt":"2026-10-28","modified":true},
+    {"file":"games/island-conquest/public/audio/bach-bwv846.mp3","kind":"music","game":"island-conquest","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5","sourceFile":"knowledge/audio/source/bach-bwv846.mid","author":"J. S. Bach；MIDI：Tobias Erbsland / Mutopia；合成編曲：Game Lab","license":"Public Domain source + Project-owned arrangement","obtainedAt":"2026-10-28","modified":true},
     {"file":"games/memory-monsters/public/audio/bach-bwv846.webm","kind":"music","game":"memory-monsters","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5","sourceFile":"knowledge/audio/source/bach-bwv846.mid","author":"J. S. Bach；MIDI：Tobias Erbsland / Mutopia；合成編曲：Game Lab","license":"Public Domain source + Project-owned arrangement","obtainedAt":"2026-10-28","modified":true},
     {"file":"games/memory-monsters/public/audio/bach-bwv846.mp3","kind":"music","game":"memory-monsters","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5","sourceFile":"knowledge/audio/source/bach-bwv846.mid","author":"J. S. Bach；MIDI：Tobias Erbsland / Mutopia；合成編曲：Game Lab","license":"Public Domain source + Project-owned arrangement","obtainedAt":"2026-10-28","modified":true},
     {"file":"games/island-duo/public/audio/fur-elise.webm","kind":"music","game":"island-duo","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=931","sourceFile":"knowledge/audio/source/beethoven-fur-elise.mid","author":"Ludwig van Beethoven；MIDI：Stelios Samelis / Mutopia；合成編曲：Game Lab","license":"Public Domain source + Project-owned arrangement","obtainedAt":"2026-10-28","modified":true},
@@ -62,28 +64,6 @@
       "game": "monster-math",
       "sourceUrl": "https://kenney.nl/assets/music-jingles",
       "sourceFile": "Audio/Steel jingles/jingles_STEEL11.ogg",
-      "author": "Kenney（採樣）與Game Lab（原創編曲）",
-      "license": "CC0-1.0 sample + Project-owned arrangement",
-      "obtainedAt": "2026-10-25",
-      "modified": true
-    },
-    {
-      "file": "games/island-conquest/public/audio/island-loop.webm",
-      "kind": "music",
-      "game": "island-conquest",
-      "sourceUrl": "https://kenney.nl/assets/music-jingles",
-      "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg",
-      "author": "Kenney（採樣）與Game Lab（原創編曲）",
-      "license": "CC0-1.0 sample + Project-owned arrangement",
-      "obtainedAt": "2026-10-25",
-      "modified": true
-    },
-    {
-      "file": "games/island-conquest/public/audio/island-loop.mp3",
-      "kind": "music",
-      "game": "island-conquest",
-      "sourceUrl": "https://kenney.nl/assets/music-jingles",
-      "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg",
       "author": "Kenney（採樣）與Game Lab（原創編曲）",
       "license": "CC0-1.0 sample + Project-owned arrangement",
       "obtainedAt": "2026-10-25",
