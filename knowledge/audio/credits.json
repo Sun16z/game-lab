@@ -78,6 +78,8 @@
       "file": "games/memory-monsters/public/audio/voice/zh-Hant-complete.mp3",
       "kind": "voice", "game": "memory-monsters", "locale": "zh-Hant",
       "sourceUrl": "https://huggingface.co/openbmb/VoxCPM2", "author": "OpenBMB VoxCPM2與Game Lab", "license": "Apache-2.0 generated output", "obtainedAt": "2026-10-26", "modified": true
-    }
+    },
+    {"file":"games/cloud-climb/public/audio/mozart-k545.webm","kind":"music","game":"cloud-climb","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=998","sourceFile":"knowledge/audio/source/mozart-k545-1.mid","author":"W. A. Mozart；MIDI：Alejandro Sierra / Mutopia；合成編曲：Game Lab","license":"CC BY-SA 3.0","obtainedAt":"2026-10-29","modified":true},
+    {"file":"games/cloud-climb/public/audio/mozart-k545.mp3","kind":"music","game":"cloud-climb","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=998","sourceFile":"knowledge/audio/source/mozart-k545-1.mid","author":"W. A. Mozart；MIDI：Alejandro Sierra / Mutopia；合成編曲：Game Lab","license":"CC BY-SA 3.0","obtainedAt":"2026-10-29","modified":true}
   ]
 }
