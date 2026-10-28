@@ -9,7 +9,7 @@ export function createMonsterAudio(storage: Pick<Storage, "getItem" | "setItem">
       boss: [0.32, 0, 370, 0.01, 0.065, 0.14, 0, 1, 70],
       victory: [0.3, 0, 660, 0.005, 0.07, 0.17, 0, 1, 45]
     },
-    music: { main: ["./audio/monster-loop.webm", "./audio/monster-loop.mp3"] },
+    music: { main: ["./audio/mozart-runner.webm", "./audio/mozart-runner.mp3"] },
     voice: getApprovedPraiseVoice("monster-math")
   }, storage);
 }
