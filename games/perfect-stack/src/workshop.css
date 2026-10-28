@@ -87,3 +87,14 @@ button:focus-visible,select:focus-visible{outline:3px solid #bd704e;outline-offs
   border: 0; border-radius: 7px; background: #c56747; color: #fff9e9;
   box-shadow: 0 4px 0 #8d4837; font-size: 16px; font-weight: 850; text-decoration: none;
 }
+
+/* The island friends cheer from outside the playfield and never intercept taps. */
+.brand-friends,.stack-friends{display:flex;justify-content:center;align-items:end;pointer-events:none}
+.brand-friends img,.stack-friends img{display:block;height:100%;width:auto;max-width:34%;object-fit:contain;filter:drop-shadow(0 3px 3px #365b6c35);transform-origin:50% 90%;animation:friends-breathe 3s ease-in-out infinite}
+.brand-friends img:nth-child(2),.stack-friends img:nth-child(2){animation-delay:.45s}.brand-friends img:nth-child(3),.stack-friends img:nth-child(3){animation-delay:.9s}
+.stack-friends{height:64px;grid-column:1/-1;justify-content:flex-end;gap:1px}
+@keyframes friends-breathe{50%{transform:translateY(-3px) rotate(2deg)}}
+@media(min-width:721px){#ready-panel .brand-friends{display:flex;height:52px;margin:0}.stack-friends{height:90px;justify-content:flex-start}}
+@media(max-width:520px){.stack-friends{height:48px}}
+@media(prefers-reduced-motion:reduce){.brand-friends img,.stack-friends img{animation:none}}
+.game-wrap:has(#ready-panel:not(.hidden)) .stack-friends,.game-wrap:has(#result-panel:not(.hidden)) .stack-friends{display:none}
