@@ -6,3 +6,4 @@
 - Source file: https://www.mutopiaproject.org/ftp/MozartWA/KV545/K545-1/K545-1.mid
 - Transcription license: Creative Commons Attribution-ShareAlike 3.0, https://creativecommons.org/licenses/by-sa/3.0/ . The original composition and historical score are public domain; the digital transcription is distributed here under its stated license.
 - Game Lab arrangement: synthesized locally from the opening 36 seconds, with soft bell overtones and fades; no existing recorded performance or soundfont. Modified 2026-10-28. The rendered adaptation is available under CC BY-SA 3.0.
+- Runner variation: the Game Lab synthesized loop is sped up with FFmpeg `atempo=1.15`, then encoded to Opus and MP3. It remains CC BY-SA 3.0.
