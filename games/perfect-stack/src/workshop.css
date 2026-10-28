@@ -98,3 +98,4 @@ button:focus-visible,select:focus-visible{outline:3px solid #bd704e;outline-offs
 @media(max-width:520px){.stack-friends{height:48px}}
 @media(prefers-reduced-motion:reduce){.brand-friends img,.stack-friends img{animation:none}}
 .game-wrap:has(#ready-panel:not(.hidden)) .stack-friends,.game-wrap:has(#result-panel:not(.hidden)) .stack-friends{display:none}
+.music-credit{text-align:center;font-size:10px;color:#587b82;margin:4px}.music-credit a{color:inherit}

@@ -9,7 +9,7 @@ export function createStackAudio(storage: Pick<Storage, "getItem" | "setItem"> |
       bullseye: [0.3, 0, 680, 0.005, 0.06, 0.15, 0, 1, 65],
       finish: [0.22, 0, 290, 0.01, 0.07, 0.15, 0, 1, -65]
     },
-    music: { main: ["./audio/stack-loop.webm", "./audio/stack-loop.mp3"] },
+    music: { main: ["./audio/mozart-k545.webm", "./audio/mozart-k545.mp3"] },
     voice: getApprovedPraiseVoice("perfect-stack")
   }, storage);
 }
