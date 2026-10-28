@@ -28,3 +28,10 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 .message.incorrect{color:#8b2f22;background:#fff0df;border-color:#c5614c}
 @media(max-width:600px){.dodo{left:0;bottom:19%;height:40%;max-width:24%}.order-card{left:29%;width:47%;font-size:12px;max-height:59%}.message.correct,.message.incorrect{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.dodo{transition:none}.kitchen.success .dodo{transform:none}}
+
+/* Lili, Dodo's kitchen friend, responds without covering the plate. */
+.lili{position:absolute;z-index:2;right:0;bottom:18%;height:39%;max-width:21%;object-fit:contain;object-position:bottom;pointer-events:none;filter:drop-shadow(0 4px 3px #654c3d50);transition:transform .25s ease}
+.kitchen.success .lili{transform:translateY(-7px) rotate(5deg)}
+.kitchen.needs-help .lili{transform:rotate(-6deg)}
+@media(max-width:600px){.lili{right:0;bottom:19%;height:31%;max-width:20%}}
+@media(prefers-reduced-motion:reduce){.lili{transition:none}.kitchen.success .lili,.kitchen.needs-help .lili{transform:none}}
