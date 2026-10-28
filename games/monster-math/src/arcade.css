@@ -33,3 +33,4 @@ body{background:repeating-linear-gradient(90deg,#ffffff02 0 1px,transparent 1px 
 @keyframes friends-breathe{50%{transform:translateY(-3px) rotate(2deg)}}
 @media(min-width:721px) and (max-height:700px){.overlay-card>.island-friends{height:48px}}
 @media(prefers-reduced-motion:reduce){.island-friends img{animation:none}}
+.music-credit{text-align:center;font-size:10px;color:#d2e0ce;margin:4px}.music-credit a{color:inherit}
