@@ -3,7 +3,9 @@ import { decodeSave, save } from './save';
 describe('local progress', () => {
   it('validates versions, bounds and ingredient values', () => {
     expect(decodeSave('{"version":1,"completed":1,"plate":["tomato",null,null,null]}')?.completed).toBe(1);
-    for (const raw of ['{', '{"version":2,"completed":0,"plate":[null,null,null,null]}', '{"version":1,"completed":5,"plate":[null,null,null,null]}', '{"version":1,"completed":0,"plate":["bad",null,null,null]}']) expect(decodeSave(raw)).toBeUndefined();
+    expect(decodeSave('{"version":2,"completed":11,"plate":[null,null,null,null]}')?.completed).toBe(11);
+    expect(decodeSave('{"version":2,"completed":13,"plate":[null,null,null,null]}')).toBeUndefined();
+    for (const raw of ['{', '{"version":3,"completed":0,"plate":[null,null,null,null]}', '{"version":1,"completed":5,"plate":[null,null,null,null]}', '{"version":1,"completed":0,"plate":["bad",null,null,null]}']) expect(decodeSave(raw)).toBeUndefined();
   });
   it('restores and validates the total placements for resumed challenges', () => {
     expect(decodeSave('{"version":1,"completed":2,"plate":[null,null,null,null],"moves":5}')?.moves).toBe(5);

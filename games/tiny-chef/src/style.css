@@ -17,3 +17,14 @@ body { padding-bottom: env(safe-area-inset-bottom); }
 #result .actions { margin-top: 12px; }
 #result .actions .primary { min-width: 180px; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+/* Dodo stays beside the counter; order, plate and touch targets remain unobstructed. */
+.dodo{position:absolute;z-index:2;left:2%;bottom:18%;height:51%;max-width:23%;object-fit:contain;object-position:bottom;pointer-events:none;filter:drop-shadow(0 4px 3px #654c3d50);transition:transform .25s ease}
+.kitchen.success .dodo{transform:translateY(-7px) rotate(-5deg)}
+.order-card{z-index:4;max-height:58%;overflow:auto;font-size:clamp(12px,1.5vw,18px)}
+.plate{z-index:3}
+.message.correct,.message.incorrect{padding:9px 12px;border-radius:10px;border:2px solid;font-size:clamp(14px,2vw,17px)}
+.message.correct{color:#215c38;background:#e2f5dc;border-color:#589b68}
+.message.incorrect{color:#8b2f22;background:#fff0df;border-color:#c5614c}
+@media(max-width:600px){.dodo{left:0;bottom:19%;height:40%;max-width:24%}.order-card{left:29%;width:47%;font-size:12px;max-height:59%}.message.correct,.message.incorrect{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.dodo{transition:none}.kitchen.success .dodo{transform:none}}
