@@ -15,3 +15,7 @@ describe("cloud game languages", () => {
     expect(chooseLanguage("ja-JP")).toBe("en");
   });
 });
+
+import {cafeCopy,shapeNames,colorNames} from './cafe-i18n';
+import {extra} from './cafe-extra';
+it('translates every café label, twelve shapes, colors and extra controls across nine locales',()=>{for(const lang of languages){expect(Object.keys(cafeCopy[lang])).toEqual(Object.keys(cafeCopy.en));for(const value of Object.values(cafeCopy[lang]))expect(value?.trim().length).toBeGreaterThan(0);expect(shapeNames(lang)).toHaveLength(12);expect(colorNames(lang)).toHaveLength(4);for(const value of Object.values(extra(lang)))expect(value?.trim().length).toBeGreaterThan(0);}});
