@@ -1,6 +1,8 @@
 {
   "version": 1,
   "files": [
+    {"file":"games/color-lab/public/audio/mozart-k545.webm","kind":"music","game":"color-lab","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=998","sourceFile":"knowledge/audio/source/mozart-k545-1.mid","author":"W. A. Mozart；MIDI：Alejandro Sierra / Mutopia；合成編曲：Game Lab","license":"CC BY-SA 3.0","obtainedAt":"2026-10-28","modified":true},
+    {"file":"games/color-lab/public/audio/mozart-k545.mp3","kind":"music","game":"color-lab","sourceUrl":"https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=998","sourceFile":"knowledge/audio/source/mozart-k545-1.mid","author":"W. A. Mozart；MIDI：Alejandro Sierra / Mutopia；合成編曲：Game Lab","license":"CC BY-SA 3.0","obtainedAt":"2026-10-28","modified":true},
     {"file":"games/star-map/public/audio/star-map.webm","kind":"music","game":"star-map","sourceUrl":"https://github.com/Sun16z/game-lab","sourceFile":"scripts/generate-star-map-music.py","author":"Game Lab","license":"Project-owned original composition and recording","obtainedAt":"2026-10-28","modified":false},
     {"file":"games/star-map/public/audio/star-map.mp3","kind":"music","game":"star-map","sourceUrl":"https://github.com/Sun16z/game-lab","sourceFile":"scripts/generate-star-map-music.py","author":"Game Lab","license":"Project-owned original composition and recording","obtainedAt":"2026-10-28","modified":false},
     {"file":"games/bridge-builder/public/audio/island-loop.webm","kind":"music","game":"bridge-builder","sourceUrl":"https://kenney.nl/assets/music-jingles","sourceFile":"Audio/Steel jingles/jingles_STEEL05.ogg","author":"Kenney（採樣）與Game Lab（原創編曲）","license":"CC0-1.0 sample + Project-owned arrangement","obtainedAt":"2026-10-25","modified":true},
@@ -60,28 +62,6 @@
       "game": "monster-math",
       "sourceUrl": "https://kenney.nl/assets/music-jingles",
       "sourceFile": "Audio/Steel jingles/jingles_STEEL11.ogg",
-      "author": "Kenney（採樣）與Game Lab（原創編曲）",
-      "license": "CC0-1.0 sample + Project-owned arrangement",
-      "obtainedAt": "2026-10-25",
-      "modified": true
-    },
-    {
-      "file": "games/color-lab/public/audio/color-loop-v2.webm",
-      "kind": "music",
-      "game": "color-lab",
-      "sourceUrl": "https://kenney.nl/assets/music-jingles",
-      "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg",
-      "author": "Kenney（採樣）與Game Lab（原創編曲）",
-      "license": "CC0-1.0 sample + Project-owned arrangement",
-      "obtainedAt": "2026-10-25",
-      "modified": true
-    },
-    {
-      "file": "games/color-lab/public/audio/color-loop-v2.mp3",
-      "kind": "music",
-      "game": "color-lab",
-      "sourceUrl": "https://kenney.nl/assets/music-jingles",
-      "sourceFile": "Audio/Steel jingles/jingles_STEEL05.ogg",
       "author": "Kenney（採樣）與Game Lab（原創編曲）",
       "license": "CC0-1.0 sample + Project-owned arrangement",
       "obtainedAt": "2026-10-25",
