@@ -28,6 +28,18 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   if (!event.request.url.startsWith(self.registration.scope)) return;
+  // Refresh the document on every online visit. A cached old HTML document must
+  // not hide a new cast/layout release until the player refreshes twice.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(fetch(event.request).then(response => {
+      if (response.status === 200) { const copy = response.clone(); event.waitUntil(caches.open(CACHE).then(cache => cache.put(event.request, copy))); }
+      return response;
+    }).catch(async () => {
+      const cache = await caches.open(CACHE);
+      return (await cache.match(event.request)) || (await cache.match(self.registration.scope)) || Response.error();
+    }));
+    return;
+  }
   event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
     if (response.status === 200) { const copy = response.clone(); caches.open(CACHE).then(cache => cache.put(event.request, copy)); }
     return response;
