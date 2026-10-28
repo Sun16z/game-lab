@@ -10,7 +10,7 @@ import "./style.css";
 
 function el<T extends HTMLElement=HTMLElement>(id:string):T{const n=document.getElementById(id);if(!n)throw Error(`Missing ${id}`);return n as T;}
 function storage():Storage|undefined{try{return localStorage}catch{return undefined}}
-const audio=new GameAudio({cues:{start:[.18,0,520,.01,.06,.18,0,1,90],move:[.12,0,440,.01,.03,.08,0,1,40],blocked:[.1,0,250,.01,.04,.1,0,1,-30],gem:[.2,0,740,.01,.08,.18,0,1,120],finish:[.25,0,650,.01,.1,.3,0,1,160]},music:{main:["./audio/island-loop.webm","./audio/island-loop.mp3"]}},storage());
+const audio=new GameAudio({cues:{start:[.18,0,520,.01,.06,.18,0,1,90],move:[.12,0,440,.01,.03,.08,0,1,40],blocked:[.1,0,250,.01,.04,.1,0,1,-30],gem:[.2,0,740,.01,.08,.18,0,1,120],finish:[.25,0,650,.01,.1,.3,0,1,160]},music:{main:["./audio/fur-elise.webm","./audio/fur-elise.mp3"]}},storage());
 const same=(a:Position,b:Position)=>a.x===b.x&&a.y===b.y;
 class IslandGame{
   private language:Language=chooseLanguage(new URLSearchParams(location.search).get("lang")??storage()?.getItem("game-lab:language")??navigator.language);
