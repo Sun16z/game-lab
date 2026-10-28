@@ -16,7 +16,7 @@
         <div class="top-actions"><label class="visually-hidden" for="language-select">Language</label><select id="language-select" aria-label="Language"><option value="zh-Hant">繁體中文</option><option value="en">English</option><option value="es">Español</option><option value="pt-BR">Português (BR)</option><option value="fr">Français</option><option value="ar">العربية</option><option value="sw">Kiswahili</option><option value="id">Bahasa Indonesia</option><option value="hi">हिन्दी</option></select><button id="sound-button" class="sound-button" type="button">🔊</button></div>
       </header>
       <main class="shell">
-        <div class="hero"><div><div class="eyebrow">C001 · ISLAND CONQUEST</div><h1 id="title">小島佔地王</h1><p id="subtitle">鋪路、圈地、搶寶箱！</p></div><div class="hero-art" aria-hidden="true"><svg viewBox="0 0 160 120"><ellipse cx="80" cy="95" rx="65" ry="16" fill="#8bb4ad" opacity=".35"/><path d="M20 79Q80 60 140 79L120 104H41Z" fill="#c3c78d" stroke="#3c6c6a" stroke-width="2"/><path d="M40 94Q80 82 120 94" fill="none" stroke="#e8d9ac" stroke-width="6"/><path d="M77 28V81" stroke="#dfc991" stroke-width="3"/><path d="M73 30L43 69H73Z" fill="#fff1c8"/><path d="M82 40V69H105Z" fill="#dba274"/><path d="M42 75H111L98 89H57Z" fill="#b37854" stroke="#e8d5a1" stroke-width="2"/><path d="M20 110Q31 103 42 110M118 111Q130 104 144 111" fill="none" stroke="#b6ccc0" stroke-width="2"/><circle cx="126" cy="25" r="15" fill="none" stroke="#c3bb8f"/><path d="M126 12V38M113 25H139" stroke="#c3bb8f"/></svg></div></div>
+        <div class="hero"><div><div class="eyebrow">C001 · ISLAND CONQUEST</div><h1 id="title">小島佔地王</h1><p id="subtitle">鋪路、圈地、搶寶箱！</p></div><div class="hero-art island-friends" aria-hidden="true"><img src="./friends/dodo.webp" alt=""><img src="./friends/lili.webp" alt=""><img src="./friends/pip.webp" alt=""></div></div>
         <section id="setup" class="setup-panel">
           <p id="intro">輪流選一片路，轉好方向後放在小島上。連上自己的路會加分；圈住空地還能插旗再走一步！</p>
           <div class="setup-options"><fieldset><legend id="mode-label">遊玩方式</legend><label><input type="radio" name="mode" value="ai" checked /><span id="mode-ai">對電腦</span></label><label><input type="radio" name="mode" value="local" /><span id="mode-local">同裝置雙人</span></label></fieldset><fieldset id="difficulty-field"><legend id="difficulty-label">電腦難度</legend><select id="difficulty-select"><option value="easy">輕鬆</option><option value="normal" selected>普通</option><option value="hard">高手</option></select></fieldset><fieldset><legend id="size-label">小島大小</legend><select id="size-select"><option value="6" selected>大島6×6</option><option value="4">小小島4×4</option></select></fieldset></div>
@@ -30,7 +30,7 @@
         </section>
         <section id="result" class="result-panel hidden" role="status"><span class="result-icon" aria-hidden="true">🏆</span><h2 id="result-title">勝利！</h2><p id="result-score"></p><div class="result-actions"><button id="replay-button" class="primary-button" type="button">再玩一局</button><button id="share-button" class="secondary-button" type="button">分享戰果</button><button id="copy-button" class="secondary-button" type="button">複製挑戰連結</button></div><p id="share-status" aria-live="polite"></p></section>
       </main>
-      <footer>Game Lab · C001 · Kenney CC0音樂採樣 · 不需帳號，可離線遊玩</footer>
+      <footer>Game Lab · C001 · <a href="https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=5">Bach BWV846 · Mutopia public-domain MIDI</a> · Game Lab arrangement</footer>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
