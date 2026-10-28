@@ -11,7 +11,7 @@ import {chooseLanguage,copy,next,type Language} from './i18n';
 import './style.css';
 function el<T extends HTMLElement=HTMLElement>(id:string):T { const node=document.getElementById(id); if(!node)throw Error(`Missing ${id}`); return node as T; }
 function storage():Storage|undefined { try{return localStorage}catch{return undefined} }
-const audio=new GameAudio({cues:{start:[.18,0,510,.01,.06,.18,0,1,90],place:[.12,0,440,.01,.03,.1,0,1,30],wrong:[.1,0,260,.01,.05,.12,0,1,-20],success:[.22,0,720,.01,.08,.2,0,1,110],finish:[.25,0,650,.01,.1,.3,0,1,160]},music:{main:['./audio/island-loop.webm','./audio/island-loop.mp3']}},storage());
+const audio=new GameAudio({cues:{start:[.18,0,510,.01,.06,.18,0,1,90],place:[.12,0,440,.01,.03,.1,0,1,30],wrong:[.1,0,260,.01,.05,.12,0,1,-20],success:[.22,0,720,.01,.08,.2,0,1,110],finish:[.25,0,650,.01,.1,.3,0,1,160]},music:{main:['./audio/mozart-k545.webm','./audio/mozart-k545.mp3']}},storage());
 type Tool='deck'|'strong'|'support';
 class Game {
  private language:Language=chooseLanguage(new URLSearchParams(location.search).get('lang')??storage()?.getItem('game-lab:language')??navigator.language);
