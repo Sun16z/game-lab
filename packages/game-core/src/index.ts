@@ -61,7 +61,7 @@ export const games: readonly GameDefinition[] = [
   { id: "G008", slug: "paper-plane", title: "紙飛機郵差", summary: "調整飛行角度，乘著風把信送到朋友家。", category: "手感挑戰", replay: "探索不同風向與飛行路線", motif: "✈", art: ["#91d9cf", "#579dc1"], priority: "P2", status: "playable" },
   { id: "G009", slug: "bridge-builder", title: "小小造橋師", summary: "用有限積木搭橋，送小動物過河。", category: "創作實驗", replay: "用更少材料造出穩固的橋", motif: "⌒", art: ["#d5b073", "#8d8dba"], priority: "P2", status: "playable" },
   { id: "G010", slug: "tiny-chef", title: "山丘食堂", summary: "組合食材、顏色和形狀，完成客人的點子。", category: "創作實驗", replay: "做出自己的創意菜單", motif: "✿", art: ["#ffc875", "#e98280"], priority: "P2", status: "playable" },
-  { id: "G011", slug: "star-map", title: "星星連線家", summary: "連起夜空星點，找出藏起來的星座。", category: "探索同玩", replay: "收集星空故事與隱藏圖案", motif: "✦", art: ["#7889d5", "#463c8e"], priority: "P2", status: "planned" },
+  { id: "G011", slug: "star-map", title: "星星連線家", summary: "和朵朵、栗栗、小燈一起規劃星圖路線。", category: "探索同玩", replay: "挑戰八張越來越複雜的星圖", motif: "✦", art: ["#7889d5", "#463c8e"], priority: "P2", status: "playable" },
   { id: "G012", slug: "robot-maze", title: "機器人迷宮", summary: "排列前進與轉彎指令，帶機器人找到出口。", category: "動腦解謎", replay: "縮短指令、挑戰不同迷宮", motif: "⌘", art: ["#7bd4d2", "#5484a7"], priority: "P2", status: "planned" },
   { id: "G013", slug: "monster-band", title: "怪獸樂團", summary: "安排怪獸音符，錄下自己的短旋律。", category: "創作實驗", replay: "換樂器組合出新作品", motif: "♪", art: ["#f39ccc", "#8976c9"], priority: "P2", status: "planned" },
   { id: "G014", slug: "firefly-garden", title: "螢火蟲小花園", summary: "照顧植物、觀察夜晚來訪的小生物。", category: "探索同玩", replay: "嘗試不同花園配置", motif: "✺", art: ["#a5d485", "#5a9b90"], priority: "P2", status: "planned" },
