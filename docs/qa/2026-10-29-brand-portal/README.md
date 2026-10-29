@@ -24,3 +24,12 @@
 `apps/portal/app/{page,layout,styles,not-found}`、`app/games/[slug]/page.tsx`、`components/{Brand,GameArt,GameCard,InlinePlay}.tsx`、`lib/game-profiles.ts`、`public/{brand,icon.svg,og.png}`。
 
 預覽、CI與正式部署結果見本PR與部署紀錄；尚未部署前不視為正式站已更新。
+
+## PR68預覽驗收
+
+預覽：https://pr-68-game-lab.fmrowfds68.workers.dev/ 。CI與Workers部署皆通過。375×812與800×600首頁HTTP200、23張卡片、無水平溢出；完美疊塔介紹頁的開始入口能開啟實際遊戲包。
+
+- [預覽手機首頁](preview-home-mobile.png)、[預覽桌機首頁](preview-home-desktop.png)
+- [預覽手機介紹](preview-detail-mobile.png)、[預覽桌機介紹](preview-detail-desktop.png)
+
+此紀錄與截圖在合併前回報給使用者。
