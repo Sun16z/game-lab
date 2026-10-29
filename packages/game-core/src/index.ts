@@ -1,5 +1,5 @@
 export { utcDay, validUtcDay, dailyIndex } from "./daily";
-export type GameId = `G${"001" | "002" | "003" | "004" | "005" | "006" | "007" | "008" | "009" | "010" | "011" | "012" | "013" | "014" | "015" | "016" | "017" | "018" | "019" | "020"}` | "C001" | "C002" | "C003";
+export type GameId = `G${"001" | "002" | "003" | "004" | "005" | "006" | "007" | "008" | "009" | "010" | "011" | "012" | "013" | "014" | "015" | "016" | "017" | "018" | "019" | "020"}` | "C001" | "C002" | "C003" | "C004";
 export type RunState = "READY" | "PLAYING" | "PAUSED" | "RESULT" | "ERROR";
 export type GameCategory = "手感挑戰" | "動腦解謎" | "創作實驗" | "探索同玩";
 
@@ -73,5 +73,6 @@ export const games: readonly GameDefinition[] = [
   { id: "G020", slug: "pocket-planet", title: "口袋星球", summary: "放上山、水和生物，觀察自己的星球變化。", category: "探索同玩", replay: "嘗試不同組合與星球故事", motif: "◌", art: ["#b4a0e3", "#6d90c6"], priority: "P2", status: "planned" },
   { id: "C001", displayId: "G021", slug: "island-conquest", title: "小島佔地王", summary: "輪流鋪路、圈住寶箱，和電腦或朋友搶地盤。", category: "探索同玩", replay: "換路線和對手，再挑戰一次", motif: "🏝", art: ["#80d7b0", "#4c8fb2"], priority: "P1", status: "playable" },
   { id: "C002", displayId: "G022", slug: "memory-monsters", title: "記憶怪獸翻翻樂", summary: "看怪獸、聽提示，幫每隻怪獸找到好朋友。", category: "動腦解謎", replay: "從三對怪獸一路挑戰到八對", motif: "●", art: ["#7d6bd4", "#ffbd62"], priority: "P1", status: "playable" },
-  { id: "C003", displayId: "G023", slug: "cloud-climb", title: "朵朵栗栗的跳跳雲", summary: "踩上彈力雲、預判風向，和朵朵栗栗挑戰12條天空路線。", category: "手感挑戰", replay: "練習精準落地、挑戰星星支線與無盡天空", motif: "☁", art: ["#9edce9", "#8ec3a9"], priority: "P2", status: "playable" }
+  { id: "C003", displayId: "G023", slug: "cloud-climb", title: "朵朵栗栗的跳跳雲", summary: "踩上彈力雲、預判風向，和朵朵栗栗挑戰12條天空路線。", category: "手感挑戰", replay: "練習精準落地、挑戰星星支線與無盡天空", motif: "☁", art: ["#9edce9", "#8ec3a9"], priority: "P2", status: "playable" },
+  { id: "C004", displayId: "G024", slug: "lexi-jet", title: "朵朵的英語紙飛機", summary: "駕駛紙飛機閃避泡泡，切換詞性光束，打開英文單字雲。", category: "手感挑戰", replay: "挑戰12條航線與情境詞性，降落後自由複習", motif: "✈", art: ["#a5dfe6", "#e5f3ca"], priority: "P2", status: "playable" }
 ];
