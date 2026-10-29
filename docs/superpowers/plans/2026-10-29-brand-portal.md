@@ -1,0 +1,12 @@
+# Wind Chime Islands portal redesign
+
+Goal: fullyrefreshhomepage andallgameintroductionpages withDodo/Lili/Pip brand,retainindividualgameartidentity,andmakeplay/learning clear. Latestuserapproval authorizesimplementation; preserveexistinggameURLs/staticdeployment.
+
+Visualplan:storybookislandarrival signature,notgenericgradient+glyphcards. Palettepaper#fff8e8,ink#294c50,sky#c9e7df,moss#789d82,terracotta#ce785b,sun#efc86a. DisplayGeorgia/NotoSerifTC/systemserif inmoderation,bodyAvenirNext/NotoSansTC/system;noexternalfontdependency. Homepageheroasymmetricalislandscene withlargeexistingbrandportraits,quickplayentry,actualdynamiccounts,categoriesandallplayablecatalog. Per-gameillustratedscene prop+friend,uniquecontextuallearning/3stepinstructions+ageguidance,largePlayCTA;plannedpagesclearlyplanned/noindex.
+
+Tasks:
+- [x] AuditexistingNextstaticportal/CSS/data andexistinggameDESIGNfiles;authorcorrectprofiledatafor20original+3existingcandidates,newLexiJetfutureC004profile. Don'tlabelunreleasedmodesplayable.
+- [x] Sharedbrandnav/hero/illustration/cardcomponents,homepagecategoryanchors(nofakefilters),featuredselection+allgames,parentsnoteandfooter. Maintainfullcardclick/keyboard44px+,actualcounts,noaccount/cookies/backend.
+- [x] All/games/[slug]/pages:uniqueillustration+learning+operations/replaydescription,largeprimarydirectplayandoptionalclick-to-loadsameoriginiframe (noautostartheavybundle),stickyphoneplayaction,backlink,plannedstatusandrelatedgames. RetainURL/metadata/canonical/robots;nochangesframe-ancestorspolicy. Branded404withoutbreaking9localecontent.
+- [x] Staticresponsive375×812,800×600,1024×768,keyboardfocus/reducedmotion/safearea;imageslocalWebP,lazybelowfold. No newnpmdeps. UpdateOG/faviconfromactualbrandart.
+- [x] Parentreviewandfullchecks;independentPRpreviewscreenshotsbeforemerge,formalverify. Preserveuserunstageddocs.
