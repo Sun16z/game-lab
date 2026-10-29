@@ -1,0 +1,25 @@
+{
+  "name": "@game-lab/lexi-jet",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && node ../../scripts/create-game-sw.mjs lexi-jet",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@game-lab/game-analytics": "workspace:*",
+    "@game-lab/game-audio": "workspace:*",
+    "@game-lab/game-core": "workspace:*",
+    "@game-lab/game-share": "workspace:*",
+    "@game-lab/platform-adapters": "workspace:*",
+    "@game-lab/locale-voice": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "vitest": "^3.2.7"
+  }
+}
