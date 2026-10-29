@@ -65,7 +65,7 @@ export default function NotFound() {
   const t = copy[language];
   const homeHref = `/?lang=${encodeURIComponent(language)}`;
   return (
-    <main className="notFoundPage" lang={language} dir={language === "ar" ? "rtl" : "ltr"}>
+    <main id="main-content" className="notFoundPage" lang={language} dir={language === "ar" ? "rtl" : "ltr"}>
       <div className="notFoundStars" aria-hidden="true">✦　✧　✦</div>
       <div className="notFoundCard">
         <label className="notFoundLanguage">{t.language}
