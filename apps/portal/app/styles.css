@@ -340,3 +340,44 @@ p { text-wrap: pretty; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .gameCard:hover, .featuredStory:hover, .primaryButton:active, .gameCard:hover .cardAction > span { transform: none; }
 }
+
+/* Kid-first home: phone-sized game tiles, one tap to play.
+   Shape rule: chips and the info button are full-pill; tiles and the continue card use 1.1rem. */
+.parentNote h1 { font-family: var(--display); font-weight: 600; letter-spacing: -.02em; font-size: 1.65rem; line-height: 1.4; margin: .45rem 0 1rem; }
+.parentsPage .parentNote { margin-top: 1rem; }
+.kidHome { padding-top: 1.25rem; }
+.greet { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+.greet img { width: 64px; height: auto; flex: none; }
+.greet h1 { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.3; }
+.continueCard { display: flex; align-items: center; gap: .9rem; margin-bottom: 1rem; padding: .7rem 1.1rem .7rem .7rem; border-radius: 1.1rem; background: #e8eddb; text-decoration: none; transition: transform .15s; }
+.continueIcon { display: grid; place-items: center; width: 52px; height: 52px; flex: none; border-radius: 999px; background: var(--ink); color: var(--paper); }
+.continueCopy { display: grid; gap: .15rem; min-width: 0; }
+.continueCopy small { color: var(--muted); font-size: .9rem; font-weight: 650; }
+.continueCopy strong { font-size: 1.15rem; line-height: 1.35; }
+.chipBar { position: sticky; top: 0; z-index: 2; display: flex; gap: .5rem; overflow-x: auto; margin: 0 -1rem 1rem; padding: .6rem 1rem; background: var(--paper); scrollbar-width: none; }
+.chipBar::-webkit-scrollbar { display: none; }
+.chip { display: inline-flex; flex: none; align-items: center; gap: .45rem; min-height: 52px; padding: 0 1.1rem 0 .9rem; border: 2px solid var(--rule); border-radius: 999px; background: #fffdf6; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: transform .15s; }
+.chip[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.tileGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem .85rem; margin: 0; padding: 0; list-style: none; scroll-margin-top: 5rem; }
+.tile { position: relative; min-width: 0; }
+.tileGrid:not([data-filter="all"]) .tile { display: none; }
+.tileGrid[data-filter="手感挑戰"] .tile[data-category="手感挑戰"], .tileGrid[data-filter="動腦解謎"] .tile[data-category="動腦解謎"], .tileGrid[data-filter="創作實驗"] .tile[data-category="創作實驗"], .tileGrid[data-filter="探索同玩"] .tile[data-category="探索同玩"] { display: block; }
+.tilePlay { display: grid; gap: .5rem; text-decoration: none; transition: transform .15s; }
+.tilePlay .gameArt { border-radius: 1.1rem; aspect-ratio: 1 / 1; box-shadow: 0 6px 16px #294c5014; }
+.tilePlay .gameArt > svg { position: absolute; width: 175%; height: auto; left: -37%; bottom: 0; }
+.tilePlay .artFriend { width: 46%; right: -2%; bottom: -2%; }
+.tilePlay .artFriend-pip { width: 38%; }
+.tileName { padding: 0 .25rem; font-size: 1.05rem; font-weight: 750; line-height: 1.35; }
+.tileInfo { position: absolute; top: .45rem; right: .45rem; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; background: #fffdf6e6; color: var(--ink); box-shadow: 0 2px 6px #294c501f; }
+.continueCard:active, .tilePlay:active, .chip:active { transform: scale(.97); }
+@media (hover: hover) { .tilePlay:hover { transform: translateY(-3px); } .chip:hover:not([aria-pressed="true"]) { background: #f3efdf; } }
+@media (min-width: 700px) { .tileGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem 1.25rem; } .chipBar { margin-inline: 0; padding-inline: 0; } }
+@media (min-width: 1000px) { .tileGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 620px) {
+  .siteHeader { min-height: 64px; }
+  .siteHeader .parentNav { display: inline-flex; min-height: 44px; padding: 0 .9rem; border: 1px solid var(--rule); border-radius: 999px; font-size: .9rem; }
+  .siteHeader nav a:first-child { border-bottom: 1px solid var(--rule); }
+  .kidHome { padding-top: .75rem; }
+  .greet img { width: 52px; }
+}
+@media (prefers-reduced-motion: reduce) { .continueCard, .tilePlay, .chip { transition: none; } .continueCard:active, .tilePlay:active, .chip:active, .tilePlay:hover { transform: none; } }
