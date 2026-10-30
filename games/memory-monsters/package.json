@@ -7,5 +7,5 @@
   "dependencies": {
     "@game-lab/game-audio": "workspace:*", "@game-lab/game-core": "workspace:*", "@game-lab/game-share": "workspace:*", "@game-lab/platform-adapters": "workspace:*"
   },
-  "devDependencies": { "typescript": "^5.9.3", "vite": "^7.3.7", "vitest": "^3.2.7" }
+  "devDependencies": { "typescript": "^5.9.3", "vite": "^7.3.7", "vitest": "^4.1.12" }
 }
