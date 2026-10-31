@@ -1,4 +1,6 @@
 import Phaser from "phaser";
+import { PixelCelebrations } from "./pixel-celebrations";
+import { composite } from "./vendor/pixelfx/core/index.js";
 import { createRun, transitionRun, type GameRun } from "@game-lab/game-core";
 import { createLocalScoreStorage } from "@game-lab/game-storage";
 import type { GameEvent, GameEventName } from "@game-lab/game-analytics";
@@ -100,6 +102,7 @@ type Spark = { x: number; y: number; vx: number; vy: number; startedAt: number; 
 
 class StackScene extends Phaser.Scene {
   private graphics!: Phaser.GameObjects.Graphics;
+  private pixelFx!: PixelCelebrations;
   private run: GameRun = createRun("G001", crypto.randomUUID(), crypto.randomUUID());
   private progress = loadProgress(safeStorage());
   private runTheme: Theme = this.progress.selectedTheme;
@@ -136,13 +139,37 @@ class StackScene extends Phaser.Scene {
   private sparks: Spark[] = [];
   private lastGained: Achievement[] = [];
   private lastUnlocked: Theme[] = [];
-  private readonly reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  private reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   private readonly touchPointer = touchPointerQuery();
 
   constructor() { super("perfect-stack"); }
 
   create(): void {
     this.graphics = this.add.graphics();
+    this.pixelFx = new PixelCelebrations(() => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 240; canvas.height = 360;
+      const context = canvas.getContext("2d")!;
+      context.imageSmoothingEnabled = false;
+      const pixels = context.createImageData(240, 360);
+      const key = "stack-pixelfx";
+      const texture = this.textures.addCanvas(key, canvas)!;
+      texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
+      const image = this.add.image(0, 0, key).setOrigin(0).setScale(2).setDepth(100).setVisible(false);
+      return {
+        present: frame => { composite(frame, pixels.data, null); context.putImageData(pixels, 0, 0); texture.refresh(); image.setVisible(true); },
+        clear: () => { context.clearRect(0, 0, 240, 360); texture.refresh(); image.setVisible(false); },
+        destroy: () => { image.destroy(); this.textures.remove(key); }
+      };
+    });
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const motionChanged = () => {
+      this.reducedMotion = motionQuery.matches;
+      if (this.reducedMotion) { this.pixelFx.clear(); this.sparks = []; this.fallingPieces = []; }
+    };
+    motionQuery.addEventListener("change", motionChanged);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { motionQuery.removeEventListener("change", motionChanged); this.pixelFx.destroy(); });
+    if (import.meta.env.DEV) Object.defineProperty(window, "perfectStackFxQA", { configurable: true, value: Object.freeze({ snapshot: () => ({ run: this.run.state, layers: this.layers(), theme: this.runTheme, activeX: this.activeX, target: { ...this.currentTarget() }, reduced: this.reducedMotion, fx: this.pixelFx.snapshot() }) }) });
     this.homeExit = mountHomeExit(document.querySelector<HTMLElement>(".top-actions")!, this.language);
     this.touchPointer.addEventListener("change", () => this.applyLanguage());
     const select = element<HTMLSelectElement>("language-select");
@@ -200,11 +227,12 @@ class StackScene extends Phaser.Scene {
     this.emit("game_loaded", { source: window.self === window.top ? "standalone" : "portal" });
   }
 
-  update(): void {
+  update(_time: number, delta: number): void {
     if (this.run.state !== "PLAYING") return;
     this.activeElapsed = (performance.now() - this.activeStartedAt) / 1000;
     this.activeX = movingX(this.activeElapsed, this.currentTarget().width, speedForLayer(this.layers(), this.mode), this.fromRight(), startPhaseForLayer(this.layers(), this.run.seed));
     this.draw();
+    this.pixelFx.update(delta / 1000);
   }
 
   private layers(): number { return this.blocks.length - 1; }
@@ -212,6 +240,7 @@ class StackScene extends Phaser.Scene {
   private fromRight(): boolean { return this.layers() % 2 === 1; }
 
   private resetTower(): void {
+    this.pixelFx.clear();
     this.runTheme = this.progress.selectedTheme;
     this.palette = paletteFor(this.run.seed, this.runTheme);
     const color = this.palette.blocks[0];
@@ -304,6 +333,8 @@ class StackScene extends Phaser.Scene {
     const justBeatRecord = this.bestLayers > 0 && !this.recordCelebrated && this.layers() > this.bestLayers;
     if (justBeatRecord) this.recordCelebrated = true;
     const streakMilestone = outcome.perfect && outcome.combo % 3 === 0;
+    this.pixelFx.trigger({ bullseye: outcome.bullseye, streakMilestone, justBeatRecord }, this.reducedMotion,
+      this.runTheme, this.palette.blocks, this.palette.accent, outcome.block.x + outcome.block.width / 2, activeY);
     const praise = streakMilestone ? getStreakPraise(this.language, outcome.combo, this.voiceLocaleTag) : "";
     if (praise) void this.audio.say(getStreakPraiseCue(outcome.combo), this.voiceLocaleTag);
     const feedback = streakMilestone
@@ -320,6 +351,7 @@ class StackScene extends Phaser.Scene {
 
   private finish(reason: string): void {
     if (this.run.state !== "PLAYING") return;
+    this.pixelFx.clear();
     this.audio.pause();
     this.audio.play("finish");
     this.run = transitionRun(this.run, "RESULT", new Date().toISOString());
