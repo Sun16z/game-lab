@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { beaconLoader } from "../packages/web-analytics/beacon.mjs";
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, relative } from "node:path";
 
@@ -19,7 +20,12 @@ const themeScript = readFileSync(resolve(themeDir, "theme.js"), "utf8");
 const themeStyle = readFileSync(resolve(themeDir, "game.css"), "utf8");
 const html = readFileSync(htmlPath, "utf8");
 if (!html.includes("</head>")) throw new Error("Game HTML must contain </head>");
-writeFileSync(htmlPath, html.replace(/<html(?=[\s>])/i, `<html data-game="${game}"`).replace("</head>", `<script>${themeScript}</script><style>${themeStyle}</style></head>`));
+const beacon = beaconLoader(process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN || "");
+if (!html.includes("</body>")) throw new Error("Game HTML must contain </body>");
+const instrumentedHtml = html.replace(/<html(?=[\s>])/i, `<html data-game="${game}"`)
+  .replace("</head>", `<script>${themeScript}</script><style>${themeStyle}</style></head>`)
+  .replace("</body>", `${beacon ? `<script>${beacon}</script>` : ""}</body>`);
+writeFileSync(htmlPath, instrumentedHtml);
 
 const files = filesIn(dist).filter((path) => !path.endsWith("/sw.js"));
 // Audio enters the runtime cache after first playback, keeping install light.

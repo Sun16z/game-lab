@@ -13,7 +13,7 @@
     "build:game": "pnpm audio:check && pnpm voice:generate && pnpm --filter @game-lab/perfect-stack build && pnpm --filter @game-lab/monster-math build && pnpm --filter @game-lab/color-lab build && pnpm --filter @game-lab/island-conquest build && pnpm --filter @game-lab/memory-monsters build && pnpm --filter @game-lab/math-runner build && pnpm --filter @game-lab/cloud-sculptor build && pnpm --filter @game-lab/island-duo build && pnpm --filter @game-lab/shadow-friends build && pnpm --filter @game-lab/rhythm-garden build && pnpm --filter @game-lab/paper-plane build && pnpm --filter @game-lab/bridge-builder build && pnpm --filter @game-lab/tiny-chef build && pnpm --filter @game-lab/star-map build && pnpm --filter @game-lab/cloud-climb build && pnpm --filter @game-lab/lexi-jet build && node scripts/copy-game.mjs",
     "build": "pnpm build:game && pnpm --filter @game-lab/portal build",
     "typecheck": "pnpm -r --if-present typecheck",
-    "test": "node --test scripts/create-game-sw.test.mjs packages/game-theme/theme.test.mjs && pnpm -r --if-present test",
+    "test": "node --test scripts/create-game-sw.test.mjs packages/game-theme/theme.test.mjs packages/web-analytics/beacon.test.mjs && pnpm -r --if-present test",
     "audio:check": "node scripts/check-audio.mjs",
     "size:check": "node scripts/check-game-size.mjs"
   },
