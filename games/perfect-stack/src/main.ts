@@ -102,6 +102,7 @@ type Spark = { x: number; y: number; vx: number; vy: number; startedAt: number; 
 
 class StackScene extends Phaser.Scene {
   private graphics!: Phaser.GameObjects.Graphics;
+  private activeGraphics!: Phaser.GameObjects.Graphics;
   private pixelFx!: PixelCelebrations;
   private run: GameRun = createRun("G001", crypto.randomUUID(), crypto.randomUUID());
   private progress = loadProgress(safeStorage());
@@ -146,6 +147,7 @@ class StackScene extends Phaser.Scene {
 
   create(): void {
     this.graphics = this.add.graphics();
+    this.activeGraphics = this.add.graphics().setDepth(2);
     this.pixelFx = new PixelCelebrations(() => {
       const canvas = document.createElement("canvas");
       canvas.width = 240; canvas.height = 360;
@@ -155,7 +157,7 @@ class StackScene extends Phaser.Scene {
       const key = "stack-pixelfx";
       const texture = this.textures.addCanvas(key, canvas)!;
       texture.setFilter(Phaser.Textures.FilterMode.NEAREST);
-      const image = this.add.image(0, 0, key).setOrigin(0).setScale(2).setDepth(100).setVisible(false);
+      const image = this.add.image(0, 0, key).setOrigin(0).setScale(2).setDepth(1).setVisible(false);
       return {
         present: frame => { composite(frame, pixels.data, null); context.putImageData(pixels, 0, 0); texture.refresh(); image.setVisible(true); },
         clear: () => { context.clearRect(0, 0, 240, 360); texture.refresh(); image.setVisible(false); },
@@ -228,6 +230,7 @@ class StackScene extends Phaser.Scene {
   }
 
   update(_time: number, delta: number): void {
+    if (this.run.state === "RESULT") { this.pixelFx.update(delta / 1000); return; }
     if (this.run.state !== "PLAYING") return;
     this.activeElapsed = (performance.now() - this.activeStartedAt) / 1000;
     this.activeX = movingX(this.activeElapsed, this.currentTarget().width, speedForLayer(this.layers(), this.mode), this.fromRight(), startPhaseForLayer(this.layers(), this.run.seed));
@@ -362,6 +365,7 @@ class StackScene extends Phaser.Scene {
       this.bestLayers = this.layers();
       this.scoreStorage.saveBest(bestKeyForMode(this.mode), this.bestLayers);
     }
+    if (this.lastResultWasBest && this.layers() > 0) this.pixelFx.celebrateRecord(this.reducedMotion, this.runTheme, this.palette.blocks, this.palette.accent);
     const nextProgress = advanceProgress(this.progress, this.layers(), this.longestCombo);
     this.progress = nextProgress.progress;
     this.lastGained = nextProgress.gained;
@@ -618,6 +622,8 @@ class StackScene extends Phaser.Scene {
 
   private draw(): void {
     const g = this.graphics;
+    const active = this.activeGraphics;
+    active.clear();
     const palette = this.palette;
     const offset = Math.max(0, this.blocks.length - 9) * BLOCK_HEIGHT;
     const now = performance.now();
@@ -666,9 +672,9 @@ class StackScene extends Phaser.Scene {
       const target=this.currentTarget();
       g.fillStyle(0xffffff,.12).fillRect(target.x,activeY,target.width,BLOCK_HEIGHT-2);
       g.lineStyle(2,0x315568,.28).lineBetween(target.x,activeY-6,target.x,activeY+BLOCK_HEIGHT).lineBetween(target.x+target.width,activeY-6,target.x+target.width,activeY+BLOCK_HEIGHT);
-      g.fillStyle(palette.accent, 1).fillRoundedRect(this.activeX, activeY, this.currentTarget().width, BLOCK_HEIGHT - 2, 5);
-      g.fillStyle(0xffffff, 0.25).fillRoundedRect(this.activeX + 5, activeY + 4, Math.max(0, this.currentTarget().width - 10), 5, 3);
-      drawHouseWindows(g,this.activeX,activeY,this.currentTarget().width,this.blocks.length);
+      active.fillStyle(palette.accent, 1).fillRoundedRect(this.activeX, activeY, this.currentTarget().width, BLOCK_HEIGHT - 2, 5);
+      active.fillStyle(0xffffff, 0.25).fillRoundedRect(this.activeX + 5, activeY + 4, Math.max(0, this.currentTarget().width - 10), 5, 3);
+      drawHouseWindows(active,this.activeX,activeY,this.currentTarget().width,this.blocks.length);
     } else if (this.failedX !== null) {
       g.fillStyle(0xff697b, 0.75).fillRoundedRect(this.failedX, activeY, this.currentTarget().width, BLOCK_HEIGHT - 2, 5);
     }

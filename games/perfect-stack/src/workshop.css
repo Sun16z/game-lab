@@ -98,3 +98,5 @@ button:focus-visible,select:focus-visible{outline:3px solid #bd704e;outline-offs
 @media(min-width:721px){#ready-panel .brand-friends{display:none}}
 @media(prefers-reduced-motion:reduce){.brand-friends img,.stack-friends img{animation:none}}
 .music-credit{text-align:center;font-size:10px;color:#587b82;margin:4px}.music-credit a{color:inherit}
+/* Leave room beside the result card for record confetti without covering controls. */
+#result-panel .overlay-card { width: min(100%, 300px); }

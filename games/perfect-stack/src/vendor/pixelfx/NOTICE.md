@@ -18,3 +18,5 @@ core/index.js is a minimal export barrel; unused stockActor fallback in fx.js an
 unused text/measure methods and font import in painter.js were removed so no
 actor/font/action assets are bundled. No gallery assets or proprietary fonts copied.
 Other imported files retain upstream implementation and copyright comments.
+
+2026-10-31: confetti popper origins moved from ±74 to ±112 pixels to sit beside the result card.

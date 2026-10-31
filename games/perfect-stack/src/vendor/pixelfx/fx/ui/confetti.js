@@ -17,8 +17,8 @@ export const meta = {
 };
 
 const POPPERS = [
-  { x: -74, y: -1, a: -Math.PI / 2 + 0.62, t: 0.1 },
-  { x: 74, y: -1, a: -Math.PI / 2 - 0.62, t: 0.26 },
+  { x: -112, y: -1, a: -Math.PI / 2 + 0.62, t: 0.1 },
+  { x: 112, y: -1, a: -Math.PI / 2 - 0.62, t: 0.26 },
 ];
 const INK = hex("#141019");
 
