@@ -1,0 +1,32 @@
+/* Shared shell treatment; canvas scenes and share-card artwork keep their own palette. */
+html[data-theme="dark"] { color-scheme: dark; background: #182b32; }
+html[data-theme="dark"] body { background: #182b32; color: #f7eedb; }
+html[data-theme="dark"] :is(.hud, .result, .overlay-card, .panel, .pause-panel, .overlay, .focus-overlay, .play-footer, .journey-map, .journey-passport, .audio-panel) { background: #304a49 !important; color: #fff7e7; border-color: #78958a; }
+html[data-theme="dark"] :is(.hud, .result, .overlay-card, .panel, .pause-panel, .overlay, .focus-overlay, .play-footer, .journey-map, .journey-passport) :is(p, small, h1, h2, h3, strong, label, dt, dd) { color: #fff7e7; }
+/* Bright setup cards retain their original dark type and illustration colors. */
+html[data-theme="dark"] :is(.hero, .level, fieldset, .weapon-rack button) { color: #263f50; }
+html[data-theme="dark"] :is(button, select) { color-scheme: light; }
+html[data-theme="dark"] :is(footer, .music-credit, #locked, .note, .eyebrow) { color: #d0ded4; }
+html[data-theme="dark"] :is(.hero, .result, .overlay-card, .panel) :is(button, select) { color: #263f50; }
+html[data-theme="dark"] :is(button, select) { background: #f7eedb; color: #182b32; border-color: #9db8aa; }
+html[data-theme="dark"] :is(button[aria-pressed="true"], button[aria-selected="true"]) { background: #f2cf80; color: #182b32; outline-color: #f7eedb; }
+html[data-theme="dark"] .hero :is(.eyebrow, .note, p) { color: #304857; }
+/* Preserve contrast inside light inset cards and nested HUD cells. */
+html[data-theme="dark"] :is(.learning-benefit, .repair-note) :is(strong, small, p, span),
+html[data-theme="dark"] :is(.repair-note, .learning-benefit) { color: #173b52; }
+html[data-theme="dark"] .hud > div { background: #304a49; }
+html[data-theme="dark"] fieldset { background: #304a49; color: #fff7e7; }
+html[data-theme="dark"] fieldset :is(legend, p) { color: #fff7e7; }
+html[data-theme="dark"] .hero .eyebrow { color: #43635e; }
+html[data-theme="dark"][data-game="cloud-sculptor"] .welcome :is(h1, p) { color: #173b52; }
+html[data-theme="dark"][data-game="cloud-sculptor"] .stage-page h3 { color: #d0ded4; }
+html[data-theme="dark"][data-game="color-lab"] :is(.brand, #title, #tagline) { color: #f7eedb; }
+html[data-theme="dark"][data-game="perfect-stack"] #hint { color: #c1d2c8; }
+html[data-theme="dark"] .paper :is(h1, h2, h3, p, small, strong) { color: #173b52; }
+html[data-theme="dark"] .paper .eyebrow { color: #43635e; }
+html[data-theme="dark"] .repair-note { color: #173b52 !important; }
+html[data-theme="dark"][data-game="math-runner"] .hero :is(h1, p),
+html[data-theme="dark"][data-game="memory-monsters"] .hero :is(h1, p) { color: #f7eedb; }
+html[data-theme="dark"][data-game="island-conquest"] :is(.subtitle, .setup-options label) { color: #f7eedb; }
+html[data-theme="dark"][data-game="memory-monsters"] .levels button small { color: #173b52; }
+html[data-theme="dark"][data-game="color-lab"] .keyboard-hint { color: #c1d2c8; }

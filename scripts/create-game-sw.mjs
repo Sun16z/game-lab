@@ -11,6 +11,16 @@ function filesIn(directory) {
     return entry.isDirectory() ? filesIn(path) : [path];
   });
 }
+// Apply the shared preference before paint in every standalone game. Inject before
+// hashing so the service worker precaches the exact HTML that was built.
+const themeDir = resolve(import.meta.dirname, "../packages/game-theme");
+const htmlPath = resolve(dist, "index.html");
+const themeScript = readFileSync(resolve(themeDir, "theme.js"), "utf8");
+const themeStyle = readFileSync(resolve(themeDir, "game.css"), "utf8");
+const html = readFileSync(htmlPath, "utf8");
+if (!html.includes("</head>")) throw new Error("Game HTML must contain </head>");
+writeFileSync(htmlPath, html.replace(/<html(?=[\s>])/i, `<html data-game="${game}"`).replace("</head>", `<script>${themeScript}</script><style>${themeStyle}</style></head>`));
+
 const files = filesIn(dist).filter((path) => !path.endsWith("/sw.js"));
 // Audio enters the runtime cache after first playback, keeping install light.
 const urls = ["./", ...files.map((path) => `./${relative(dist, path).replaceAll("\\", "/")}`).filter((url) => !url.startsWith("./audio/"))];
