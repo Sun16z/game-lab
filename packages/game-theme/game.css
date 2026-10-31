@@ -9,7 +9,7 @@ html[data-theme="dark"] :where(button:not(.cell, .card, .tube-button, .piece), s
 html[data-theme="dark"] :is(footer, .music-credit, #locked, .note, .eyebrow) { color: #d0ded4; }
 html[data-theme="dark"] :is(.hero, .result, .overlay-card, .panel) :is(button, select) { color: #263f50; }
 html[data-theme="dark"] :where(button:not(.cell, .card, .tube-button, .piece), select) { background: #f7eedb; color: #182b32; border-color: #9db8aa; }
-html[data-theme="dark"] :is(button[aria-pressed="true"], button[aria-selected="true"]) { background: #f2cf80; color: #182b32; outline-color: #f7eedb; }
+html[data-theme="dark"] :is(button[aria-pressed="true"], button[aria-selected="true"]):not(.cell, .card, .tube-button, .piece) { background: #f2cf80; color: #182b32; outline-color: #f7eedb; }
 html[data-theme="dark"] .hero :is(.eyebrow, .note, p) { color: #304857; }
 /* Preserve contrast inside light inset cards and nested HUD cells. */
 html[data-theme="dark"] :is(.learning-benefit, .repair-note) :is(strong, small, p, span),
