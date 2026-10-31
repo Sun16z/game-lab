@@ -14,7 +14,7 @@ html[data-theme="dark"] .hero :is(.eyebrow, .note, p) { color: #304857; }
 /* Preserve contrast inside light inset cards and nested HUD cells. */
 html[data-theme="dark"] :is(.learning-benefit, .repair-note) :is(strong, small, p, span),
 html[data-theme="dark"] :is(.repair-note, .learning-benefit) { color: #173b52; }
-html[data-theme="dark"] .hud > div { background: #304a49; }
+html[data-theme="dark"][data-game="color-lab"] .hud > div { background: #304a49; }
 html[data-theme="dark"] fieldset { background: #304a49; color: #fff7e7; }
 html[data-theme="dark"] fieldset :is(legend, p) { color: #fff7e7; }
 html[data-theme="dark"] .hero .eyebrow { color: #43635e; }
@@ -27,6 +27,6 @@ html[data-theme="dark"] .paper .eyebrow { color: #43635e; }
 html[data-theme="dark"] .repair-note { color: #173b52 !important; }
 html[data-theme="dark"][data-game="math-runner"] .hero :is(h1, p),
 html[data-theme="dark"][data-game="memory-monsters"] .hero :is(h1, p) { color: #f7eedb; }
-html[data-theme="dark"][data-game="island-conquest"] :is(.subtitle, .setup-options label) { color: #f7eedb; }
+html[data-theme="dark"][data-game="island-conquest"] :is(#subtitle, .setup-options label) { color: #f7eedb; }
 html[data-theme="dark"][data-game="memory-monsters"] .levels small { color: #173b52; }
 html[data-theme="dark"][data-game="color-lab"] .keyboard-hint { color: #c1d2c8; }
