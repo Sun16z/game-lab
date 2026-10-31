@@ -10,7 +10,7 @@ function worker(fetchImpl) {
   const root = mkdtempSync(join(tmpdir(), 'game-sw-'));
   try {
     mkdirSync(join(root, 'dist'));
-    writeFileSync(join(root, 'dist/index.html'), 'new install');
+    writeFileSync(join(root, 'dist/index.html'), '<!doctype html><html><head></head><body>new install</body></html>');
     execFileSync(process.execPath, [resolve('scripts/create-game-sw.mjs'), 'test-game'], { cwd: root });
     const handlers = {}, saved = new Map();
     const scope = 'https://example.test/play/test-game/';

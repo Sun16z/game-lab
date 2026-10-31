@@ -381,3 +381,16 @@ p { text-wrap: pretty; }
   .greet img { width: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { .continueCard, .tilePlay, .chip { transition: none; } .continueCard:active, .tilePlay:active, .chip:active, .tilePlay:hover { transform: none; } }
+
+/* A synchronous head script resolves system preference before the first paint. */
+.themeButton { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--rule); border-radius: 50%; background: transparent; cursor: pointer; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+[data-theme="dark"] { color-scheme: dark; --paper: #182b32; --ink: #f7eedb; --sky: #344f50; --moss: #a8c9ac; --terracotta: #e5a98d; --sun: #f2cf80; --muted: #c1d2c8; --rule: #647c73; }
+[data-theme="dark"] .continueCard, [data-theme="dark"] .parentNote, [data-theme="dark"] .learningStrip, [data-theme="dark"] .featuredStory, [data-theme="dark"] .climbStory { background: #304a49; }
+[data-theme="dark"] .chip { background: #304a49; color: #f7eedb; }
+[data-theme="dark"] .chip[aria-pressed="true"] { background: #f7eedb; color: #182b32; }
+[data-theme="dark"] .tileInfo { color: #294c50; }
+[data-theme="dark"] .playSteps li::before { background: #304a49; }
+[data-theme="dark"] .secondaryButton:hover, [data-theme="dark"] .chip:hover:not([aria-pressed="true"]) { background: #45635e; }
+[data-theme="dark"] .siteHeader nav a:hover { color: #f2cf80; }
+@media (max-width: 620px) { .siteHeader nav { gap: .5rem; } }

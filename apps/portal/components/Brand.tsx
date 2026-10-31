@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeButton } from "./ThemeButton";
 import { games } from "@game-lab/game-core";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -9,7 +10,7 @@ export function Chime({ className = "" }: { className?: string }) {
 export function SiteHeader() {
   return <header className="siteHeader">
     <Link href="/" className="brand" aria-label="朵朵栗栗的風鈴群島首頁"><Chime /><span>朵朵栗栗<span className="brandSub">風鈴群島 · Game Lab</span></span></Link>
-    <nav aria-label="主要導覽"><Link href="/parents/" className="parentNav">給大人</Link></nav>
+    <nav aria-label="主要導覽"><ThemeButton /><Link href="/parents/" className="parentNav">給大人</Link></nav>
   </header>;
 }
 
