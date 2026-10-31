@@ -6,7 +6,7 @@ import { siteUrl } from "../lib/site";
 import { SiteHeader, SiteFooter } from "../components/Brand";
 import "./styles.css";
 
-const themeScript = readFileSync(resolve(process.cwd(), "../../packages/game-theme/theme.js"), "utf8");
+const themeScript = readFileSync(resolve(process.cwd(), "../../packages/game-theme/theme.js"), "utf8") + "\nif (new URLSearchParams(location.search).get(\"lang\") === \"ar\") document.documentElement.dir = \"rtl\";";
 
 const playableCount = games.filter(game => game.status === "playable").length;
 const description = `和朵朵、栗栗、小燈一起探索風鈴群島。${playableCount}款免費遊戲，從捏雲朵、搭橋到解謎與同玩，手機和鍵盤都能出發。`;
