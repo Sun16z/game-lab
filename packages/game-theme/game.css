@@ -2,7 +2,7 @@
 html[data-theme="dark"] { color-scheme: dark; background: #182b32; }
 html[data-theme="dark"] body { background: #182b32; color: #f7eedb; }
 html[data-theme="dark"] :is(.hud, .result, .overlay-card, .panel, .pause-panel, .overlay, .focus-overlay, .play-footer, .journey-map, .journey-passport, .audio-panel) { background: #304a49 !important; color: #fff7e7; border-color: #78958a; }
-html[data-theme="dark"] :is(.hud, .result, .overlay-card, .panel, .pause-panel, .overlay, .focus-overlay, .play-footer, .journey-map, .journey-passport) :is(p, small, h1, h2, h3, strong, label, dt, dd) { color: #fff7e7; }
+html[data-theme="dark"] :is(.hud, .result, .overlay-card, .panel, .pause-panel, .overlay, .focus-overlay, .play-footer, .journey-map, .journey-passport) :is(p, small, h1, h2, h3, strong, label, dt, dd):not(:where(.share-preview *)) { color: #fff7e7; }
 /* Bright setup cards retain their original dark type and illustration colors. */
 html[data-theme="dark"] :is(.hero, .level, fieldset, .weapon-rack button) { color: #263f50; }
 html[data-theme="dark"] :where(button:not(.cell, .card, .tube-button, .piece), select) { color-scheme: light; }
