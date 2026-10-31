@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ThemeButton } from "./ThemeButton";
 import { AnalyticsPrivacy } from "./AnalyticsPrivacy";
+import { ParentsLink } from "./ParentsLink";
 import { games } from "@game-lab/game-core";
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
@@ -11,13 +12,13 @@ export function Chime({ className = "" }: { className?: string }) {
 export function SiteHeader() {
   return <header className="siteHeader">
     <Link href="/" className="brand" aria-label="朵朵栗栗的風鈴群島首頁"><Chime /><span>朵朵栗栗<span className="brandSub">風鈴群島 · Game Lab</span></span></Link>
-    <nav aria-label="主要導覽"><ThemeButton /><Link href="/parents/" className="parentNav">給大人</Link></nav>
+    <nav aria-label="主要導覽"><ThemeButton /><ParentsLink className="parentNav">給大人</ParentsLink></nav>
   </header>;
 }
 
 export function SiteFooter() {
   const playable = games.filter(game => game.status === "playable").length;
-  return <footer className="siteFooter"><div className="footerBrand"><Chime /><p>風鈴響了，<br />下次再一起出發。</p></div><div><Link href="/">回遊戲 ↑</Link> <Link href="/parents/">給陪玩的大人</Link><p>{playable}款可玩 · 免費遊玩 · 不用註冊</p><AnalyticsPrivacy /><small>朵朵栗栗的風鈴群島 / Game Lab</small></div></footer>;
+  return <footer className="siteFooter"><div className="footerBrand"><Chime /><p>風鈴響了，<br />下次再一起出發。</p></div><div><Link href="/">回遊戲 ↑</Link> <ParentsLink>給陪玩的大人</ParentsLink><p>{playable}款可玩 · 免費遊玩 · 不用註冊</p><AnalyticsPrivacy /><small>朵朵栗栗的風鈴群島 / Game Lab</small></div></footer>;
 }
 
 export function ArrivalScene() {
