@@ -127,6 +127,6 @@
 
 ## Cloudflare Web Analytics
 
-- Cloudflare Web Analytics：已以手動JS方式接入。正式部署的GitHub Actions repository variable `NEXT_PUBLIC_CF_ANALYTICS_TOKEN`保存網站token；token會出現在公開HTML中，不是秘密。PR預覽和本機建置不設定此變數；即使有變數，程式也只在`games.somewhen.life`載入beacon。確認Cloudflare後台使用手動安裝，避免自動注入造成重複統計。
+- Cloudflare Web Analytics：已以手動JS方式接入。正式部署的GitHub Actions repository variable `NEXT_PUBLIC_CF_ANALYTICS_TOKEN`保存網站token；token會出現在公開HTML中，不是秘密。PR預覽和本機建置不設定此變數；即使有變數，程式也只在`games.somewhen.life`載入beacon。Cloudflare的自動注入可能使用另一個網站token，因此Game Lab HTML使用`no-transform`避免邊緣改寫；載入器也在DOM解析後檢查既有Cloudflare beacon，若仍有自動注入便不再載入手動版本。404等無法套用此標頭的回應可能由自動版本計數，需在Cloudflare後台針對本網站停用自動注入，才能確保全部流量進入手動網站的統計。
 - Portal、404和所有建置後的`/play/<slug>/`共用此設定。介紹頁嵌入遊戲時兩個頁面各記一次，分析可用`/play/<slug>/`路徑作為遊戲頁瀏覽指標；它包含介紹頁的iframe載入，不代表玩家已按下開始。遊戲service worker只處理同源請求，beacon不進入其快取；離線時遊戲不依賴beacon。
 - 未來加入完整CSP時，除了允許`https://static.cloudflareinsights.com`的腳本，手動安裝的beacon還需允許連線至`https://cloudflareinsights.com`。變更前需在預覽環境測試。
