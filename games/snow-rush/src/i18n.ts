@@ -14,3 +14,5 @@ id:words(['Meluncur di Salju 90','Berski bersama Dodo dan Lili! Lewati gerbang d
 hi:words(['बर्फीली दौड़ ९०','डोडो और लिली के साथ स्की करें! द्वार पार करें और बर्फ पर कूदें।','अवलोकन, अनुमान और हाथ-आँख तालमेल का अभ्यास करें।','रास्ता','शुरू करें','मुड़ने के लिए बाएँ या दाएँ दबाएँ। बर्फ पर कूदें; टक्कर से गति कम होती है।','रोकें','जारी रखें','कूदें','बाएँ','दाएँ','नीचे पहुँच गए!','फिर खेलें','स्कोर कार्ड साझा करें','चुनौती लिंक कॉपी करें','लिंक कॉपी हुआ','साझा नहीं हो सका','द्वार','टक्कर','दूरी','अंक','क्या आप मेरा स्कोर हरा सकते हैं?','होम','आवाज़','सुबह की बर्फ','तारों की ढलान','चीड़ का रास्ता'])
 };
 export function chooseLanguage(raw:string):Language { if(languages.includes(raw as Language))return raw as Language;const base=raw.toLowerCase().split('-')[0];return base==='zh'?'zh-Hant':base==='pt'?'pt-BR':languages.find(l=>l===base)??'en'; }
+
+export const characterLabel:Record<Language,string>={'zh-Hant':'選擇角色',en:'Choose a character',es:'Elige personaje','pt-BR':'Escolha personagem',fr:'Choisir un personnage',ar:'اختر الشخصية',sw:'Chagua mhusika',id:'Pilih karakter',hi:'पात्र चुनें'};

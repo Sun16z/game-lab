@@ -7,7 +7,7 @@ export function project(distance: number, lane: number): { x: number; y: number;
   return { x: 240 + lane * 135 * scale, y: 565 - (1 - scale) * 460, scale };
 }
 
-export function drawSnow(ctx: CanvasRenderingContext2D, state: SnowState, features: readonly Feature[], skier?: HTMLImageElement, course: 0 | 1 | 2 = 0): void {
+export function drawSnow(ctx: CanvasRenderingContext2D, state: SnowState, features: readonly Feature[], skier?: HTMLImageElement | HTMLCanvasElement, course: 0 | 1 | 2 = 0): void {
   const sky = ctx.createLinearGradient(0, 0, 0, 640);
   sky.addColorStop(0, ['#80bdd7','#645e9c','#568eaa'][course]); sky.addColorStop(.55, ['#d7eff0','#cfb9db','#b9dedd'][course]); sky.addColorStop(1, '#f6fbfa');
   ctx.fillStyle = sky; ctx.fillRect(0, 0, 480, 640);
@@ -44,6 +44,6 @@ export function drawSnow(ctx: CanvasRenderingContext2D, state: SnowState, featur
   const x = 240 + state.x * 135; const y = 563 - (state.jump > 0 ? Math.sin(Math.PI * state.jump / .8) * 55 : 0);
   ctx.fillStyle = '#59899955'; ctx.beginPath(); ctx.ellipse(x, 595, 30, 8, 0, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = '#c56858'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x - 25, y + 25); ctx.lineTo(x + 23, y + 25); ctx.stroke();
-  if (skier?.complete && skier.naturalWidth) ctx.drawImage(skier, x - 34, y - 45, 68, 70);
+  if (skier && (skier instanceof HTMLCanvasElement || skier.complete && skier.naturalWidth)) ctx.drawImage(skier, x - 62, y - 72, 124, 124);
   else { ctx.fillStyle = '#4297bb'; ctx.beginPath(); ctx.arc(x, y - 8, 24, 0, Math.PI * 2); ctx.fill(); }
 }
