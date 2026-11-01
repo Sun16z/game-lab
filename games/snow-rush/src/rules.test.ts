@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { courseFeatures, initialSnowState, stepSnow, DURATION } from './rules';
+import { courseFeatures, initialSnowState, stepSnow, DURATION, INITIAL_SPEED, MAX_SPEED } from './rules';
 describe('snow course', () => {
   it('reproduces three distinct courses and leaves routes around obstacles', () => {
     expect(courseFeatures(0)).toEqual(courseFeatures(0));
     expect(courseFeatures(0)).not.toEqual(courseFeatures(1));
-    expect(new Set(courseFeatures(2).map(f => f.id)).size).toBe(42);
+    expect(new Set(courseFeatures(2).map(f => f.id)).size).toBe(52);
+    expect(courseFeatures(0)[1].distance - courseFeatures(0)[0].distance).toBe(44);
   });
   it('ends at 90 seconds and respects speed and steering bounds', () => {
-    let s = initialSnowState(); const course = courseFeatures(0);
+    let s = initialSnowState(); const course: ReturnType<typeof courseFeatures> = [];
+    expect(s.speed).toBe(INITIAL_SPEED);
     for (let i = 0; i < 2000; i++) s = stepSnow(s, { steer: 1, jump: false }, course, .05);
-    expect(s.elapsed).toBe(DURATION); expect(s.speed).toBeLessThanOrEqual(22); expect(s.x).toBe(1.4);
+    expect(s.elapsed).toBe(DURATION); expect(s.speed).toBe(MAX_SPEED); expect(s.x).toBe(1.4);
     expect(stepSnow(s, { steer: -1, jump: true }, course, .05)).toBe(s);
   });
   it('counts a gate once and allows jumping over snowbanks', () => {
