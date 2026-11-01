@@ -22,6 +22,6 @@ describe("game catalog", () => {
     expect(games.find((game) => game.id === "C002")?.displayId).toBe("G022");
     expect(games.find((game) => game.id === "C003")?.displayId).toBe("G023");
     expect(games.find((game) => game.id === "C004")?.displayId).toBe("G024");
-    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002", "G003", "G004", "G006", "G007", "G008", "G009", "G010", "G011", "G018", "G019", "C001", "C002", "C003", "C004"]);
+    expect(games.filter((game) => game.status === "playable").map((game) => game.id)).toEqual(["G001", "G002", "G003", "G004", "G005", "G006", "G007", "G008", "G009", "G010", "G011", "G018", "G019", "C001", "C002", "C003", "C004"]);
   });
 });
