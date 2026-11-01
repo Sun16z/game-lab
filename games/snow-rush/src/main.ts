@@ -15,7 +15,7 @@ const canvas = $<HTMLCanvasElement>('stage'), ctx = canvas.getContext('2d')!;
 const input = new SnowInput(), image = new Image(), liliImage = new Image(); image.src = './dodo.webp'; liliImage.src = './lili.webp';
 let skier3D:Skier3D | undefined;try{skier3D=new Skier3D();skier3D.canvas.addEventListener('webglcontextlost',()=>{skier3D=undefined})}catch{/* WebGL unavailable: retain the original offline fallback. */}
 function storage() { try { return localStorage; } catch { return undefined; } }
-const audio = new GameAudio({ cues: { start:[.12,0,500,.01,.05,.15,0,1,70], gate:[.12,0,680,.01,.05,.12,0,1,90], hit:[.1,0,260,.01,.04,.12,0,1,40], finish:[.15,0,760,.02,.1,.2,0,1,100] }, music:{main:['./audio/mozart-k545.webm','./audio/mozart-k545.mp3']} }, storage());
+const audio = new GameAudio({ cues: { start:[.12,0,500,.01,.05,.15,0,1,70], gate:[.12,0,680,.01,.05,.12,0,1,90], hit:[.1,0,260,.01,.04,.12,0,1,40], finish:[.15,0,760,.02,.1,.2,0,1,100] }, music:{main:['./audio/summit-sprint.webm','./audio/summit-sprint.mp3']} }, storage());
 function readLanguage(){try{return storage()?.getItem('game-lab:language')}catch{return null}}
 let language = chooseLanguage(new URLSearchParams(location.search).get('lang') ?? readLanguage() ?? navigator.language);
 const audioUI = mountAudioControls($<HTMLButtonElement>('sound'),audio,language);

@@ -4,8 +4,8 @@ describe('snow course', () => {
   it('reproduces three distinct courses and leaves routes around obstacles', () => {
     expect(courseFeatures(0)).toEqual(courseFeatures(0));
     expect(courseFeatures(0)).not.toEqual(courseFeatures(1));
-    expect(new Set(courseFeatures(2).map(f => f.id)).size).toBe(52);
-    expect(courseFeatures(0)[1].distance - courseFeatures(0)[0].distance).toBe(44);
+    expect(new Set(courseFeatures(2).map(f => f.id)).size).toBe(56);
+    expect(courseFeatures(0)[1].distance - courseFeatures(0)[0].distance).toBe(64);
   });
   it('ends at 90 seconds and respects speed and steering bounds', () => {
     let s = initialSnowState(); const course: ReturnType<typeof courseFeatures> = [];
