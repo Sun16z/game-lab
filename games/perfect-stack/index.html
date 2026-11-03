@@ -24,18 +24,37 @@
         <div id="stage-frame" class="stage-frame">
           <div class="stack-friends" aria-hidden="true"><img src="./friends/dodo.webp" alt=""><img src="./friends/lili.webp" alt=""><img src="./friends/pip.webp" alt=""></div>
           <div id="game-canvas" aria-label="完美疊塔遊戲畫面"></div>
+          <img id="challenge-marker-avatar" class="challenge-marker-avatar hidden" src="./friends/dodo.webp" alt="" aria-hidden="true">
           <div id="combo-chip" class="game-chip combo-chip hidden"></div>
           <div id="record-chip" class="game-chip record-chip hidden" role="status" aria-live="polite"></div>
           <div id="ready-panel" class="overlay">
             <div class="overlay-card">
               <span class="pill" id="ready-pill">一鍵挑戰</span>
               <div class="workshop-emblem brand-friends" aria-hidden="true"><img src="./friends/dodo.webp" alt=""><img src="./friends/lili.webp" alt=""><img src="./friends/pip.webp" alt=""></div>
+              <div id="challenge-banner" class="challenge-banner hidden"><img id="challenge-banner-avatar" src="./friends/dodo.webp" alt=""><span id="challenge-banner-copy"></span><strong id="challenge-banner-number">0</strong><span id="challenge-banner-unit">層</span></div>
               <h1 id="ready-title">抓準時機，<br />疊得更高。</h1>
               <p id="ready-description">方塊左右移動時，點一下畫面就能放下。對得越準，塔就越穩。</p>
               <p id="ready-repair" class="repair-note"></p>
               <div class="mode-picker"><label id="mode-label" for="mode-select">模式</label><select id="mode-select"><option value="standard">一般</option><option value="child">兒童</option></select></div>
               <div class="theme-picker"><label id="ready-theme-label" for="ready-theme-select">主題</label><select id="ready-theme-select"><option value="classic">經典</option><option value="neon">霓虹</option><option value="cosmos">星際</option></select><small id="ready-total">累積0層</small></div>
               <button id="start-button" class="primary-button" type="button"><span id="start-label">開始遊戲</span> <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+          <div id="role-picker" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="role-picker-title">
+            <div class="overlay-card compact role-picker-card">
+              <h2 id="role-picker-title">選一個角色，傳給家人</h2>
+              <div class="role-grid">
+                <button type="button" data-challenge-role="dad"><img src="./friends/dodo.webp" alt=""><span>爸爸</span></button>
+                <button type="button" data-challenge-role="mom"><img src="./friends/lili.webp" alt=""><span>媽媽</span></button>
+                <button type="button" data-challenge-role="brother"><img src="./friends/pip.webp" alt=""><span>哥哥</span></button>
+                <button type="button" data-challenge-role="sister"><img src="./friends/lili.webp" alt=""><span>姊姊</span></button>
+                <button type="button" data-challenge-role="youngerBrother"><img src="./friends/pip.webp" alt=""><span>弟弟</span></button>
+                <button type="button" data-challenge-role="youngerSister"><img src="./friends/lili.webp" alt=""><span>妹妹</span></button>
+                <button type="button" data-challenge-role="grandpa"><img src="./friends/dodo.webp" alt=""><span>阿公</span></button>
+                <button type="button" data-challenge-role="grandma"><img src="./friends/lili.webp" alt=""><span>阿嬤</span></button>
+                <button type="button" data-challenge-role="self"><img src="./friends/pip.webp" alt=""><span>我</span></button>
+              </div>
+              <button id="role-picker-close" class="retry-button" type="button">取消</button>
             </div>
           </div>
           <div id="pause-panel" class="overlay hidden">
