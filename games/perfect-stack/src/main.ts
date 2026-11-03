@@ -11,6 +11,8 @@ import { mountAudioControls } from "@game-lab/game-audio/ui";
 import { createStackAudio } from "./audio";
 import { chooseLanguage, translations, type Language } from "./i18n";
 import { shareTranslations } from "./share-i18n";
+import { CHALLENGE_ROLES, encodeChallenge, parseChallenge, type ChallengeRoleKey } from "./challenge";
+import { paletteFor } from "./appearance";
 import { progressCopy } from "./progress-i18n";
 import { modeCopy } from "./mode-i18n";
 import { drawHouseWindows, drawSkyWorkshop } from "./sky-art";
@@ -23,6 +25,7 @@ import "@game-lab/platform-adapters/home-exit.css";
 import "./workshop.css";
 
 const WIDTH = 480;
+const CHALLENGE_LINE = 0xe8603c;  // warm orange-red: stands out on every sky phase and theme
 const HEIGHT = 720;
 const BLOCK_HEIGHT = 34;
 const BASE_Y = 602;
@@ -80,20 +83,13 @@ function drawStackArtwork(ctx: CanvasRenderingContext2D, theme: Theme): void {
   }
 }
 
-const PALETTES = [
-    { background: 0x91ced7, blocks: [0xe2a96a, 0xd88669, 0x9ac2ad, 0xe8c574], accent: 0xffd575 },
-    { background: 0x91ced7, blocks: [0x9ec7b7, 0xdda577, 0xb3bf97, 0xe5bc72], accent: 0xffd575 },
-    { background: 0x91ced7, blocks: [0xe7be7b, 0xc58e7f, 0x8fbdc2, 0xe2a16f], accent: 0xffd575 }
-];
-const THEME_PALETTES = {
-  neon: { background: 0x181d3d, blocks: [0x34e4e1, 0xff5fb7, 0xc37aff, 0x8affde], accent: 0xfaf46c },
-  cosmos: { background: 0x111830, blocks: [0xbdaaff, 0x89b9ff, 0xffb9db, 0x8ce0e7], accent: 0xffe9a8 }
-} as const;
+const initialChallenge = parseChallenge(location.href);
 
-function paletteFor(seed: string, theme: Theme): { background: number; blocks: readonly number[]; accent: number } {
-  if (theme !== "classic") return THEME_PALETTES[theme];
-  const hash = [...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  return PALETTES[hash % PALETTES.length];
+function loadRole(): ChallengeRoleKey | null {
+  try {
+    const value = safeStorage()?.getItem("g001.role");
+    return value && CHALLENGE_ROLES.some(({ key }) => key === value) ? value as ChallengeRoleKey : null;
+  } catch { return null; }
 }
 
 type PlacedBlock = Block & { y: number; color: number };
@@ -104,7 +100,7 @@ class StackScene extends Phaser.Scene {
   private graphics!: Phaser.GameObjects.Graphics;
   private activeGraphics!: Phaser.GameObjects.Graphics;
   private pixelFx!: PixelCelebrations;
-  private run: GameRun = createRun("G001", crypto.randomUUID(), crypto.randomUUID());
+  private run: GameRun = createRun("G001", initialChallenge?.seed ?? crypto.randomUUID(), crypto.randomUUID());
   private progress = loadProgress(safeStorage());
   private runTheme: Theme = this.progress.selectedTheme;
   private palette = paletteFor(this.run.seed, this.runTheme);
@@ -120,7 +116,7 @@ class StackScene extends Phaser.Scene {
   private bullseyes = 0;
   private repairCount = 0;
   private longestCombo = 0;
-  private mode: GameMode = new URLSearchParams(location.search).get("mode") === "child" ? "child" : loadMode(safeStorage());
+  private mode: GameMode = initialChallenge?.mode ?? (new URLSearchParams(location.search).get("mode") === "child" ? "child" : loadMode(safeStorage()));
   private bestLayers = this.scoreStorage.getBest(bestKeyForMode(this.mode)) ?? 0;
   private recordCelebrated = false;
   private retryIndex = 0;
@@ -142,6 +138,8 @@ class StackScene extends Phaser.Scene {
   private lastUnlocked: Theme[] = [];
   private reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   private readonly touchPointer = touchPointerQuery();
+  private activeRole: ChallengeRoleKey | null = loadRole();
+  private readonly challengeTarget = initialChallenge;
 
   constructor() { super("perfect-stack"); }
 
@@ -184,6 +182,7 @@ class StackScene extends Phaser.Scene {
     });
     const modeSelect = element<HTMLSelectElement>("mode-select");
     modeSelect.value = this.mode;
+    modeSelect.disabled = Boolean(this.challengeTarget);
     modeSelect.addEventListener("change", () => {
       this.mode = modeSelect.value === "child" ? "child" : "standard";
       this.bestLayers = this.scoreStorage.getBest(bestKeyForMode(this.mode)) ?? 0;
@@ -205,6 +204,10 @@ class StackScene extends Phaser.Scene {
     element("share-card-button").addEventListener("click", () => void this.shareResultCard());
     element("download-card-button").addEventListener("click", () => void this.downloadResultCard());
     element("copy-link-button").addEventListener("click", () => void this.copyResultLink());
+    element("role-picker-close").addEventListener("click", () => element("role-picker").classList.add("hidden"));
+    for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>("[data-challenge-role]"))) {
+      button.addEventListener("click", () => this.selectRole(button.dataset.challengeRole as ChallengeRoleKey));
+    }
     element("pause-button").addEventListener("click", () => this.pause());
     element("resume-button").addEventListener("click", () => this.resume());
     this.audioControls = mountAudioControls(element<HTMLButtonElement>("sound-button"), this.audio, this.language);
@@ -227,6 +230,7 @@ class StackScene extends Phaser.Scene {
     this.draw();
     this.emit("game_page_view", { source: window.self === window.top ? "standalone" : "portal" });
     this.emit("game_loaded", { source: window.self === window.top ? "standalone" : "portal" });
+    if (this.challengeTarget) this.emit("challenge_open", { role: this.challengeTarget.role });
   }
 
   update(_time: number, delta: number): void {
@@ -376,6 +380,7 @@ class StackScene extends Phaser.Scene {
       perfectDrops: this.perfectDrops, bullseyes: this.bullseyes, repairs: this.repairCount, longestCombo: this.longestCombo,
       durationSeconds: Math.max(0, (Date.parse(this.run.endedAt!) - Date.parse(this.run.startedAt!)) / 1000)
     });
+    if (this.challengeTarget && this.layers() > this.challengeTarget.layers) this.emit("challenge_beat", { role: this.challengeTarget.role });
     element("pause-button").classList.add("hidden");
     element("drop-button").classList.add("hidden");
     element("result-panel").classList.remove("hidden");
@@ -391,12 +396,17 @@ class StackScene extends Phaser.Scene {
     if (this.run.state !== "RESULT") return;
     this.emit("retry_click", { previousRunId: this.run.id });
     this.retryIndex += 1;
-    this.run = createRun("G001", crypto.randomUUID(), crypto.randomUUID());
+    this.run = createRun("G001", this.challengeTarget?.seed ?? crypto.randomUUID(), crypto.randomUUID());
     element("share-status").textContent = "";
     this.startRun();
   }
 
   private resultShareLink(): string {
+    if (this.activeRole) {
+      const link = new URL(encodeChallenge({ layers: this.layers(), role: this.activeRole, seed: this.run.seed, mode: this.mode }, location.href));
+      link.searchParams.set("lang", this.language);
+      return link.toString();
+    }
     const link = new URL(shareLink(location.href, this.language));
     if (this.mode === "child") link.searchParams.set("mode", "child");
     else link.searchParams.delete("mode");
@@ -405,6 +415,7 @@ class StackScene extends Phaser.Scene {
 
   private async shareResultCard(): Promise<void> {
     if (this.run.state !== "RESULT") return;
+    if (!this.activeRole) { element("role-picker").classList.remove("hidden"); return; }
     const button = element<HTMLButtonElement>("share-card-button");
     button.disabled = true;
     const t = translations[this.language];
@@ -412,6 +423,7 @@ class StackScene extends Phaser.Scene {
     try {
       const blob = await this.resultCardBlob();
       const result = await shareCardOrDownload(blob, "game-lab-perfect-stack.png", t.title, this.resultShareLink(), s.challenge(this.layers()));
+      this.emit("challenge_create", { role: this.activeRole });
       element("share-status").textContent = result === "downloaded" ? s.downloaded : "";
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
@@ -445,6 +457,7 @@ class StackScene extends Phaser.Scene {
 
   private async copyResultLink(): Promise<void> {
     if (this.run.state !== "RESULT") return;
+    if (!this.activeRole) { element("role-picker").classList.remove("hidden"); return; }
     const s = shareTranslations[this.language];
     try {
       await copyShareLink(this.resultShareLink());
@@ -484,6 +497,13 @@ class StackScene extends Phaser.Scene {
       eventId: crypto.randomUUID(), eventName, gameId: "G001", runId: this.run.id,
       sessionId: this.playerSessionId, timestamp: new Date().toISOString(), gameVersion: VERSION, properties
     });
+  }
+
+  private selectRole(role: ChallengeRoleKey): void {
+    this.activeRole = role;
+    try { safeStorage()?.setItem("g001.role", role); } catch { /* Optional preference. */ }
+    element("role-picker").classList.add("hidden");
+    if (this.run.state === "RESULT") void this.shareResultCard();
   }
 
   private updateHud(): void {
@@ -528,11 +548,16 @@ class StackScene extends Phaser.Scene {
   private updateResult(): void {
     const t = translations[this.language];
     const p = progressCopy[this.language];
-    element("result-title").textContent = this.lastResultWasBest ? t.newBest : t.resultTitle;
+    const s = shareTranslations[this.language];
+    const challengeBeat = Boolean(this.challengeTarget && this.layers() > this.challengeTarget.layers);
+    const challengeRole = this.challengeTarget ? s.roleNames[this.challengeTarget.role] : "";
+    element("result-title").textContent = challengeBeat ? s.challengeBeat(challengeRole) : this.lastResultWasBest ? t.newBest : t.resultTitle;
     element("result-layers").textContent = String(this.layers());
     element("share-preview-score").textContent = `${this.layers()} ${t.unit}`;
     element("share-preview-invitation").textContent = shareTranslations[this.language].challenge(this.layers());
-    element("result-summary").textContent = this.lastResultWasBest
+    element("result-summary").textContent = this.challengeTarget
+      ? challengeBeat ? s.challengeBack(challengeRole) : s.challengeGap(Math.max(0, this.challengeTarget.layers - this.layers()))
+      : this.lastResultWasBest
       ? t.newBestSummary(this.bestLayers)
       : this.lastResultBestBefore > 0
         ? this.layers() === this.lastResultBestBefore
@@ -546,6 +571,9 @@ class StackScene extends Phaser.Scene {
     unlockNote.textContent = this.lastUnlocked.length ? p.unlocked(this.lastUnlocked.map((id) => p.themes[id]).join("、")) : "";
     unlockNote.classList.toggle("hidden", this.lastUnlocked.length === 0);
     this.refreshThemeSelectors();
+    element("retry-button").classList.toggle("primary-button", Boolean(this.challengeTarget && !challengeBeat));
+    element("retry-button").classList.toggle("retry-button", !(this.challengeTarget && !challengeBeat));
+    element("share-card-button").textContent = challengeBeat ? s.challengeBack(challengeRole) : this.challengeTarget ? s.challengeShare : s.shareCard;
   }
 
   private refreshThemeSelectors(): void {
@@ -588,19 +616,37 @@ class StackScene extends Phaser.Scene {
     const modeSelect = element<HTMLSelectElement>("mode-select");
     modeSelect.options[0].textContent = mode.standard;
     modeSelect.options[1].textContent = mode.child;
-    element("start-label").textContent = t.start;
+    element("start-label").textContent = this.challengeTarget ? s.challengeStart : t.start;
     element("pause-pill").textContent = t.pausePill;
     element("pause-title").textContent = t.pauseTitle;
     element("resume-button").textContent = t.resume;
     element("result-pill").textContent = t.resultPill;
     element("result-unit").textContent = t.unit;
     element("retry-label").textContent = t.retry;
-    element("share-card-button").textContent = s.shareCard;
+    element("share-card-button").textContent = this.challengeTarget ? s.challengeShare : s.shareCard;
     element("download-card-button").textContent = s.downloadCard;
     element("copy-link-button").textContent = s.copyLink;
     element("pause-button").textContent = t.pause;
     element("hint").textContent = inputInstruction(t.hint, t.hintTouch, this.touchPointer.matches);
     element("footer-text").textContent = t.footer;
+    element("role-picker-title").textContent = s.rolePickerTitle;
+    element("role-picker-close").textContent = t.retry;
+    for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>("[data-challenge-role]"))) {
+      const role = button.dataset.challengeRole as ChallengeRoleKey;
+      button.setAttribute("aria-label", s.roleNames[role]);
+      const label = button.querySelector("span");
+      if (label) label.textContent = s.roleNames[role];
+    }
+    if (this.challengeTarget) {
+      const targetRole = s.roleNames[this.challengeTarget.role];
+      const avatar = CHALLENGE_ROLES.find(({ key }) => key === this.challengeTarget!.role)!;
+      element("challenge-banner").classList.remove("hidden");
+      element("challenge-banner-avatar").setAttribute("src", `./friends/${avatar.avatar}.webp`);
+      element("challenge-banner-avatar").setAttribute("alt", targetRole);
+      element("challenge-banner-copy").textContent = targetRole;
+      element("challenge-banner-number").textContent = String(this.challengeTarget.layers);
+      element("challenge-banner-unit").textContent = translations[this.language].unit;
+    } else element("challenge-banner").classList.add("hidden");
     this.refreshThemeSelectors();
     this.updateHud();
     if (this.run.state === "RESULT") this.updateResult();
@@ -631,6 +677,22 @@ class StackScene extends Phaser.Scene {
     const bounce = this.reducedMotion || feedbackAge >= 180 ? 0 : 7 * Math.sin(Math.PI * feedbackAge / 180);
     g.clear();
     drawSkyWorkshop(g,this.layers(),this.runTheme,now,this.reducedMotion);
+    const challengeMarker = element<HTMLImageElement>("challenge-marker-avatar");
+    if (this.challengeTarget && this.run.state === "PLAYING") {
+      const targetY = BASE_Y - this.challengeTarget.layers * BLOCK_HEIGHT + offset;
+      if (targetY > 145 && targetY < 630) {
+        const distance = Math.abs(this.layers() - this.challengeTarget.layers);
+        // a thick dashed line a child notices from across the room; it brightens over the last 8 layers
+        const alpha = Math.min(1, 0.55 + Math.max(0, 8 - distance) * 0.06);
+        g.lineStyle(4, CHALLENGE_LINE, alpha);
+        for (let x = 16; x < WIDTH - 60; x += 22) g.lineBetween(x, targetY, Math.min(x + 12, WIDTH - 60), targetY);
+        // the canvas is drawn at 480×720 and scaled to fit the screen; the avatar is a DOM element in screen pixels
+        const canvasBox = this.game.canvas.getBoundingClientRect();
+        const parentTop = (challengeMarker.offsetParent ?? document.body).getBoundingClientRect().top;
+        challengeMarker.style.top = `${canvasBox.top - parentTop + targetY * (canvasBox.height / HEIGHT || 1)}px`;  // CSS centers it on this point
+        challengeMarker.classList.remove("hidden");
+      } else challengeMarker.classList.add("hidden");
+    } else challengeMarker.classList.add("hidden");
     if (this.bestLayers > 0 && this.run.state === "PLAYING") {
       const recordY = BASE_Y - this.bestLayers * BLOCK_HEIGHT + offset;
       if (recordY > 145 && recordY < 630) {

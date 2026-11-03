@@ -3,6 +3,7 @@ import type { GameId } from "@game-lab/game-core";
 export type GameEventName =
   | "game_page_view" | "game_loaded" | "game_start" | "game_end"
   | "retry_click" | "level_start" | "level_complete" | "game_error"
+  | "challenge_create" | "challenge_open" | "challenge_beat"
   | "ad_opportunity" | "ad_result";
 
 export interface GameEvent {
