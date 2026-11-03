@@ -140,6 +140,7 @@ class StackScene extends Phaser.Scene {
   private readonly touchPointer = touchPointerQuery();
   private activeRole: ChallengeRoleKey | null = loadRole();
   private pendingRoleAction: "share" | "copy" | null = null;
+  private challengeMarkerEl: HTMLImageElement | null = null;
   private rolePickerTrigger: HTMLButtonElement | null = null;
   private challengeMarkerLayout = { canvasTop: 0, parentTop: 0, scale: 1 };
   private readonly challengeTarget = initialChallenge;
@@ -216,10 +217,17 @@ class StackScene extends Phaser.Scene {
     this.audioControls = mountAudioControls(element<HTMLButtonElement>("sound-button"), this.audio, this.language);
     this.input.on("pointerdown", () => { if (this.run.state === "PLAYING") this.drop(); });
     window.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && !element("role-picker").classList.contains("hidden")) {
-        event.preventDefault();
-        this.closeRolePicker();
-        return;
+      const picker = element("role-picker");
+      if (!picker.classList.contains("hidden")) {
+        if (event.key === "Escape") { event.preventDefault(); this.closeRolePicker(); return; }
+        if (event.key === "Tab") {
+          const items = Array.from(picker.querySelectorAll<HTMLButtonElement>("button:not([disabled])"));
+          const at = items.indexOf(document.activeElement as HTMLButtonElement);
+          const next = event.shiftKey ? (at <= 0 ? items.length - 1 : at - 1) : (at === items.length - 1 ? 0 : at + 1);
+          event.preventDefault(); items.at(next)?.focus();
+          return;
+        }
+        if (event.code === "Space" && !(event.target instanceof HTMLElement && picker.contains(event.target))) { event.preventDefault(); return; }
       }
       if (event.code !== "Space" || event.repeat) return;
       if (event.target instanceof HTMLElement && event.target.closest("button,select")) return;
@@ -595,7 +603,7 @@ class StackScene extends Phaser.Scene {
     element("share-preview-score").textContent = `${this.layers()} ${t.unit}`;
     element("share-preview-invitation").textContent = shareTranslations[this.language].challenge(this.layers());
     element("result-summary").textContent = this.challengeTarget
-      ? challengeBeat ? s.challengeBack(challengeRole) : s.challengeGap(Math.max(1, this.challengeTarget.layers - this.layers() + 1))
+      ? challengeBeat ? `${challengeRole} ${this.challengeTarget.layers} → ${this.layers()}` : s.challengeGap(Math.max(1, this.challengeTarget.layers - this.layers() + 1))
       : this.lastResultWasBest
       ? t.newBestSummary(this.bestLayers)
       : this.lastResultBestBefore > 0
@@ -723,7 +731,7 @@ class StackScene extends Phaser.Scene {
     const bounce = this.reducedMotion || feedbackAge >= 180 ? 0 : 7 * Math.sin(Math.PI * feedbackAge / 180);
     g.clear();
     drawSkyWorkshop(g,this.layers(),this.runTheme,now,this.reducedMotion);
-    const challengeMarker = element<HTMLImageElement>("challenge-marker-avatar");
+    const challengeMarker = this.challengeMarkerEl ??= element<HTMLImageElement>("challenge-marker-avatar");
     if (this.challengeTarget && this.run.state === "PLAYING") {
       const targetY = BASE_Y - this.challengeTarget.layers * BLOCK_HEIGHT + offset;
       if (targetY > 145 && targetY < 630) {
