@@ -139,6 +139,8 @@ class StackScene extends Phaser.Scene {
   private reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   private readonly touchPointer = touchPointerQuery();
   private activeRole: ChallengeRoleKey | null = loadRole();
+  private pendingRoleAction: "share" | "copy" | null = null;
+  private challengeMarkerLayout = { canvasTop: 0, parentTop: 0, scale: 1 };
   private readonly challengeTarget = initialChallenge;
 
   constructor() { super("perfect-stack"); }
@@ -226,6 +228,8 @@ class StackScene extends Phaser.Scene {
     });
     this.resetTower();
     this.applyLanguage();
+    this.refreshChallengeMarkerLayout();
+    window.addEventListener("resize", () => this.refreshChallengeMarkerLayout());
     this.updateHud();
     this.draw();
     this.emit("game_page_view", { source: window.self === window.top ? "standalone" : "portal" });
@@ -415,7 +419,11 @@ class StackScene extends Phaser.Scene {
 
   private async shareResultCard(): Promise<void> {
     if (this.run.state !== "RESULT") return;
-    if (!this.activeRole) { element("role-picker").classList.remove("hidden"); return; }
+    if (!this.activeRole) {
+      this.pendingRoleAction = "share";
+      element("role-picker").classList.remove("hidden");
+      return;
+    }
     const button = element<HTMLButtonElement>("share-card-button");
     button.disabled = true;
     const t = translations[this.language];
@@ -449,6 +457,7 @@ class StackScene extends Phaser.Scene {
     const s = shareTranslations[this.language];
     try {
       downloadScoreCard(await this.resultCardBlob(), "game-lab-perfect-stack.png");
+      this.emit("challenge_create", { role: this.activeRole });
       element("share-status").textContent = s.downloaded;
     } catch {
       element("share-status").textContent = s.shareFailed;
@@ -457,10 +466,15 @@ class StackScene extends Phaser.Scene {
 
   private async copyResultLink(): Promise<void> {
     if (this.run.state !== "RESULT") return;
-    if (!this.activeRole) { element("role-picker").classList.remove("hidden"); return; }
+    if (!this.activeRole) {
+      this.pendingRoleAction = "copy";
+      element("role-picker").classList.remove("hidden");
+      return;
+    }
     const s = shareTranslations[this.language];
     try {
       await copyShareLink(this.resultShareLink());
+      this.emit("challenge_create", { role: this.activeRole });
       element("share-status").textContent = s.copied;
     } catch {
       element("share-status").textContent = s.shareFailed;
@@ -503,7 +517,9 @@ class StackScene extends Phaser.Scene {
     this.activeRole = role;
     try { safeStorage()?.setItem("g001.role", role); } catch { /* Optional preference. */ }
     element("role-picker").classList.add("hidden");
-    if (this.run.state === "RESULT") void this.shareResultCard();
+    const action = this.pendingRoleAction;
+    this.pendingRoleAction = null;
+    if (this.run.state === "RESULT") void (action === "copy" ? this.copyResultLink() : this.shareResultCard());
   }
 
   private updateHud(): void {
@@ -556,7 +572,7 @@ class StackScene extends Phaser.Scene {
     element("share-preview-score").textContent = `${this.layers()} ${t.unit}`;
     element("share-preview-invitation").textContent = shareTranslations[this.language].challenge(this.layers());
     element("result-summary").textContent = this.challengeTarget
-      ? challengeBeat ? s.challengeBack(challengeRole) : s.challengeGap(Math.max(0, this.challengeTarget.layers - this.layers()))
+      ? challengeBeat ? s.challengeBack(challengeRole) : s.challengeGap(Math.max(1, this.challengeTarget.layers - this.layers() + 1))
       : this.lastResultWasBest
       ? t.newBestSummary(this.bestLayers)
       : this.lastResultBestBefore > 0
@@ -629,8 +645,8 @@ class StackScene extends Phaser.Scene {
     element("pause-button").textContent = t.pause;
     element("hint").textContent = inputInstruction(t.hint, t.hintTouch, this.touchPointer.matches);
     element("footer-text").textContent = t.footer;
-    element("role-picker-title").textContent = s.rolePickerTitle;
-    element("role-picker-close").textContent = t.retry;
+    element("role-picker-title").textContent = `${s.chooseRole} · ${s.rolePickerTitle}`;
+    element("role-picker-close").textContent = s.cancel;
     for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>("[data-challenge-role]"))) {
       const role = button.dataset.challengeRole as ChallengeRoleKey;
       button.setAttribute("aria-label", s.roleNames[role]);
@@ -643,7 +659,7 @@ class StackScene extends Phaser.Scene {
       element("challenge-banner").classList.remove("hidden");
       element("challenge-banner-avatar").setAttribute("src", `./friends/${avatar.avatar}.webp`);
       element("challenge-banner-avatar").setAttribute("alt", targetRole);
-      element("challenge-banner-copy").textContent = targetRole;
+      element("challenge-banner-copy").textContent = s.challengeTarget(targetRole, this.challengeTarget.layers);
       element("challenge-banner-number").textContent = String(this.challengeTarget.layers);
       element("challenge-banner-unit").textContent = translations[this.language].unit;
     } else element("challenge-banner").classList.add("hidden");
@@ -687,9 +703,7 @@ class StackScene extends Phaser.Scene {
         g.lineStyle(4, CHALLENGE_LINE, alpha);
         for (let x = 16; x < WIDTH - 60; x += 22) g.lineBetween(x, targetY, Math.min(x + 12, WIDTH - 60), targetY);
         // the canvas is drawn at 480×720 and scaled to fit the screen; the avatar is a DOM element in screen pixels
-        const canvasBox = this.game.canvas.getBoundingClientRect();
-        const parentTop = (challengeMarker.offsetParent ?? document.body).getBoundingClientRect().top;
-        challengeMarker.style.top = `${canvasBox.top - parentTop + targetY * (canvasBox.height / HEIGHT || 1)}px`;  // CSS centers it on this point
+        challengeMarker.style.top = `${this.challengeMarkerLayout.canvasTop - this.challengeMarkerLayout.parentTop + targetY * this.challengeMarkerLayout.scale}px`;  // CSS centers it on this point
         challengeMarker.classList.remove("hidden");
       } else challengeMarker.classList.add("hidden");
     } else challengeMarker.classList.add("hidden");
@@ -740,6 +754,20 @@ class StackScene extends Phaser.Scene {
     } else if (this.failedX !== null) {
       g.fillStyle(0xff697b, 0.75).fillRoundedRect(this.failedX, activeY, this.currentTarget().width, BLOCK_HEIGHT - 2, 5);
     }
+  }
+
+  private refreshChallengeMarkerLayout(): void {
+    const marker = element<HTMLImageElement>("challenge-marker-avatar");
+    const wasHidden = marker.classList.contains("hidden");
+    marker.classList.remove("hidden");
+    const canvasBox = this.game.canvas.getBoundingClientRect();
+    const parentBox = element("stage-frame").getBoundingClientRect();
+    this.challengeMarkerLayout = {
+      canvasTop: canvasBox.top,
+      parentTop: parentBox.top,
+      scale: canvasBox.height / HEIGHT || 1
+    };
+    if (wasHidden) marker.classList.add("hidden");
   }
 }
 
