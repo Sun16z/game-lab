@@ -140,6 +140,7 @@ class StackScene extends Phaser.Scene {
   private readonly touchPointer = touchPointerQuery();
   private activeRole: ChallengeRoleKey | null = loadRole();
   private pendingRoleAction: "share" | "copy" | null = null;
+  private rolePickerTrigger: HTMLButtonElement | null = null;
   private challengeMarkerLayout = { canvasTop: 0, parentTop: 0, scale: 1 };
   private readonly challengeTarget = initialChallenge;
 
@@ -206,7 +207,7 @@ class StackScene extends Phaser.Scene {
     element("share-card-button").addEventListener("click", () => void this.shareResultCard());
     element("download-card-button").addEventListener("click", () => void this.downloadResultCard());
     element("copy-link-button").addEventListener("click", () => void this.copyResultLink());
-    element("role-picker-close").addEventListener("click", () => element("role-picker").classList.add("hidden"));
+    element("role-picker-close").addEventListener("click", () => this.closeRolePicker());
     for (const button of Array.from(document.querySelectorAll<HTMLButtonElement>("[data-challenge-role]"))) {
       button.addEventListener("click", () => this.selectRole(button.dataset.challengeRole as ChallengeRoleKey));
     }
@@ -215,6 +216,11 @@ class StackScene extends Phaser.Scene {
     this.audioControls = mountAudioControls(element<HTMLButtonElement>("sound-button"), this.audio, this.language);
     this.input.on("pointerdown", () => { if (this.run.state === "PLAYING") this.drop(); });
     window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !element("role-picker").classList.contains("hidden")) {
+        event.preventDefault();
+        this.closeRolePicker();
+        return;
+      }
       if (event.code !== "Space" || event.repeat) return;
       if (event.target instanceof HTMLElement && event.target.closest("button,select")) return;
       event.preventDefault();
@@ -230,6 +236,10 @@ class StackScene extends Phaser.Scene {
     this.applyLanguage();
     this.refreshChallengeMarkerLayout();
     window.addEventListener("resize", () => this.refreshChallengeMarkerLayout());
+    const markerResizeObserver = new ResizeObserver(() => this.refreshChallengeMarkerLayout());
+    markerResizeObserver.observe(this.game.canvas);
+    markerResizeObserver.observe(element("stage-frame"));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => markerResizeObserver.disconnect());
     this.updateHud();
     this.draw();
     this.emit("game_page_view", { source: window.self === window.top ? "standalone" : "portal" });
@@ -294,6 +304,7 @@ class StackScene extends Phaser.Scene {
     element("record-chip").classList.remove("hidden");
     this.updateHud();
     this.draw();
+    this.refreshChallengeMarkerLayout();
   }
 
   private drop(): void {
@@ -420,8 +431,7 @@ class StackScene extends Phaser.Scene {
   private async shareResultCard(): Promise<void> {
     if (this.run.state !== "RESULT") return;
     if (!this.activeRole) {
-      this.pendingRoleAction = "share";
-      element("role-picker").classList.remove("hidden");
+      this.openRolePicker("share");
       return;
     }
     const button = element<HTMLButtonElement>("share-card-button");
@@ -457,7 +467,6 @@ class StackScene extends Phaser.Scene {
     const s = shareTranslations[this.language];
     try {
       downloadScoreCard(await this.resultCardBlob(), "game-lab-perfect-stack.png");
-      this.emit("challenge_create", { role: this.activeRole });
       element("share-status").textContent = s.downloaded;
     } catch {
       element("share-status").textContent = s.shareFailed;
@@ -467,8 +476,7 @@ class StackScene extends Phaser.Scene {
   private async copyResultLink(): Promise<void> {
     if (this.run.state !== "RESULT") return;
     if (!this.activeRole) {
-      this.pendingRoleAction = "copy";
-      element("role-picker").classList.remove("hidden");
+      this.openRolePicker("copy");
       return;
     }
     const s = shareTranslations[this.language];
@@ -516,10 +524,25 @@ class StackScene extends Phaser.Scene {
   private selectRole(role: ChallengeRoleKey): void {
     this.activeRole = role;
     try { safeStorage()?.setItem("g001.role", role); } catch { /* Optional preference. */ }
-    element("role-picker").classList.add("hidden");
+    this.closeRolePicker();
     const action = this.pendingRoleAction;
     this.pendingRoleAction = null;
     if (this.run.state === "RESULT") void (action === "copy" ? this.copyResultLink() : this.shareResultCard());
+  }
+
+  private openRolePicker(action: "share" | "copy"): void {
+    this.pendingRoleAction = action;
+    this.rolePickerTrigger = document.activeElement instanceof HTMLButtonElement ? document.activeElement : null;
+    const picker = element("role-picker");
+    picker.classList.remove("hidden");
+    picker.querySelector<HTMLButtonElement>("[data-challenge-role]")?.focus();
+  }
+
+  private closeRolePicker(): void {
+    element("role-picker").classList.add("hidden");
+    const trigger = this.rolePickerTrigger;
+    this.rolePickerTrigger = null;
+    trigger?.focus();
   }
 
   private updateHud(): void {
@@ -566,7 +589,7 @@ class StackScene extends Phaser.Scene {
     const p = progressCopy[this.language];
     const s = shareTranslations[this.language];
     const challengeBeat = Boolean(this.challengeTarget && this.layers() > this.challengeTarget.layers);
-    const challengeRole = this.challengeTarget ? s.roleNames[this.challengeTarget.role] : "";
+    const challengeRole = this.challengeTarget ? this.displayChallengeRoleName(s, this.challengeTarget.role) : "";
     element("result-title").textContent = challengeBeat ? s.challengeBeat(challengeRole) : this.lastResultWasBest ? t.newBest : t.resultTitle;
     element("result-layers").textContent = String(this.layers());
     element("share-preview-score").textContent = `${this.layers()} ${t.unit}`;
@@ -590,6 +613,10 @@ class StackScene extends Phaser.Scene {
     element("retry-button").classList.toggle("primary-button", Boolean(this.challengeTarget && !challengeBeat));
     element("retry-button").classList.toggle("retry-button", !(this.challengeTarget && !challengeBeat));
     element("share-card-button").textContent = challengeBeat ? s.challengeBack(challengeRole) : this.challengeTarget ? s.challengeShare : s.shareCard;
+  }
+
+  private displayChallengeRoleName(s: typeof shareTranslations[Language], role: ChallengeRoleKey): string {
+    return role === "self" ? s.friendName : s.roleNames[role];
   }
 
   private refreshThemeSelectors(): void {
@@ -654,18 +681,21 @@ class StackScene extends Phaser.Scene {
       if (label) label.textContent = s.roleNames[role];
     }
     if (this.challengeTarget) {
-      const targetRole = s.roleNames[this.challengeTarget.role];
+      const targetRole = this.displayChallengeRoleName(s, this.challengeTarget.role);
       const avatar = CHALLENGE_ROLES.find(({ key }) => key === this.challengeTarget!.role)!;
       element("challenge-banner").classList.remove("hidden");
       element("challenge-banner-avatar").setAttribute("src", `./friends/${avatar.avatar}.webp`);
       element("challenge-banner-avatar").setAttribute("alt", targetRole);
-      element("challenge-banner-copy").textContent = s.challengeTarget(targetRole, this.challengeTarget.layers);
+      element("challenge-marker-avatar").setAttribute("src", `./friends/${avatar.avatar}.webp`);
+      element("challenge-marker-avatar").setAttribute("alt", targetRole);
+      element("challenge-banner-copy").textContent = s.challengeTarget(targetRole);
       element("challenge-banner-number").textContent = String(this.challengeTarget.layers);
       element("challenge-banner-unit").textContent = translations[this.language].unit;
     } else element("challenge-banner").classList.add("hidden");
     this.refreshThemeSelectors();
     this.updateHud();
     if (this.run.state === "RESULT") this.updateResult();
+    this.refreshChallengeMarkerLayout();
   }
 
   private showToast(message: string, duration: number, celebration: boolean): void {
